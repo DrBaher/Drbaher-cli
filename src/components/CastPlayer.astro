@@ -1,0 +1,23 @@
+---
+export interface Props {
+  /** Path to the .cast file in /public, e.g. /casts/nda-review-quickstart.cast */
+  src: string;
+  /** Display title shown in the terminal header. */
+  title?: string;
+  /** Terminal columns × rows. */
+  cols?: number;
+  rows?: number;
+  /** Extra wrapper classes. */
+  class?: string;
+}
+const { src, title, cols = 88, rows = 20, class: extraClass = '' } = Astro.props as Props;
+---
+<figure class={`not-prose cast-frame ${extraClass}`}>
+  <div class="cast-header">
+    <span class="traffic" style="background:#ff5f57"></span>
+    <span class="traffic" style="background:#febc2e"></span>
+    <span class="traffic" style="background:#28c840"></span>
+    {title ? <span class="ml-2 font-mono text-[11px] uppercase tracking-wider text-cream-50/50">{title}</span> : null}
+  </div>
+  <div data-cast={src} data-cols={cols} data-rows={rows} class="cast-target"></div>
+</figure>

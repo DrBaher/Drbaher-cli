@@ -1,0 +1,146 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Callout from '../components/Callout.astro';
+import CodeBlock from '../components/CodeBlock.astro';
+import TryDemo from '../components/TryDemo.astro';
+---
+<BaseLayout
+  title="Use cases"
+  active="use-cases"
+  description="Concrete vignettes showing how the three CLIs solve real contract-ops problems: vendor onboarding, M&A diligence, employment NDAs."
+  toc
+>
+  <p class="eyebrow">Use cases</p>
+  <h1>Three concrete jobs an agent + human can run together.</h1>
+
+  <p class="text-lg text-ink-700 dark:text-night-100">
+    Each vignette below is structured the same way: an agent does the operational work over the
+    CLIs, and a human approves the gates that need a deliberate gesture (a signature, an
+    escalation override, a final-position acceptance). The shell snippets show what the agent
+    invokes; the bolded steps show where the human steps in.
+  </p>
+
+  <Callout label="Pattern">
+    Agent: <strong>draft</strong> → <strong>review</strong> → <strong>negotiate</strong> →
+    <strong>convert</strong> → <strong>send</strong>. &nbsp;Human: <strong>approve signature</strong>,
+    <strong>resolve escalations</strong>, <strong>sign-off on final agreed text</strong>. Stop
+    wherever you want; pick up where you stopped.
+  </Callout>
+
+  <h2>1. Vendor onboarding NDA at scale</h2>
+
+  <p>
+    You're an ops lead at a 60-person company onboarding 10–20 vendors a quarter. Each one needs an NDA
+    before any technical conversation starts. Today: legal sees every one, slows to a week per vendor.
+  </p>
+
+  <p>
+    With the CLI suite, you push a single house template through <code class="chip">draft</code> with the
+    vendor's details, run <code class="chip">review</code> to confirm it matches policy, hand it to
+    <code class="chip">sign-cli</code>, done in 90 seconds. Legal only gets pinged when
+    <code class="chip">review</code> escalates a finding.
+  </p>
+
+  <CodeBlock label="vendor-onboarding flow">{`# In a CSV with vendor name, address, contact email
+while IFS=, read -r name addr email; do
+  nda-review-cli draft \\
+    --template common-paper-mutual \\
+    --party-a "Acme Inc." --party-a-address "123 Main St" \\
+    --party-b "$name" --party-b-address "$addr" \\
+    --purpose "vendor evaluation" \\
+    --out "out/$name.md" --out-docx "out/$name.docx"
+
+  docx2pdf "out/$name.docx" "out/$name.pdf"
+
+  sign-cli send --file "out/$name.pdf" \\
+    --signer "alice@acme.com:Alice Founder" \\
+    --signer "$email:$name signer" \\
+    --provider sign-well
+done < vendors.csv`}</CodeBlock>
+
+  <p>
+    If <code class="chip">review</code> later flags a counterparty redline that's outside your stance,
+    the negotiation flow takes over — same files, no portal switch.
+  </p>
+
+  <h2>2. M&amp;A diligence — bulk NDAs across deal partners</h2>
+
+  <p>
+    During diligence you need NDAs with bankers, accountants, advisors, target-company employees,
+    sometimes 30+ counterparties in a week. Each one wants their own boilerplate; nobody has time to
+    one-shot-redline that many.
+  </p>
+
+  <p>
+    Run <code class="chip">review --learn-profile</code> on each incoming counterparty so the CLI builds
+    a stance fingerprint per firm. Repeat parties (same banker, different deals) get a consistent stance
+    automatically. When a counterparty's amendments cross your non-negotiable redlines, you escalate to
+    counsel; otherwise the auto-counter does its work.
+  </p>
+
+  <CodeBlock label="diligence — batch review">{`for f in incoming/*.docx; do
+  nda-review-cli review --file "$f" --why \\
+    --counterparty "$(basename "$f" .docx | tr '_' ' ')" \\
+    --learn-profile \\
+    --out-md "review/$(basename "$f" .docx).md"
+done
+
+# Aggregate the review summaries
+nda-review-cli summarize --dir review/ --out review/summary.md`}</CodeBlock>
+
+  <p>
+    Every review writes a hash-chained record — useful when post-close discovery asks who saw what when.
+  </p>
+
+  <h2>3. Employment paperwork — confidentiality + IP assignment</h2>
+
+  <p>
+    Onboarding an engineer needs an NDA, an IP assignment, and often a non-compete (where enforceable).
+    Today: HR sends three docs, each via a different e-sign tool, audit trails scattered across vendor
+    dashboards.
+  </p>
+
+  <p>
+    Bundle the three docs into a single signing flow with <code class="chip">sign-cli send --bulk</code>.
+    The receipt for the whole onboarding lives as one hash-chained file on disk; if the new hire later
+    files a dispute, you can hand the verified bundle to opposing counsel without asking three separate
+    SaaS vendors for export.
+  </p>
+
+  <CodeBlock label="employment onboarding bundle">{`# Single CSV: file, signer email, signer label
+cat > onboarding.csv <<EOF
+nda.pdf,alice@acme.com,Alice (employee)
+ip-assignment.pdf,alice@acme.com,Alice (employee)
+noncompete.pdf,alice@acme.com,Alice (employee)
+EOF
+
+sign-cli send --bulk onboarding.csv \\
+  --provider sign-well \\
+  --receipt-bundle bundles/alice-2025-05-10.json
+
+# Later — verify offline, even years from now
+sign-cli verify bundles/alice-2025-05-10.json`}</CodeBlock>
+
+  <h2>What these have in common</h2>
+
+  <ul>
+    <li><strong>Composable.</strong> Each step is a CLI invocation. You can wire them together with shell scripts, GitHub Actions, n8n, anything.</li>
+    <li><strong>Local artifacts.</strong> Every output lives on disk in a standard format. No "log into the dashboard to download."</li>
+    <li><strong>Agent-friendly.</strong> Same primitives over MCP — your operations agent can run the same flow.</li>
+    <li><strong>Cheap.</strong> The CLIs are free; you only pay your e-sign provider per envelope.</li>
+  </ul>
+
+  <h2>Use cases the CLIs are <em>not</em> ideal for</h2>
+
+  <ul>
+    <li><strong>Cross-team discussion threads.</strong> If finance, legal, and sales all need to comment in one place, you want a SaaS suite. The CLI workflow assumes one operator per document.</li>
+    <li><strong>Procurement orchestration.</strong> Vendors like Coupa or Ironclad plug into a procurement tool's RFP flow. Replicating that with the CLIs is doable but custom.</li>
+    <li><strong>Documents you don't actually want auditable.</strong> If you'd rather logs be vendor-controlled and disposable, this isn't the right shape.</li>
+  </ul>
+
+  <TryDemo
+    href="https://nda-review-cli-production.up.railway.app/"
+    title="Try the review on a sample NDA"
+    blurb="See what the deterministic findings + risk score look like before you script anything around it. ~10 seconds."
+  />
+</BaseLayout>

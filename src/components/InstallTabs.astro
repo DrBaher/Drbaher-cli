@@ -1,0 +1,43 @@
+---
+export interface Tab {
+  id: string;
+  label: string;
+  command: string;
+  note?: string;
+}
+
+export interface Props {
+  /** Stable id for this group (so multiple groups don't collide). */
+  id: string;
+  tabs: Tab[];
+  /** Which tab is active by default. Defaults to first. */
+  defaultTab?: string;
+}
+const { id, tabs, defaultTab } = Astro.props as Props;
+const activeId = defaultTab ?? tabs[0].id;
+---
+<div class="not-prose my-5" data-tabs id={id}>
+  <div role="tablist" class="tabs-bar" aria-label="Install method">
+    {tabs.map(tab => (
+      <button
+        role="tab"
+        type="button"
+        class="tab-btn"
+        data-tab={tab.id}
+        aria-selected={tab.id === activeId ? 'true' : 'false'}
+        aria-controls={`${id}-${tab.id}`}
+      >
+        {tab.label}
+      </button>
+    ))}
+  </div>
+  {tabs.map(tab => (
+    <section role="tabpanel" id={`${id}-${tab.id}`} data-panel={tab.id} hidden={tab.id !== activeId}>
+      <div class="code-shell">
+        <pre class="codeblock"><code>{tab.command}</code></pre>
+        <button class="copy-btn" type="button" aria-label="Copy to clipboard">Copy</button>
+      </div>
+      {tab.note ? <p class="mt-1 text-[12.5px] text-ink-500 dark:text-night-200">{tab.note}</p> : null}
+    </section>
+  ))}
+</div>

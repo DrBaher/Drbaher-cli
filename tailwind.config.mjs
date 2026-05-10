@@ -1,6 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}'],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
@@ -36,11 +37,40 @@ export default {
           100: '#dff2e8',
           200: '#c4e8d6',
         },
+        // Dark-mode palette (warm off-black, not pure)
+        night: {
+          50:  '#e9e6e0',
+          100: '#cdc7bd',
+          200: '#9d9388',
+          300: '#6f6760',
+          400: '#3a3530',
+          500: '#262220',
+          600: '#1c1916',
+          700: '#15120f',
+          800: '#100e0c',
+          900: '#0a0908',
+        },
       },
       fontFamily: {
         serif: ['"Source Serif 4"', '"Source Serif Pro"', 'Georgia', 'ui-serif', 'serif'],
         sans: ['"Inter"', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
         mono: ['"JetBrains Mono"', 'ui-monospace', '"SF Mono"', 'Menlo', 'monospace'],
+      },
+      keyframes: {
+        'flow-dot': {
+          '0%': { offsetDistance: '0%', opacity: '0' },
+          '15%': { opacity: '1' },
+          '85%': { opacity: '1' },
+          '100%': { offsetDistance: '100%', opacity: '0' },
+        },
+        'fade-up': {
+          '0%': { opacity: '0', transform: 'translateY(8px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+      },
+      animation: {
+        'flow-dot': 'flow-dot 3.6s ease-in-out infinite',
+        'fade-up': 'fade-up 0.5s ease-out both',
       },
       typography: ({ theme }) => ({
         DEFAULT: {
@@ -88,6 +118,31 @@ export default {
             },
             'blockquote p:first-of-type::before': { content: '""' },
             'blockquote p:last-of-type::after': { content: '""' },
+          },
+        },
+        invert: {
+          css: {
+            color: theme('colors.night.50'),
+            a: { color: theme('colors.accent.300') },
+            'h1, h2, h3, h4': { color: theme('colors.night.50') },
+            code: {
+              backgroundColor: theme('colors.night.500'),
+              color: theme('colors.night.50'),
+            },
+            pre: {
+              backgroundColor: theme('colors.night.700'),
+              color: theme('colors.night.50'),
+            },
+            blockquote: {
+              backgroundColor: 'rgba(15, 110, 81, 0.08)',
+              color: theme('colors.night.50'),
+              borderLeftColor: theme('colors.accent.400'),
+            },
+            strong: { color: theme('colors.night.50') },
+            'thead th': { color: theme('colors.night.50') },
+            'tbody tr td, tbody tr': { color: theme('colors.night.100') },
+            li: { color: theme('colors.night.100') },
+            p: { color: theme('colors.night.100') },
           },
         },
       }),

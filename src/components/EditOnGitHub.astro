@@ -1,0 +1,16 @@
+---
+export interface Props {
+  /** Path inside the site repo to link to. Defaults to the current page slug. */
+  path?: string;
+}
+const { path } = Astro.props as Props;
+const pathname = Astro.url.pathname.replace(/\/$/, '') || '/';
+const guess = path ?? `src/pages${pathname === '/' ? '/index.astro' : pathname + '.astro'}`;
+const href = `https://github.com/DrBaher/Drbaher-cli/edit/main/${guess.replace(/^\//, '')}`;
+---
+<p class="not-prose mt-8 text-[12.5px] text-ink-500 dark:text-night-200">
+  <a href={href} target="_blank" rel="noopener" class="inline-flex items-center gap-1 hover:text-accent-600 hover:underline dark:hover:text-accent-300">
+    <svg viewBox="0 0 16 16" class="h-3 w-3" aria-hidden="true"><path d="M11.5 1.5l3 3-9 9H2.5v-3l9-9z" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linejoin="round"/></svg>
+    Edit this page on GitHub
+  </a>
+</p>

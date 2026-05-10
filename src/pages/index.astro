@@ -3,33 +3,48 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Callout from '../components/Callout.astro';
 import ToolCard from '../components/ToolCard.astro';
 import WorkflowDiagram from '../components/WorkflowDiagram.astro';
+import TryDemo from '../components/TryDemo.astro';
+import { getCliMeta } from '../data/registry';
+
+const meta = await getCliMeta();
 ---
-<BaseLayout title="Overview" active="overview" description="Three composable, local-first CLIs for the contract workflow: draft and review NDAs, convert documents to PDF, and collect signatures with an audit trail.">
-  <p class="eyebrow">Overview</p>
-  <h1>Three CLIs for the contract workflow.</h1>
-  <p class="text-lg text-ink-700">
-    Draft an NDA against your house playbook. Review what counterparties send you. Negotiate, convert to PDF,
-    collect signatures with a tamper-evident audit trail. Each tool is independently useful; together they
-    cover the full lifecycle from blank page to signed agreement.
-  </p>
+<BaseLayout title="Overview" active="overview" description="Three composable, local-first CLIs built for an agent-driven contract workflow: agents do the operational work, humans approve the gates that matter.">
+  <div class="not-prose hero-band">
+    <p class="eyebrow">Built for the agent era</p>
+    <h1 class="!mt-2">Agents do the work. You approve what matters.</h1>
+    <p class="text-lg text-ink-700 dark:text-night-100 max-w-[62ch]">
+      Three CLIs for the contract workflow — drafting an NDA, reviewing what comes back, negotiating, converting to PDF,
+      collecting signatures with a tamper-evident audit trail. Designed so an LLM agent can run 90% of the operational
+      work and a human stays in the loop only for the gates that actually need a human gesture.
+    </p>
+    <div class="mt-5 flex flex-wrap items-center gap-2 text-[12.5px]">
+      <span class="rounded-md border border-accent-200 bg-accent-50 px-2 py-1 font-mono text-accent-700 dark:border-accent-700/40 dark:bg-accent-900/20 dark:text-accent-300">MCP-native</span>
+      <span class="rounded-md border border-accent-200 bg-accent-50 px-2 py-1 font-mono text-accent-700 dark:border-accent-700/40 dark:bg-accent-900/20 dark:text-accent-300">Hash-chained audit trail</span>
+      <span class="rounded-md border border-accent-200 bg-accent-50 px-2 py-1 font-mono text-accent-700 dark:border-accent-700/40 dark:bg-accent-900/20 dark:text-accent-300">Per-signer approval tokens</span>
+      <span class="rounded-md border border-accent-200 bg-accent-50 px-2 py-1 font-mono text-accent-700 dark:border-accent-700/40 dark:bg-accent-900/20 dark:text-accent-300">Local-first · MIT</span>
+    </div>
+  </div>
 
   <Callout label="TL;DR">
-    Three open-source CLIs, three repositories, one workflow. Local-first by default —
-    no SaaS account, no telemetry, no vendor lock-in. Use them piecemeal or chain them together.
+    Three open-source CLIs, three repositories, one agent-friendly workflow. Local-first by default —
+    no SaaS account, no telemetry, no vendor lock-in. The agent drives via MCP / stdio; the human approves
+    signatures and escalations. Use them piecemeal or chain them together.
   </Callout>
 
-  <h2>The workflow at a glance</h2>
-  <WorkflowDiagram />
+  <h2 data-reveal>The workflow at a glance</h2>
+  <div data-reveal>
+    <WorkflowDiagram />
+  </div>
 
-  <p>
+  <p data-reveal>
     Each box is a separate CLI you install and use on its own. The arrows are file types — the agreed
     text flows out of one tool and into the next. There is no proprietary glue, no shared database,
     no daemon process. Just three command-line tools that read and write standard file formats.
   </p>
 
-  <h2>The tools</h2>
+  <h2 data-reveal>The tools</h2>
 
-  <div class="not-prose mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
+  <div class="not-prose mt-4 grid grid-cols-1 gap-4 md:grid-cols-3" data-reveal>
     <ToolCard
       title="nda-review-cli"
       tagline="Draft, review, and negotiate NDAs against your own house playbook. Deterministic by default; opt-in LLM augmentation."
@@ -38,6 +53,10 @@ import WorkflowDiagram from '../components/WorkflowDiagram.astro';
       href="/tools/nda-review-cli/"
       github="https://github.com/DrBaher/nda-review-cli"
       glyph="◐"
+      version={meta['nda-review-cli'].version}
+      versionSource={meta['nda-review-cli'].source}
+      stars={meta['nda-review-cli'].stars}
+      weeklyDownloads={meta['nda-review-cli'].weeklyDownloads}
     />
     <ToolCard
       title="docx2pdf-cli"
@@ -47,6 +66,10 @@ import WorkflowDiagram from '../components/WorkflowDiagram.astro';
       href="/tools/docx2pdf-cli/"
       github="https://github.com/DrBaher/docx2pdf-cli"
       glyph="⇆"
+      version={meta['docx2pdf-cli'].version}
+      versionSource={meta['docx2pdf-cli'].source}
+      stars={meta['docx2pdf-cli'].stars}
+      weeklyDownloads={meta['docx2pdf-cli'].weeklyDownloads}
     />
     <ToolCard
       title="sign-cli"
@@ -56,22 +79,72 @@ import WorkflowDiagram from '../components/WorkflowDiagram.astro';
       href="/tools/sign-cli/"
       github="https://github.com/DrBaher/sign-cli"
       glyph="✓"
+      version={meta['sign-cli'].version}
+      versionSource={meta['sign-cli'].source}
+      stars={meta['sign-cli'].stars}
+      weeklyDownloads={meta['sign-cli'].weeklyDownloads}
     />
   </div>
+
+  <TryDemo
+    href="https://nda-review-cli-production.up.railway.app/"
+    title="Try the NDA review live"
+    blurb="Sandboxed browser demo runs draft, review, and the negotiation simulator end-to-end. No install. No sign-in."
+  />
+
+  <h2>Built for an agent-driven workflow</h2>
+
+  <p>
+    Most legal-tech assumes a human at a desk: dashboards, threaded comments, in-app redlining.
+    These CLIs assume the opposite — an LLM agent doing the operational work and a human approving
+    the things that legitimately need a human. Drafting, scoring, suggesting amendments, sending,
+    tracking: agent. Signing, escalating non-negotiable conflicts, accepting a final position:
+    human, with a deliberate gesture.
+  </p>
+
+  <div class="not-prose my-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
+    <div class="rounded-lg border border-accent-200 bg-mint-50 p-4 dark:border-accent-700/40 dark:bg-accent-900/15">
+      <div class="font-mono text-[11px] uppercase tracking-[0.14em] text-accent-700 dark:text-accent-300">Agent does</div>
+      <ul class="mt-2 space-y-1 text-[14px] text-ink-800 dark:text-night-100">
+        <li>Drafts NDAs from your house templates</li>
+        <li>Reviews counterparty docs against your policy</li>
+        <li>Proposes amendments using your stance + priorities</li>
+        <li>Sends documents for signature, tracks status</li>
+        <li>Verifies signed PDFs and audit chains</li>
+      </ul>
+    </div>
+    <div class="rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-700/40 dark:bg-amber-900/15">
+      <div class="font-mono text-[11px] uppercase tracking-[0.14em] text-amber-700 dark:text-amber-200">Human approves</div>
+      <ul class="mt-2 space-y-1 text-[14px] text-ink-800 dark:text-night-100">
+        <li>Signing — every signature requires a per-signer token</li>
+        <li>Escalations on non-negotiable redlines</li>
+        <li>Accepting the final agreed position before finalize</li>
+        <li>Anything outside the deterministic policy guardrails</li>
+      </ul>
+    </div>
+  </div>
+
+  <p>
+    The MCP server in <a href="/tools/sign-cli/">sign-cli</a> exposes every command to any
+    MCP-aware client (Claude Code, Cursor, Codex). Same per-signer guardrails — the agent never
+    sees the approval token, the human does. <a href="/mcp/">Read the MCP guide</a> for the wire-up.
+  </p>
 
   <h2>Why three small tools instead of one big platform</h2>
 
   <p>
     Most contract operations products are SaaS suites. They want every step in one dashboard, every
     document in their database, every signature behind their identity provider. That's a fine
-    business model for them, but it makes contract operations expensive, opaque, and hard to leave.
+    business model for them, but it makes contract operations expensive, opaque, and — critically
+    for an agent-driven workflow — hard for an agent to drive without scraping or RPA glue.
   </p>
 
   <p>
     The three CLIs here take the opposite stance. Each does one thing well. None of them require
-    an account, a subscription, or a network call you didn't ask for. You can swap any one of them
-    for an alternative, fork them, or audit the source end to end. Together they cover the same
-    workflow a SaaS suite would, but you keep the documents and the audit trail on your machine.
+    an account, a subscription, or a network call you didn't ask for. An agent can drive them over
+    stdio or MCP; a human can drive them from a terminal. You can swap any one of them, fork them,
+    or audit the source end to end. Together they cover the same workflow a SaaS suite would, with
+    the documents and audit trail on your machine — and an interface an agent can use natively.
   </p>
 
   <h2>Where to go from here</h2>
@@ -82,6 +155,8 @@ import WorkflowDiagram from '../components/WorkflowDiagram.astro';
     <li><a href="/tools/nda-review-cli/">nda-review-cli</a> — drafting, reviewing, and negotiating NDAs against your house policy.</li>
     <li><a href="/tools/docx2pdf-cli/">docx2pdf-cli</a> — DOCX to PDF, honestly. No surprises, no hidden conversions.</li>
     <li><a href="/tools/sign-cli/">sign-cli</a> — multi-provider e-signature with audit-grade evidence.</li>
+    <li><a href="/compare/">Comparison</a> — how the suite stacks up against SaaS contract platforms.</li>
+    <li><a href="/changelog/">Changelog</a> — what's new and what's coming next.</li>
     <li><a href="/principles/">Principles</a> — what these tools have in common and what they refuse to do.</li>
   </ul>
 </BaseLayout>

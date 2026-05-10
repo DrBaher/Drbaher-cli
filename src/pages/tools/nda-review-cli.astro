@@ -1,11 +1,41 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Callout from '../../components/Callout.astro';
+import CodeBlock from '../../components/CodeBlock.astro';
+import CastPlayer from '../../components/CastPlayer.astro';
+import TryDemo from '../../components/TryDemo.astro';
+import FreshHeader from '../../components/FreshHeader.astro';
+import JsonLd from '../../components/JsonLd.astro';
+import { getCliMeta } from '../../data/registry';
+
+const meta = (await getCliMeta())['nda-review-cli'];
+
+const jsonLd = {
+  '@type': 'SoftwareApplication',
+  name: 'nda-review-cli',
+  applicationCategory: 'DeveloperApplication',
+  operatingSystem: 'macOS, Linux, Windows',
+  softwareVersion: meta.version,
+  programmingLanguage: 'Python',
+  license: 'https://opensource.org/licenses/MIT',
+  url: 'https://drbaher-cli.vercel.app/tools/nda-review-cli/',
+  codeRepository: 'https://github.com/DrBaher/nda-review-cli',
+  description: 'Draft, review, and negotiate NDAs against your own house playbook. Deterministic by default; opt-in LLM augmentation. Stdlib-only Python.',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+};
 ---
-<BaseLayout title="nda-review-cli" active="tools/nda-review-cli" description="Draft, review, and negotiate NDAs against your own house playbook. Deterministic by default, with optional LLM augmentation. Stdlib-only Python.">
+<BaseLayout
+  title="nda-review-cli"
+  active="tools/nda-review-cli"
+  description="Draft, review, and negotiate NDAs against your own house playbook. Deterministic by default, with optional LLM augmentation. Stdlib-only Python."
+  withCasts
+  toc
+>
+  <JsonLd data={jsonLd} />
   <p class="eyebrow">Tool · Python</p>
   <h1><span class="font-mono">nda-review-cli</span></h1>
-  <p class="text-lg text-ink-700">
+  <FreshHeader name="nda-review-cli" version={meta.version} source={meta.source} fetchedAt={meta.fetchedAt} stars={meta.stars} weeklyDownloads={meta.weeklyDownloads} github="https://github.com/DrBaher/nda-review-cli" />
+  <p class="text-lg text-ink-700 dark:text-night-100">
     Draft, review, and negotiate NDAs against your own house playbook. Deterministic by default;
     opt-in second-pass LLM adjudication via the model of your choice. Stdlib-only Python — single
     file, no SDKs, no telemetry.
@@ -16,6 +46,29 @@ import Callout from '../../components/Callout.astro';
     to set your house policy, then <code class="chip">draft</code> / <code class="chip">review</code> /
     <code class="chip">negotiate</code> for the full workflow.
   </Callout>
+
+  <CastPlayer src="/casts/nda-review-quickstart.cast" title="nda-review-cli — quickstart + review" />
+
+  <h2>Try it without installing</h2>
+  <p>The full draft / review / simulator demo runs in a sandbox below — no install, no signup. Reset every 30 minutes.</p>
+
+  <div class="not-prose my-4 overflow-hidden rounded-lg border border-ink-700/15 bg-night-900 shadow-[0_4px_24px_rgba(0,0,0,0.06)] dark:border-night-300/15">
+    <div class="flex items-center gap-2 border-b border-white/10 px-3 py-2">
+      <span class="h-2.5 w-2.5 rounded-full bg-[#ff5f57]"></span>
+      <span class="h-2.5 w-2.5 rounded-full bg-[#febc2e]"></span>
+      <span class="h-2.5 w-2.5 rounded-full bg-[#28c840]"></span>
+      <span class="ml-2 font-mono text-[11px] uppercase tracking-wider text-cream-50/50">nda-review-cli — live sandbox</span>
+      <a href="https://nda-review-cli-production.up.railway.app/" target="_blank" rel="noopener" class="ml-auto font-mono text-[11px] text-cream-50/60 hover:text-cream-50">open in new tab ↗</a>
+    </div>
+    <iframe
+      src="https://nda-review-cli-production.up.railway.app/"
+      title="nda-review-cli live demo"
+      loading="lazy"
+      sandbox="allow-scripts allow-same-origin allow-forms"
+      referrerpolicy="no-referrer"
+      class="h-[640px] w-full bg-white"
+    ></iframe>
+  </div>
 
   <h2>What it does</h2>
 
@@ -35,22 +88,22 @@ import Callout from '../../components/Callout.astro';
     red-flag patterns, negotiation stance, clause priorities, non-negotiable redlines.
   </p>
 
-  <pre class="codeblock"><code>pipx install nda-review-cli
+  <CodeBlock>{`pipx install nda-review-cli
 nda-review-cli quickstart            # 16 questions, 3 minutes
-nda-review-cli tutorial              # interactive primer + sandboxed sample review</code></pre>
+nda-review-cli tutorial              # interactive primer + sandboxed sample review`}</CodeBlock>
 
   <h2>Drafting</h2>
 
   <p>Three bundled templates, plus <code class="chip">--template-file</code> to bring your own.</p>
-  <pre class="codeblock"><code># Common Paper Mutual NDA — bundled, CC BY 4.0, attribution preserved
-nda-review-cli draft --template common-paper-mutual \
-  --party-a "Acme Inc." --party-a-address "123 Main St" \
-  --party-b "Beta LLC"  --party-b-address "10 Market Way" \
-  --purpose "evaluating a partnership" \
-  --governing-law "California" \
-  --out output/nda.md \
-  --out-docx output/nda.docx \
-  --review-after</code></pre>
+  <CodeBlock label="draft">{`# Common Paper Mutual NDA — bundled, CC BY 4.0, attribution preserved
+nda-review-cli draft --template common-paper-mutual \\
+  --party-a "Acme Inc." --party-a-address "123 Main St" \\
+  --party-b "Beta LLC"  --party-b-address "10 Market Way" \\
+  --purpose "evaluating a partnership" \\
+  --governing-law "California" \\
+  --out output/nda.md \\
+  --out-docx output/nda.docx \\
+  --review-after`}</CodeBlock>
 
   <h2>Reviewing</h2>
 
@@ -61,9 +114,9 @@ nda-review-cli draft --template common-paper-mutual \
     adds ones the rules missed, and proposes replacement clause language for high-severity items.
   </p>
 
-  <pre class="codeblock"><code>nda-review-cli review --file path/to/incoming.docx --why \
-  --counterparty "Vendor Co" --learn-profile \
-  --out-md output/review.md</code></pre>
+  <CodeBlock label="review">{`nda-review-cli review --file path/to/incoming.docx --why \\
+  --counterparty "Vendor Co" --learn-profile \\
+  --out-md output/review.md`}</CodeBlock>
 
   <h2>Two-party negotiation</h2>
 
@@ -73,6 +126,8 @@ nda-review-cli draft --template common-paper-mutual \
     tampering is detected on load. <a href="/workflow/#3--negotiate">See the workflow page</a>
     for the full sequence.
   </p>
+
+  <CastPlayer src="/casts/nda-review-negotiate.cast" title="nda-review-cli — negotiate flow" />
 
   <p>
     Three counter modes: hand-written amendments (<code class="chip">--amendments-file</code>),
@@ -108,14 +163,6 @@ nda-review-cli draft --template common-paper-mutual \
     Wire it to <a href="/tools/docx2pdf-cli/"><code class="chip">docx2pdf-cli</code></a> and
     <a href="/tools/sign-cli/"><code class="chip">sign-cli</code></a> for the full pipeline,
     or any other tool of your choosing.
-  </p>
-
-  <h2>Try it without installing</h2>
-
-  <p>
-    The repo ships a sandboxed web demo (<code class="chip">python3 web/server.py</code> in a fresh
-    clone) with three flows: draft, review, and the game-theoretic simulator. Same code path as the
-    installed CLI; no LLM features wired up so it stays cost-bounded and safe.
   </p>
 
   <h2>Repo</h2>

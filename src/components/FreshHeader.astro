@@ -1,0 +1,46 @@
+---
+import { fmtCount } from '../data/registry';
+
+export interface Props {
+  name: string;
+  version?: string;
+  source?: 'npm' | 'pypi' | 'repo' | 'fallback';
+  fetchedAt?: string;
+  stars?: number;
+  weeklyDownloads?: number;
+  github?: string;
+}
+const { name, version, source, fetchedAt, stars, weeklyDownloads, github } = Astro.props as Props;
+const sourceLabel =
+  source === 'npm'  ? 'npm' :
+  source === 'pypi' ? 'PyPI' :
+  source === 'repo' ? 'repo pyproject.toml' :
+  'fallback';
+const fetchedDate = fetchedAt ? new Date(fetchedAt).toUTCString().slice(0, 16) : null;
+const starsLabel = fmtCount(stars);
+const dlLabel = fmtCount(weeklyDownloads);
+---
+<div class="not-prose mb-4 flex flex-wrap items-center gap-2 text-[12.5px]">
+  {version ? (
+    <span class="inline-flex items-center gap-1.5 rounded-md border border-accent-200 bg-accent-50 px-2 py-1 font-mono text-accent-700 dark:border-accent-700/40 dark:bg-accent-900/20 dark:text-accent-300">
+      <span class="inline-block h-1.5 w-1.5 rounded-full bg-accent-500"></span>
+      {name} v{version}
+    </span>
+  ) : null}
+  {starsLabel && github ? (
+    <a href={github} target="_blank" rel="noopener" title={`${stars} stars on GitHub`} class="inline-flex items-center gap-1 rounded-md border border-ink-700/15 bg-cream-50 px-2 py-1 font-medium text-ink-700 hover:border-accent-300 hover:text-accent-700 dark:border-night-300/20 dark:bg-night-700 dark:text-night-100 dark:hover:text-accent-300">
+      <svg viewBox="0 0 16 16" class="h-3 w-3 fill-current" aria-hidden="true"><path d="M8 .25l2.351 4.764 5.257.764-3.804 3.708.898 5.236L8 12.247l-4.702 2.475.898-5.236L.392 5.778l5.257-.764L8 .25z"/></svg>
+      {starsLabel}
+    </a>
+  ) : null}
+  {dlLabel ? (
+    <span title={`${weeklyDownloads} npm downloads in the last 7 days`} class="inline-flex items-center gap-1 rounded-md border border-ink-700/15 bg-cream-50 px-2 py-1 text-ink-700 dark:border-night-300/20 dark:bg-night-700 dark:text-night-100">
+      <svg viewBox="0 0 16 16" class="h-3 w-3 fill-current" aria-hidden="true"><path d="M8 1v8.59l3.3-3.3 1.41 1.42L8 12.41 3.29 7.71l1.42-1.42L8 9.59V1h0zM2 13h12v2H2v-2z"/></svg>
+      {dlLabel}/wk on npm
+    </span>
+  ) : null}
+  <span class="text-ink-500 dark:text-night-200">
+    {version ? `Latest from ${sourceLabel}` : 'version unavailable'}
+    {fetchedDate ? ` · checked ${fetchedDate}` : ''}
+  </span>
+</div>

@@ -1,0 +1,52 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const entries = (await getCollection('changelog')).sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime(),
+);
+
+const cliColor: Record<string, string> = {
+  'nda-review-cli': 'bg-accent-50 text-accent-700 border-accent-200 dark:bg-accent-900/20 dark:text-accent-300 dark:border-accent-700/40',
+  'sign-cli':       'bg-blue-50  text-blue-700  border-blue-200  dark:bg-blue-900/20  dark:text-blue-200  dark:border-blue-700/40',
+  'docx2pdf-cli':   'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/20 dark:text-amber-200 dark:border-amber-700/40',
+  'site':           'bg-cream-200 text-ink-700 border-ink-700/15 dark:bg-night-500 dark:text-night-100 dark:border-night-300/20',
+};
+
+function fmt(d: Date) {
+  return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+}
+---
+<BaseLayout title="Changelog" active="changelog" description="Release notes and roadmap items for nda-review-cli, sign-cli, docx2pdf-cli, and this site.">
+  <p class="eyebrow">Changelog</p>
+  <h1>What's new across the suite.</h1>
+
+  <p class="text-lg text-ink-700 dark:text-night-100">
+    Notable releases for each CLI plus this site. Filed in reverse chronological order.
+    Subscribe by watching <a href="https://github.com/DrBaher" target="_blank" rel="noopener">@DrBaher</a> on GitHub for everything.
+  </p>
+
+  <ol class="not-prose mt-8 space-y-8">
+    {entries.map(async (entry) => {
+      const { Content } = await entry.render();
+      const colorCls = cliColor[entry.data.cli] ?? cliColor.site;
+      return (
+        <li class="border-l-2 border-ink-700/15 pl-6 dark:border-night-300/20">
+          <div class="flex flex-wrap items-center gap-2 text-[12.5px]">
+            <span class={`inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 font-mono ${colorCls}`}>
+              {entry.data.cli}{entry.data.version ? ` v${entry.data.version}` : ''}
+            </span>
+            <span class="text-ink-500 dark:text-night-200">{fmt(entry.data.date)}</span>
+            {entry.data.tags.map(t => (
+              <span class="rounded bg-cream-200 px-1.5 py-0.5 font-mono text-[11px] text-ink-700 dark:bg-night-500 dark:text-night-100">{t}</span>
+            ))}
+          </div>
+          <h2 class="mt-2 font-serif text-xl font-semibold text-ink-900 dark:text-night-50">{entry.data.title}</h2>
+          <div class="prose prose-ink mt-2 max-w-none dark:prose-invert prose-headings:font-serif prose-h2:text-base prose-h3:text-base">
+            <Content />
+          </div>
+        </li>
+      );
+    })}
+  </ol>
+</BaseLayout>

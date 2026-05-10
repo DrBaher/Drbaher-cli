@@ -3,19 +3,48 @@
 @tailwind utilities;
 
 /* Self-host nothing; use Google Fonts via the layout <head> link.
-   These rules set the page-level defaults that match peekaboo-style
-   docs sites: warm cream background, generous body line-height,
-   serif headings with confident sizing. */
+   Page-level defaults that match peekaboo-style docs sites: warm cream
+   background, generous body line-height, serif headings with confident sizing.
+   Dark mode mirrors the same palette in warm off-blacks. */
 
 @layer base {
   :root {
     color-scheme: light;
     --max-content: 720px;
   }
+  .dark {
+    color-scheme: dark;
+  }
+
+  /* Visible focus ring on every keyboard-focused interactive — accessibility win. */
+  :focus-visible {
+    outline: 2px solid theme('colors.accent.500');
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+  .dark :focus-visible {
+    outline-color: theme('colors.accent.300');
+  }
+  /* The body of the page itself doesn't need a ring on focus. */
+  body:focus-visible, main:focus-visible, article:focus-visible { outline: none; }
+
+  /* Heading anchor: hidden until heading is hovered/focused. */
+  .heading-anchor {
+    @apply ml-2 text-ink-400 no-underline opacity-0 transition-opacity dark:text-night-200;
+  }
+  h2:hover .heading-anchor,
+  h3:hover .heading-anchor,
+  .heading-anchor:focus-visible { opacity: 1; }
+  .heading-anchor:hover { @apply text-accent-600 dark:text-accent-300; }
 
   html {
     background-color: theme('colors.cream.50');
     color: theme('colors.ink.800');
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+  .dark html, html.dark {
+    background-color: theme('colors.night.700');
+    color: theme('colors.night.50');
   }
 
   body {
@@ -25,6 +54,7 @@
     -moz-osx-font-smoothing: grayscale;
     line-height: 1.6;
   }
+  .dark body { background-color: theme('colors.night.700'); color: theme('colors.night.50'); }
 
   h1, h2, h3, h4 {
     font-family: theme('fontFamily.serif');
@@ -32,59 +62,139 @@
     font-weight: 600;
     letter-spacing: -0.01em;
   }
+  .dark h1, .dark h2, .dark h3, .dark h4 { color: theme('colors.night.50'); }
 
   code, pre, kbd, samp {
     font-family: theme('fontFamily.mono');
   }
 
-  /* Selection in the accent green so highlights feel branded */
   ::selection {
     background-color: theme('colors.accent.100');
     color: theme('colors.accent.900');
   }
+  .dark ::selection {
+    background-color: theme('colors.accent.700');
+    color: theme('colors.accent.50');
+  }
 
-  /* Scrollbar restraint on the sidebar */
   .nice-scroll::-webkit-scrollbar { width: 8px; height: 8px; }
   .nice-scroll::-webkit-scrollbar-thumb { background-color: theme('colors.cream.200'); border-radius: 4px; }
   .nice-scroll::-webkit-scrollbar-thumb:hover { background-color: theme('colors.ink.400'); }
+  .dark .nice-scroll::-webkit-scrollbar-thumb { background-color: theme('colors.night.400'); }
+  .dark .nice-scroll::-webkit-scrollbar-thumb:hover { background-color: theme('colors.night.300'); }
+
+  /* Reveal-on-scroll utility — opt-in via [data-reveal] */
+  [data-reveal] { opacity: 0; transform: translateY(8px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  [data-reveal].is-visible { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) {
+    [data-reveal] { opacity: 1; transform: none; transition: none; }
+  }
 }
 
 @layer components {
-  /* Inline pill — used in nav buttons, version badge, etc. */
   .pill {
     @apply inline-flex items-center gap-1.5 rounded-md border border-ink-700/15 bg-cream-100 px-2.5 py-1 text-sm font-medium text-ink-800 transition-colors hover:bg-cream-200;
   }
+  .dark .pill {
+    @apply border-night-300/30 bg-night-500 text-night-50 hover:bg-night-400;
+  }
 
-  /* Inline code chip variant — like peekaboo's <code> in body text */
   .chip {
     @apply rounded border border-ink-700/10 bg-cream-200 px-1.5 py-0.5 font-mono text-[0.85em] text-ink-900;
   }
+  .dark .chip {
+    @apply border-night-300/20 bg-night-500 text-night-50;
+  }
 
-  /* Section-header eyebrow above a big heading */
   .eyebrow {
     @apply text-xs font-semibold uppercase tracking-[0.18em] text-accent-600;
   }
+  .dark .eyebrow { @apply text-accent-300; }
 
-  /* TL;DR / callout block — left-border + tinted background */
   .callout {
     @apply my-6 rounded-r border-l-2 border-accent-600 bg-mint-50 px-5 py-3.5 text-ink-800;
   }
+  .dark .callout {
+    @apply border-accent-400 bg-accent-900/30 text-night-50;
+  }
 
-  /* Pre/code block (when not inside .prose) */
   .codeblock {
     @apply rounded-md bg-ink-900 p-4 text-[13px] leading-relaxed text-cream-50 overflow-x-auto;
   }
+  .dark .codeblock {
+    @apply bg-night-800;
+  }
 
-  /* Sidebar nav link */
   .nav-link {
     @apply block rounded-md px-3 py-1.5 text-[14px] text-ink-700 transition-colors hover:bg-cream-200;
   }
   .nav-link.active {
     @apply bg-accent-50 font-medium text-accent-700;
   }
+  .dark .nav-link {
+    @apply text-night-100 hover:bg-night-500;
+  }
+  .dark .nav-link.active {
+    @apply bg-accent-900/40 text-accent-200;
+  }
 
-  /* Sidebar section header */
   .nav-section {
     @apply px-3 pb-1.5 pt-5 text-[11px] font-semibold uppercase tracking-[0.16em] text-ink-500;
   }
+  .dark .nav-section { @apply text-night-200; }
+
+  /* Code-with-copy block — wraps a <pre> and adds a copy button */
+  .code-shell {
+    @apply relative;
+  }
+  .code-shell .copy-btn {
+    @apply absolute right-2 top-2 inline-flex items-center gap-1 rounded-md border border-white/10 bg-white/5 px-2 py-1 font-mono text-[11px] uppercase tracking-wider text-cream-50/70 opacity-0 transition-opacity hover:bg-white/10 hover:text-cream-50 focus:opacity-100;
+  }
+  .code-shell:hover .copy-btn { opacity: 1; }
+  .code-shell .copy-btn[data-state="copied"] {
+    @apply text-accent-200 border-accent-400/30 opacity-100;
+  }
+
+  /* Install method tabs */
+  .tabs-bar {
+    @apply mb-2 inline-flex flex-wrap gap-1 rounded-lg border border-ink-700/15 bg-cream-100 p-1 text-[13px];
+  }
+  .dark .tabs-bar { @apply border-night-300/20 bg-night-500; }
+  .tab-btn {
+    @apply rounded-md px-3 py-1 font-mono text-ink-600 transition-colors hover:text-ink-900;
+  }
+  .dark .tab-btn { @apply text-night-100 hover:text-night-50; }
+  .tab-btn[aria-selected="true"] {
+    @apply bg-white text-ink-900 shadow-[0_1px_2px_rgba(0,0,0,0.06)];
+  }
+  .dark .tab-btn[aria-selected="true"] { @apply bg-night-700 text-night-50 shadow-[0_1px_2px_rgba(0,0,0,0.4)]; }
+
+  /* Cast-frame — outer chrome around asciinema-player */
+  .cast-frame {
+    @apply my-6 overflow-hidden rounded-lg border border-ink-700/15 bg-night-900 shadow-[0_4px_24px_rgba(0,0,0,0.06)];
+  }
+  .cast-frame .cast-header {
+    @apply flex items-center gap-2 border-b border-white/10 px-3 py-2;
+  }
+  .cast-frame .traffic {
+    @apply h-2.5 w-2.5 rounded-full;
+  }
+
+  /* Sidebar-aware theme toggle button */
+  .theme-toggle {
+    @apply inline-flex h-7 w-7 items-center justify-center rounded-md text-ink-600 transition-colors hover:bg-cream-200 hover:text-ink-900;
+  }
+  .dark .theme-toggle { @apply text-night-100 hover:bg-night-500 hover:text-night-50; }
+
+  /* Hero banner used on homepage and tool pages */
+  .hero-band {
+    @apply -mx-5 mb-8 rounded-none bg-gradient-to-br from-mint-50 via-cream-50 to-cream-100 px-5 py-8 sm:mx-0 sm:rounded-xl sm:px-8 sm:py-10;
+  }
+  .dark .hero-band {
+    @apply bg-gradient-to-br from-night-600 via-night-700 to-night-800;
+  }
 }
+
+/* asciinema-player overrides for visual consistency */
+.cast-frame .asciinema-player-wrapper { background: transparent !important; }
+.cast-frame .ap-player { font-family: theme('fontFamily.mono') !important; font-size: 13px !important; }

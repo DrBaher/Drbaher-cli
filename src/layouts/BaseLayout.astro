@@ -2,17 +2,32 @@
 import '../styles/global.css';
 import Sidebar from '../components/Sidebar.astro';
 import Footer from '../components/Footer.astro';
+import SearchPalette from '../components/SearchPalette.astro';
+import EditOnGitHub from '../components/EditOnGitHub.astro';
+import TOC from '../components/TOC.astro';
+
+const PLAUSIBLE_DOMAIN = import.meta.env.PUBLIC_PLAUSIBLE_DOMAIN || '';
 
 export interface Props {
   title: string;
   description?: string;
-  /** Active path key for sidebar highlight (e.g. 'overview', 'workflow', 'tools/nda-review-cli'). */
   active?: string;
+  /** Override the OG image. By default we derive it from `active` (e.g. /og/workflow.png). */
+  image?: string;
+  /** If true, load the asciinema-player JS/CSS for casts on this page. */
+  withCasts?: boolean;
+  /** If true, render the right-rail TOC. */
+  toc?: boolean;
+  /** Override the "Edit on GitHub" file path. */
+  editPath?: string;
 }
 
-const { title, description, active } = Astro.props as Props;
+const { title, description, active, image, withCasts = false, toc = false, editPath } = Astro.props as Props;
 const fullTitle = title === 'Overview' ? 'CLI tools for the contract workflow' : `${title} — CLI tools for contracts`;
 const desc = description ?? 'Three composable, local-first CLIs for drafting, reviewing, signing, and converting contracts. Open source, deterministic, no SaaS.';
+const ogPath = image ?? `/og/${active ?? 'default'}.png`;
+const ogImageAbs = new URL(ogPath, Astro.site ?? 'https://drbaher-cli.vercel.app').toString();
+const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://drbaher-cli.vercel.app').toString();
 ---
 <!doctype html>
 <html lang="en">
@@ -22,38 +37,228 @@ const desc = description ?? 'Three composable, local-first CLIs for drafting, re
   <meta name="generator" content={Astro.generator} />
   <title>{fullTitle}</title>
   <meta name="description" content={desc} />
+  <link rel="canonical" href={canonical} />
+
   <meta property="og:title" content={fullTitle} />
   <meta property="og:description" content={desc} />
   <meta property="og:type" content="website" />
+  <meta property="og:image" content={ogImageAbs} />
+  <meta property="og:url" content={canonical} />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={fullTitle} />
+  <meta name="twitter:description" content={desc} />
+  <meta name="twitter:image" content={ogImageAbs} />
+
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="alternate" type="application/rss+xml" title="drbaher CLI suite — changelog" href="/changelog/rss.xml" />
+
+  <!-- Preconnect to font CDNs early. -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link
+    rel="preload"
+    as="style"
+    href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+  />
+  <link
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+  />
+
+  {withCasts && (
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+  )}
+
+  {PLAUSIBLE_DOMAIN && (
+    <script defer is:inline data-domain={PLAUSIBLE_DOMAIN} src="https://plausible.io/js/script.js"></script>
+  )}
+
+  <script is:inline>
+    // Apply theme as early as possible to avoid FOUC.
+    (function () {
+      try {
+        const saved = localStorage.getItem('theme');
+        const sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const useDark = saved ? saved === 'dark' : sysDark;
+        if (useDark) document.documentElement.classList.add('dark');
+      } catch (e) { /* localStorage unavailable */ }
+    })();
+  </script>
 </head>
-<body class="min-h-screen bg-cream-50 text-ink-800 antialiased">
+<body class="min-h-screen bg-cream-50 text-ink-800 antialiased dark:bg-night-700 dark:text-night-50">
   <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded focus:bg-ink-900 focus:px-3 focus:py-1.5 focus:text-cream-50">Skip to content</a>
 
   <div class="mx-auto flex max-w-[1180px] flex-col lg:grid lg:grid-cols-[260px_1fr]">
     <Sidebar active={active} />
 
     <main id="main" class="min-w-0 px-5 py-8 sm:px-8 lg:px-10 lg:py-12">
-      <article class="prose prose-ink max-w-none">
+      <article class="prose prose-ink max-w-none dark:prose-invert" data-pagefind-body>
         <slot />
       </article>
+      <EditOnGitHub path={editPath} />
       <Footer />
     </main>
   </div>
 
+  {toc && <TOC />}
+  <SearchPalette />
+
   <script>
-    // Mobile sidebar toggle (no framework — vanilla)
+    // Mobile sidebar toggle
     const btn = document.getElementById('nav-toggle');
     const sidebar = document.getElementById('sidebar');
-    const close = document.getElementById('nav-close');
-    function open() { sidebar?.classList.remove('hidden'); sidebar?.classList.add('flex'); document.body.classList.add('overflow-hidden'); }
-    function shut() { sidebar?.classList.add('hidden'); sidebar?.classList.remove('flex'); document.body.classList.remove('overflow-hidden'); }
-    btn?.addEventListener('click', open);
-    close?.addEventListener('click', shut);
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') shut(); });
+    const closeBtn = document.getElementById('nav-close');
+    function openNav() { sidebar?.classList.remove('hidden'); sidebar?.classList.add('flex'); document.body.classList.add('overflow-hidden'); }
+    function shutNav() { sidebar?.classList.add('hidden'); sidebar?.classList.remove('flex'); document.body.classList.remove('overflow-hidden'); }
+    btn?.addEventListener('click', openNav);
+    closeBtn?.addEventListener('click', shutNav);
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') shutNav(); });
+
+    // Theme toggle
+    const themeBtns = document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]');
+    function applyTheme(t: string) {
+      const html = document.documentElement;
+      if (t === 'dark') html.classList.add('dark'); else html.classList.remove('dark');
+      themeBtns.forEach(b => b.setAttribute('data-current', t));
+      try { localStorage.setItem('theme', t); } catch {}
+    }
+    themeBtns.forEach(b => {
+      b.setAttribute('data-current', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+      b.addEventListener('click', () => {
+        const cur = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+        applyTheme(cur === 'dark' ? 'light' : 'dark');
+      });
+    });
+
+    // Copy-to-clipboard for .code-shell blocks
+    document.querySelectorAll<HTMLElement>('.code-shell').forEach(shell => {
+      const pre = shell.querySelector('pre');
+      const cb = shell.querySelector<HTMLButtonElement>('.copy-btn');
+      if (!pre || !cb) return;
+      cb.addEventListener('click', async () => {
+        const text = pre.innerText;
+        try {
+          await navigator.clipboard.writeText(text);
+          cb.setAttribute('data-state', 'copied');
+          cb.textContent = 'Copied';
+          setTimeout(() => { cb.removeAttribute('data-state'); cb.textContent = 'Copy'; }, 1600);
+        } catch {
+          cb.textContent = 'Press ⌘C';
+        }
+      });
+    });
+
+    // Install-method tabs
+    document.querySelectorAll<HTMLElement>('[data-tabs]').forEach(group => {
+      const buttons = group.querySelectorAll<HTMLButtonElement>('[role=tab]');
+      const panels = group.querySelectorAll<HTMLElement>('[role=tabpanel]');
+      buttons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const target = btn.getAttribute('data-tab');
+          buttons.forEach(b => b.setAttribute('aria-selected', b === btn ? 'true' : 'false'));
+          panels.forEach(p => {
+            const match = p.getAttribute('data-panel') === target;
+            p.hidden = !match;
+          });
+        });
+      });
+    });
+
+    // Reveal-on-scroll
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver(entries => {
+        entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('is-visible'); io.unobserve(e.target); } });
+      }, { rootMargin: '0px 0px -8% 0px', threshold: 0.05 });
+      document.querySelectorAll('[data-reveal]').forEach(el => io.observe(el));
+    } else {
+      document.querySelectorAll('[data-reveal]').forEach(el => el.classList.add('is-visible'));
+    }
+
+    // Heading anchor links — slugify in-page H2/H3, attach a "#" link on hover.
+    function slugify(s: string): string {
+      return s.toLowerCase().replace(/[^\w\s-]/g, '').trim().replace(/\s+/g, '-').slice(0, 60) || 'section';
+    }
+    const article = document.querySelector('article[data-pagefind-body]');
+    if (article) {
+      const used = new Set<string>();
+      article.querySelectorAll<HTMLHeadingElement>('h2, h3').forEach(h => {
+        if (!h.id) {
+          let s = slugify(h.textContent || '');
+          let n = 2;
+          while (used.has(s)) { s = `${slugify(h.textContent || '')}-${n++}`; }
+          used.add(s);
+          h.id = s;
+        } else {
+          used.add(h.id);
+        }
+        // Skip if heading already has an autolinked anchor (from rehype on .md content).
+        if (h.querySelector('a.heading-anchor')) return;
+        const a = document.createElement('a');
+        a.href = '#' + h.id;
+        a.className = 'heading-anchor';
+        a.setAttribute('aria-label', 'Permalink to this heading');
+        a.textContent = '#';
+        h.appendChild(a);
+        a.addEventListener('click', async (ev) => {
+          ev.preventDefault();
+          const url = window.location.origin + window.location.pathname + '#' + h.id;
+          history.replaceState(null, '', '#' + h.id);
+          try {
+            await navigator.clipboard.writeText(url);
+            const old = a.textContent;
+            a.textContent = '✓';
+            setTimeout(() => { a.textContent = old; }, 1200);
+          } catch { /* clipboard unavailable */ }
+          h.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      });
+    }
   </script>
+
+  {withCasts && (
+    <script type="module" is:inline>
+      // Defer the asciinema bundle until the player is needed.
+      // Each cast becomes click-to-play; loaders fire only when a target enters viewport.
+      (function () {
+        const targets = document.querySelectorAll('[data-cast]');
+        if (!targets.length) return;
+        let loaded = null;
+        async function loadPlayer() {
+          if (loaded) return loaded;
+          // Inject CSS once.
+          if (!document.querySelector('link[data-asciinema]')) {
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = 'https://cdn.jsdelivr.net/npm/asciinema-player@3.7.1/dist/bundle/asciinema-player.css';
+            link.dataset.asciinema = '1';
+            document.head.appendChild(link);
+          }
+          loaded = import('https://cdn.jsdelivr.net/npm/asciinema-player@3.7.1/dist/bundle/asciinema-player.min.js');
+          return loaded;
+        }
+        const io = new IntersectionObserver(async (entries) => {
+          for (const e of entries) {
+            if (!e.isIntersecting) continue;
+            io.unobserve(e.target);
+            const Player = await loadPlayer();
+            const cast = e.target.getAttribute('data-cast');
+            const cols = parseInt(e.target.getAttribute('data-cols') || '88', 10);
+            const rows = parseInt(e.target.getAttribute('data-rows') || '20', 10);
+            Player.create(cast, e.target, {
+              cols, rows,
+              autoPlay: true,
+              loop: true,
+              idleTimeLimit: 1.5,
+              theme: 'asciinema',
+              fit: 'width',
+              poster: 'npt:0:0',
+            });
+          }
+        }, { rootMargin: '200px' });
+        targets.forEach(t => io.observe(t));
+      })();
+    </script>
+  )}
 </body>
 </html>

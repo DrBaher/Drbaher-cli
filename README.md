@@ -19,9 +19,11 @@ npm run dev
 ## Build
 
 ```bash
-npm run build      # outputs static site to dist/
+npm run build      # astro build + pagefind index → dist/
 npm run preview    # serves the build at http://localhost:4321
 ```
+
+The build step has two parts: Astro generates the HTML/CSS/PNG assets (including dynamic OG images via `satori`), then Pagefind indexes the rendered pages and writes the search index to `dist/pagefind/`.
 
 ## Deploying
 
@@ -33,50 +35,94 @@ vercel        # follow the prompts
 # or just push to the linked GitHub repo and Vercel deploys automatically
 ```
 
-`vercel.json` declares `framework: astro`, `outputDirectory: dist`, and a few security headers (X-Content-Type-Options, X-Frame-Options, Referrer-Policy). No environment variables required.
+`vercel.json` declares `framework: astro`, `outputDirectory: dist`, and a few security headers. No required environment variables.
 
-GitHub Pages also works — point Pages at the built `dist/` directory and use the included `astro build` output.
+### Optional: privacy-respecting analytics
+
+To enable Plausible analytics, set the env var on Vercel (Settings → Environment Variables):
+
+```
+PUBLIC_PLAUSIBLE_DOMAIN=drbaher-cli.vercel.app
+```
+
+The script only loads when the variable is set; locally it's a no-op.
 
 ## Structure
 
 ```
 src/
-  layouts/BaseLayout.astro        page shell with sidebar + footer
+  layouts/BaseLayout.astro        page shell, head meta, hotkeys, theme toggle
   components/
-    Sidebar.astro                 sticky nav with section headers
+    Sidebar.astro                 sticky nav with section headers + search trigger
     Footer.astro                  cross-link footer
     Callout.astro                 TL;DR / heads-up boxes
-    ToolCard.astro                overview-page card per CLI
-    WorkflowDiagram.astro         SVG of the 5-step pipeline
+    CodeBlock.astro               <pre> with copy-to-clipboard button
+    InstallTabs.astro             install-method tabs (pipx/pip/npm/etc.)
+    ToolCard.astro                overview-page card per CLI (with live version badge)
+    WorkflowDiagram.astro         SVG of the 5-step pipeline (animated)
+    CastPlayer.astro              asciinema-player wrapper
+    TryDemo.astro                 "live demo" CTA panel
+    FreshHeader.astro             live-version badge for tool pages
+    SearchPalette.astro           cmd+K command palette + Pagefind search
+  data/
+    registry.ts                   build-time fetcher for npm/PyPI versions + READMEs
+  content/
+    config.ts                     content collection schema (changelog)
+    changelog/*.md                release-notes entries
   pages/
     index.astro                   /             — overview + 3 tool cards
     workflow.astro                /workflow/    — step-by-step with copy-paste
-    install.astro                 /install/     — install paths for all three
-    principles.astro              /principles/  — shared design ethos
+    install.astro                 /install/     — install paths + tabs
+    principles.astro              /principles/
+    compare.astro                 /compare/     — vs. SaaS suites
+    mcp.astro                     /mcp/         — sign-cli MCP server guide
+    changelog/index.astro         /changelog/
     tools/
-      nda-review-cli.astro        /tools/nda-review-cli/
-      sign-cli.astro              /tools/sign-cli/
-      docx2pdf-cli.astro          /tools/docx2pdf-cli/
+      nda-review-cli.astro
+      sign-cli.astro
+      docx2pdf-cli.astro
+    og/[...slug].png.ts           dynamic OG image generator (satori + resvg)
+  fonts/                          bundled Liberation TTFs (used by satori)
   styles/global.css               Tailwind imports + base styles
-public/favicon.svg
-astro.config.mjs                  Astro config
-tailwind.config.mjs               custom palette (cream/ink/accent/mint) + serif/sans pairing
-vercel.json                       deployment config
+public/
+  favicon.svg
+  og-default.svg                  static brand fallback
+  robots.txt                      sitemap pointer
+  casts/*.cast                    asciinema recordings
+scripts/gen-casts.py              regenerates synthetic casts
+astro.config.mjs                  Astro + tailwind + sitemap
+tailwind.config.mjs               custom palette + dark mode
+vercel.json
 ```
 
-## Design
+## Features
 
-- **Typography**: Source Serif 4 for headings, Inter for body, JetBrains Mono for code (Google Fonts via `<link>` in BaseLayout)
-- **Palette**: warm cream background (`#fdfcf9`), near-black text (`#1a1612`), forest/teal accent (`#1f7d5d`), mint-tinted callouts
-- **Layout**: documentation-style — sticky sidebar nav, max-width content column, generous whitespace
-- **No JS framework**: vanilla JS in BaseLayout for the mobile sidebar toggle; everything else is server-rendered HTML
+- **Dark mode** — system-preference detection + manual moon/sun toggle (persisted to localStorage)
+- **Cmd+K search** — Pagefind-backed palette indexes every page at build time
+- **Animated workflow diagram** — SVG with traveling dots between steps
+- **Asciinema casts** — pre-rendered terminal recordings on each tool page
+- **Live version badges** — fetched from npm/PyPI at build time, with `pyproject.toml` fallback
+- **Auto-generated OG images** — per-page PNGs via `satori` + `@resvg/resvg-js`
+- **Sitemap + robots** — standard SEO basics
+- **Embedded sandbox** — the live nda-review-cli web demo runs inline on its tool page
+- **Copy-to-clipboard** on every code block, **install-method tabs** for each CLI
+- **Reveal-on-scroll** with `prefers-reduced-motion` support
+- **Optional Plausible analytics** behind the `PUBLIC_PLAUSIBLE_DOMAIN` env var
 
-## Adding content
+## Regenerating asciinema casts
 
-- New CLI tool → add a page under `src/pages/tools/`, then add an entry to `Sidebar.astro` and a `<ToolCard>` on the index page.
-- New top-level page → add to `src/pages/` and the Sidebar's "Start" section.
-- Per-page metadata (title, description, active sidebar key) is set via `<BaseLayout>` props.
+The `public/casts/*.cast` files are synthetic but reflect real CLI output. To regenerate them:
+
+```bash
+npm run casts          # python3 scripts/gen-casts.py
+```
+
+To replace with real recordings, capture the live CLI session and save with the same filename:
+
+```bash
+asciinema rec public/casts/nda-review-quickstart.cast -c "nda-review-cli quickstart"
+```
 
 ## License
 
-MIT — see each linked CLI repository for its own license.
+MIT. See each linked CLI repository for its own license. Bundled Liberation fonts are licensed under the SIL Open Font License with a GPL exception (see Liberation Fonts project).

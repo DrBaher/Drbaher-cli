@@ -1,11 +1,40 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Callout from '../../components/Callout.astro';
+import CodeBlock from '../../components/CodeBlock.astro';
+import CastPlayer from '../../components/CastPlayer.astro';
+import FreshHeader from '../../components/FreshHeader.astro';
+import JsonLd from '../../components/JsonLd.astro';
+import { getCliMeta } from '../../data/registry';
+
+const meta = (await getCliMeta())['docx2pdf-cli'];
+
+const jsonLd = {
+  '@type': 'SoftwareApplication',
+  name: 'docx2pdf-cli',
+  applicationCategory: 'DeveloperApplication',
+  operatingSystem: 'macOS, Linux, Windows',
+  softwareVersion: meta.version,
+  programmingLanguage: 'JavaScript',
+  license: 'https://opensource.org/licenses/MIT',
+  url: 'https://drbaher-cli.vercel.app/tools/docx2pdf-cli/',
+  codeRepository: 'https://github.com/DrBaher/docx2pdf-cli',
+  description: 'Honest, batch-aware DOCX to PDF converter with hybrid backends, parallel processing, font validation, and a doctor probe.',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+};
 ---
-<BaseLayout title="docx2pdf-cli" active="tools/docx2pdf-cli" description="Honest, batch-aware DOCX to PDF converter with hybrid backends, parallel processing, font validation, and a doctor probe.">
+<BaseLayout
+  title="docx2pdf-cli"
+  active="tools/docx2pdf-cli"
+  description="Honest, batch-aware DOCX to PDF converter with hybrid backends, parallel processing, font validation, and a doctor probe."
+  withCasts
+  toc
+>
+  <JsonLd data={jsonLd} />
   <p class="eyebrow">Tool · Node.js</p>
   <h1><span class="font-mono">docx2pdf-cli</span></h1>
-  <p class="text-lg text-ink-700">
+  <FreshHeader name="docx2pdf-cli" version={meta.version} source={meta.source} fetchedAt={meta.fetchedAt} stars={meta.stars} weeklyDownloads={meta.weeklyDownloads} github="https://github.com/DrBaher/docx2pdf-cli" />
+  <p class="text-lg text-ink-700 dark:text-night-100">
     Convert Word documents to PDF, one file at a time or by the thousand. Hybrid backend strategy
     picks the right converter for what's installed on your machine. No silent fallbacks; missing
     fonts get flagged before they cost you a re-render.
@@ -15,6 +44,8 @@ import Callout from '../../components/Callout.astro';
     <code class="chip">npm i -g docx2pdf-cli</code>, then <code class="chip">docx2pdf input.docx output.pdf</code>.
     Run <code class="chip">--doctor</code> first to see which backends are detected on your machine.
   </Callout>
+
+  <CastPlayer src="/casts/docx2pdf-doctor.cast" title="docx2pdf-cli — doctor + batch convert" />
 
   <h2>What it does</h2>
 
@@ -29,7 +60,7 @@ import Callout from '../../components/Callout.astro';
 
   <h2>Quickstart</h2>
 
-  <pre class="codeblock"><code># Install
+  <CodeBlock label="install + run">{`# Install
 npm i -g docx2pdf-cli
 docx2pdf --version
 
@@ -47,7 +78,7 @@ docx2pdf --concurrency 4 --out-dir ./pdfs ./drafts/*.docx
 docx2pdf --backend gotenberg contract.docx contract.pdf
 
 # Check fonts before rendering
-docx2pdf --check-fonts contract.docx</code></pre>
+docx2pdf --check-fonts contract.docx`}</CodeBlock>
 
   <h2>Why hybrid backends matter</h2>
 

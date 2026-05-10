@@ -1,0 +1,18 @@
+---
+export interface Props {
+  /** Optional filename / language label shown in the top-left of the block. */
+  label?: string;
+  /** Tailwind classes appended to the wrapper. */
+  class?: string;
+}
+const { label, class: extraClass = '' } = Astro.props as Props;
+---
+<div class={`code-shell not-prose my-5 ${extraClass}`}>
+  {label ? (
+    <div class="flex items-center justify-between rounded-t-md border-b border-white/10 bg-night-800 px-3 py-1.5 font-mono text-[11px] uppercase tracking-wider text-cream-50/60 dark:bg-night-900">
+      <span>{label}</span>
+    </div>
+  ) : null}
+  <pre class={`codeblock ${label ? 'rounded-t-none' : ''}`}><code><slot /></code></pre>
+  <button class="copy-btn" type="button" aria-label="Copy to clipboard">Copy</button>
+</div>

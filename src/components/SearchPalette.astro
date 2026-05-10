@@ -1,0 +1,226 @@
+---
+// Cmd+K command palette + Pagefind-backed instant search.
+// Pagefind index is built by `pagefind --site dist` after `astro build`
+// and exposed at /pagefind/pagefind.js.
+---
+<div
+  id="search-palette"
+  class="fixed inset-0 z-50 hidden items-start justify-center bg-ink-900/40 p-4 pt-[10vh] backdrop-blur-sm dark:bg-night-900/60"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Search and navigation palette"
+>
+  <div class="w-full max-w-xl overflow-hidden rounded-xl border border-ink-700/15 bg-cream-50 shadow-2xl dark:border-night-300/20 dark:bg-night-600">
+    <div class="flex items-center gap-3 border-b border-ink-700/10 px-4 py-3 dark:border-night-300/15">
+      <svg viewBox="0 0 16 16" class="h-4 w-4 text-ink-500 dark:text-night-200" aria-hidden="true">
+        <circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.6" fill="none"/>
+        <path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+      <input
+        id="search-input"
+        type="search"
+        placeholder="Search the site… or type a tool name"
+        autocomplete="off"
+        spellcheck="false"
+        class="w-full border-none bg-transparent text-[15px] text-ink-900 placeholder-ink-500 outline-none dark:text-night-50 dark:placeholder-night-200"
+      />
+      <kbd class="hidden rounded bg-cream-200 px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-wider text-ink-700 sm:inline dark:bg-night-500 dark:text-night-100">esc</kbd>
+    </div>
+    <div id="search-results" class="max-h-[60vh] overflow-y-auto p-2 nice-scroll">
+      <ul id="search-default" class="space-y-0.5">
+        <li><a class="palette-link" href="/">Overview</a></li>
+        <li><a class="palette-link" href="/workflow/">The workflow</a></li>
+        <li><a class="palette-link" href="/install/">Install</a></li>
+        <li><a class="palette-link" href="/principles/">Principles</a></li>
+        <li><a class="palette-link" href="/use-cases/">Use cases</a></li>
+        <li><a class="palette-link" href="/compare/">Comparison vs SaaS</a></li>
+        <li><a class="palette-link" href="/changelog/">Changelog</a></li>
+        <li><a class="palette-link" href="/mcp/">MCP server</a></li>
+        <li><a class="palette-link" href="/tools/nda-review-cli/">nda-review-cli</a></li>
+        <li><a class="palette-link" href="/tools/sign-cli/">sign-cli</a></li>
+        <li><a class="palette-link" href="/tools/docx2pdf-cli/">docx2pdf-cli</a></li>
+      </ul>
+      <ul id="search-hits" class="hidden space-y-0.5"></ul>
+      <p id="search-empty" class="hidden px-3 py-6 text-center text-[13px] text-ink-500 dark:text-night-200">No results.</p>
+    </div>
+    <div class="border-t border-ink-700/10 bg-cream-100 px-4 py-2 text-[11px] text-ink-500 dark:border-night-300/15 dark:bg-night-700 dark:text-night-200">
+      <kbd class="rounded bg-cream-200 px-1 font-mono text-[10px] dark:bg-night-500">↑↓</kbd> navigate ·
+      <kbd class="rounded bg-cream-200 px-1 font-mono text-[10px] dark:bg-night-500">↵</kbd> open ·
+      <kbd class="rounded bg-cream-200 px-1 font-mono text-[10px] dark:bg-night-500">esc</kbd> close
+    </div>
+  </div>
+</div>
+
+<style is:global>
+  .palette-link {
+    @apply flex items-center justify-between rounded-md px-3 py-2 text-[14px] text-ink-800 transition-colors hover:bg-cream-200 hover:text-ink-900;
+  }
+  .dark .palette-link {
+    @apply text-night-100 hover:bg-night-500 hover:text-night-50;
+  }
+  .palette-link.is-active {
+    @apply bg-accent-50 text-accent-700;
+  }
+  .dark .palette-link.is-active {
+    @apply bg-accent-900/30 text-accent-200;
+  }
+  .palette-hit {
+    @apply block rounded-md px-3 py-2 transition-colors hover:bg-cream-200;
+  }
+  .dark .palette-hit { @apply hover:bg-night-500; }
+  .palette-hit-title { @apply text-[14px] font-medium text-ink-900 dark:text-night-50; }
+  .palette-hit-url   { @apply font-mono text-[11px] text-ink-500 dark:text-night-200; }
+  .palette-hit-excerpt { @apply mt-1 text-[12.5px] text-ink-700 line-clamp-2 dark:text-night-100; }
+  .palette-hit mark { @apply rounded bg-accent-100 px-0.5 text-accent-900 dark:bg-accent-700/40 dark:text-accent-100; font-style: normal; }
+</style>
+
+<script>
+  const palette = document.getElementById('search-palette') as HTMLDivElement | null;
+  const input = document.getElementById('search-input') as HTMLInputElement | null;
+  const defaultList = document.getElementById('search-default');
+  const hitsList = document.getElementById('search-hits');
+  const empty = document.getElementById('search-empty');
+
+  let pagefind: any = null;
+  let activeIndex = 0;
+
+  function visibleLinks(): HTMLAnchorElement[] {
+    const root = (defaultList?.classList.contains('hidden') ? hitsList : defaultList) as HTMLElement | null;
+    return root ? Array.from(root.querySelectorAll<HTMLAnchorElement>('a')) : [];
+  }
+
+  function setActive(i: number) {
+    const links = visibleLinks();
+    if (!links.length) return;
+    activeIndex = (i + links.length) % links.length;
+    links.forEach((a, idx) => a.classList.toggle('is-active', idx === activeIndex));
+    links[activeIndex].scrollIntoView({ block: 'nearest' });
+  }
+
+  function open() {
+    if (!palette) return;
+    palette.classList.remove('hidden');
+    palette.classList.add('flex');
+    document.body.classList.add('overflow-hidden');
+    setTimeout(() => input?.focus(), 0);
+    activeIndex = 0;
+    setActive(0);
+  }
+  function close() {
+    if (!palette) return;
+    palette.classList.add('hidden');
+    palette.classList.remove('flex');
+    document.body.classList.remove('overflow-hidden');
+    if (input) input.value = '';
+    showDefault();
+  }
+
+  function showDefault() {
+    defaultList?.classList.remove('hidden');
+    hitsList?.classList.add('hidden');
+    empty?.classList.add('hidden');
+    if (hitsList) hitsList.innerHTML = '';
+    activeIndex = 0;
+  }
+
+  async function loadPagefind() {
+    if (pagefind) return pagefind;
+    try {
+      // Build the URL at runtime so Vite doesn't try to resolve it at build time.
+      // The actual file is generated by `pagefind --site dist` after `astro build`.
+      const url = '/pagefind/' + 'pagefind.js';
+      // @ts-ignore – built artifact, no types
+      pagefind = await import(/* @vite-ignore */ url);
+      await pagefind.options({ excerptLength: 28 });
+      return pagefind;
+    } catch (e) {
+      pagefind = null;
+      return null;
+    }
+  }
+
+  async function runSearch(q: string) {
+    if (!q.trim()) { showDefault(); return; }
+    const pf = await loadPagefind();
+    if (!pf) {
+      // Pagefind not available (e.g. dev server). Filter the default list as a fallback.
+      const lower = q.toLowerCase();
+      const all = defaultList?.querySelectorAll<HTMLLIElement>('li') ?? [];
+      let matched = 0;
+      all.forEach(li => {
+        const t = li.textContent?.toLowerCase() ?? '';
+        const hit = t.includes(lower);
+        li.style.display = hit ? '' : 'none';
+        if (hit) matched++;
+      });
+      defaultList?.classList.remove('hidden');
+      hitsList?.classList.add('hidden');
+      empty?.classList.toggle('hidden', matched > 0);
+      activeIndex = 0;
+      return;
+    }
+    const search = await pf.search(q);
+    const data = await Promise.all(search.results.slice(0, 10).map((r: any) => r.data()));
+    if (!data.length) {
+      defaultList?.classList.add('hidden');
+      hitsList?.classList.add('hidden');
+      empty?.classList.remove('hidden');
+      return;
+    }
+    if (hitsList) {
+      hitsList.innerHTML = data.map(d => `
+        <li>
+          <a class="palette-hit" href="${d.url}">
+            <div class="palette-hit-title">${d.meta?.title ?? d.url}</div>
+            <div class="palette-hit-url">${d.url}</div>
+            <div class="palette-hit-excerpt">${d.excerpt}</div>
+          </a>
+        </li>
+      `).join('');
+    }
+    defaultList?.classList.add('hidden');
+    hitsList?.classList.remove('hidden');
+    empty?.classList.add('hidden');
+    activeIndex = 0;
+    setActive(0);
+  }
+
+  // Hotkey: cmd/ctrl+K opens; cmd/ctrl+/ also opens.
+  document.addEventListener('keydown', (e) => {
+    const isOpen = !palette?.classList.contains('hidden');
+    const meta = e.metaKey || e.ctrlKey;
+    if (meta && (e.key === 'k' || e.key === 'K' || e.key === '/')) {
+      e.preventDefault();
+      isOpen ? close() : open();
+      return;
+    }
+    if (!isOpen) return;
+    if (e.key === 'Escape') { e.preventDefault(); close(); }
+    if (e.key === 'ArrowDown') { e.preventDefault(); setActive(activeIndex + 1); }
+    if (e.key === 'ArrowUp')   { e.preventDefault(); setActive(activeIndex - 1); }
+    if (e.key === 'Enter') {
+      const links = visibleLinks();
+      if (links[activeIndex]) {
+        const href = links[activeIndex].getAttribute('href');
+        if (href) window.location.href = href;
+      }
+    }
+  });
+
+  // Click backdrop to close.
+  palette?.addEventListener('click', (e) => {
+    if (e.target === palette) close();
+  });
+
+  // Trigger buttons in the page (sidebar/topbar).
+  document.querySelectorAll('[data-search-trigger]').forEach((b) => {
+    b.addEventListener('click', open);
+  });
+
+  // Search-as-you-type, debounced.
+  let timer: number | undefined;
+  input?.addEventListener('input', () => {
+    if (timer) window.clearTimeout(timer);
+    timer = window.setTimeout(() => runSearch(input.value), 130);
+  });
+</script>

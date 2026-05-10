@@ -1,0 +1,115 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Callout from '../components/Callout.astro';
+import CodeBlock from '../components/CodeBlock.astro';
+---
+<BaseLayout
+  title="MCP server"
+  active="mcp"
+  description="Drive sign-cli from any MCP-aware client (Claude Code, Cursor, Codex). Same per-signer approval guardrails — no agent can sign on a human's behalf."
+  toc
+>
+  <p class="eyebrow">MCP server</p>
+  <h1>The agent drives. You approve.</h1>
+
+  <p class="text-lg text-ink-700 dark:text-night-100">
+    The whole suite is designed for an agent-driven workflow. sign-cli is the most concrete
+    expression of that: every CLI command is exposed as an MCP tool over stdio, so any MCP-aware
+    client (Claude Code, Cursor, Codex) can drive sending, tracking, and verification — while the
+    actual signing remains gated behind a per-signer human gesture.
+  </p>
+
+  <Callout label="The guardrail">
+    Agents can <em>send</em> documents and <em>track</em> status, but they can't sign. Every signature
+    requires a per-signer token tied to that signer's email, with a TTL. The agent never sees the
+    token. The human does. That asymmetry is the whole architecture.
+  </Callout>
+
+  <h2>Start the server</h2>
+  <CodeBlock label="stdio MCP server">{`# Boots the MCP server on stdio. Wire it into any MCP-aware client.
+npx sign-cli mcp`}</CodeBlock>
+
+  <h2>Wire it into Claude Code</h2>
+  <p>Add to your <code class="chip">~/.config/claude-code/settings.json</code> (or the project-level <code class="chip">.claude/settings.json</code>):</p>
+  <CodeBlock label=".claude/settings.json">{`{
+  "mcpServers": {
+    "sign-cli": {
+      "command": "npx",
+      "args": ["-y", "sign-cli", "mcp"]
+    }
+  }
+}`}</CodeBlock>
+
+  <p>
+    After that, every sign-cli command shows up as an MCP tool inside Claude Code. Ask the agent
+    to "send the contract.pdf to alice@acme.com and bob@beta.com via SignWell" and it will call
+    the right MCP tool with the right arguments.
+  </p>
+
+  <h2>Wire it into Cursor</h2>
+  <p>Cursor's MCP config lives at <code class="chip">~/.cursor/mcp.json</code>:</p>
+  <CodeBlock label="~/.cursor/mcp.json">{`{
+  "mcpServers": {
+    "sign-cli": {
+      "command": "npx",
+      "args": ["-y", "sign-cli", "mcp"],
+      "env": {}
+    }
+  }
+}`}</CodeBlock>
+
+  <h2>Available tools</h2>
+  <p>Every shell command has a 1:1 MCP tool. The most useful ones:</p>
+
+  <table class="not-prose mt-4 w-full border-collapse text-[14px]">
+    <thead>
+      <tr class="border-b border-ink-700/15 text-left dark:border-night-300/20">
+        <th class="py-2 pr-4 font-semibold text-ink-900 dark:text-night-50">Tool</th>
+        <th class="py-2 pr-4 font-semibold text-ink-900 dark:text-night-50">What it does</th>
+      </tr>
+    </thead>
+    <tbody class="text-ink-700 dark:text-night-100">
+      <tr class="border-b border-ink-700/10 dark:border-night-300/15">
+        <td class="py-2 pr-4 font-mono text-accent-700 dark:text-accent-300">send_document</td>
+        <td class="py-2 pr-4">Send a PDF to one or more signers via the chosen provider. Returns per-signer tokens.</td>
+      </tr>
+      <tr class="border-b border-ink-700/10 dark:border-night-300/15">
+        <td class="py-2 pr-4 font-mono text-accent-700 dark:text-accent-300">verify_pdf</td>
+        <td class="py-2 pr-4">Verify a signed PDF + receipt bundle. Confirms the audit chain and timestamp anchor.</td>
+      </tr>
+      <tr class="border-b border-ink-700/10 dark:border-night-300/15">
+        <td class="py-2 pr-4 font-mono text-accent-700 dark:text-accent-300">get_status</td>
+        <td class="py-2 pr-4">Check the signing status of a previously-sent document.</td>
+      </tr>
+      <tr class="border-b border-ink-700/10 dark:border-night-300/15">
+        <td class="py-2 pr-4 font-mono text-accent-700 dark:text-accent-300">list_audit_events</td>
+        <td class="py-2 pr-4">List all hash-chained events for a given document — useful for replay or post-mortem.</td>
+      </tr>
+      <tr>
+        <td class="py-2 pr-4 font-mono text-accent-700 dark:text-accent-300">list_providers</td>
+        <td class="py-2 pr-4">List configured signing providers and their status.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>What the agent can't do</h2>
+  <ul>
+    <li><strong>Sign on a human's behalf.</strong> The signing step requires an explicit per-signer token. Tokens are scoped to one signer's email and expire after a configurable TTL.</li>
+    <li><strong>Modify past audit events.</strong> The audit chain is hash-chained; tampering breaks verification.</li>
+    <li><strong>Bypass the timestamp anchor.</strong> RFC 3161 anchors are external — the agent can't forge one.</li>
+  </ul>
+
+  <h2>Why this matters</h2>
+  <p>
+    Most "agent-friendly" SaaS products are agent-friendly in the sense that they have an API.
+    They aren't agent-safe. The MCP boundary here is designed so an agent can do all the
+    operational work (sending, tracking, verifying, reporting) while the actual legal commitment
+    — the signature — stays gated behind a human gesture.
+  </p>
+
+  <p>
+    That's a meaningful architectural choice for anyone deploying agents into ops workflows.
+    You get the productivity wins of automation without the legal liability of a hallucinating
+    model accidentally executing a contract.
+  </p>
+</BaseLayout>

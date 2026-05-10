@@ -1,0 +1,83 @@
+---
+// Right-rail Table of Contents.
+// Auto-built client-side from H2/H3s inside <article data-pagefind-body>.
+// Sticky on lg+; hidden on smaller screens.
+---
+<aside class="hidden xl:block xl:fixed xl:right-[max(2rem,calc((100vw-1180px)/2))] xl:top-24 xl:w-56" aria-label="Table of contents">
+  <nav id="toc" class="text-[12.5px]" data-toc>
+    <p class="mb-2 font-semibold uppercase tracking-[0.14em] text-ink-500 dark:text-night-200">On this page</p>
+    <ol class="space-y-1.5 border-l border-ink-700/15 dark:border-night-300/20"></ol>
+  </nav>
+</aside>
+
+<style is:global>
+  [data-toc] a {
+    @apply -ml-px block border-l border-transparent pl-3 text-ink-600 transition-colors hover:border-accent-300 hover:text-accent-700;
+  }
+  .dark [data-toc] a {
+    @apply text-night-200 hover:text-accent-300;
+  }
+  [data-toc] a.is-active {
+    @apply border-accent-500 font-medium text-accent-700;
+  }
+  .dark [data-toc] a.is-active {
+    @apply border-accent-300 text-accent-200;
+  }
+  [data-toc] li.depth-3 a { @apply pl-6 text-[12px]; }
+</style>
+
+<script>
+  const tocOl = document.querySelector<HTMLOListElement>('#toc ol');
+  const article = document.querySelector<HTMLElement>('article[data-pagefind-body]');
+  if (tocOl && article) {
+    const headings = Array.from(article.querySelectorAll<HTMLHeadingElement>('h2, h3'));
+    if (headings.length < 2) {
+      // Don't show a TOC for one-section pages.
+      document.querySelector('[data-toc]')?.parentElement?.remove();
+    } else {
+      headings.forEach((h, i) => {
+        if (!h.id) {
+          const slug = (h.textContent || `section-${i}`)
+            .toLowerCase()
+            .replace(/[^\w\s-]/g, '')
+            .trim()
+            .replace(/\s+/g, '-')
+            .slice(0, 60);
+          h.id = slug;
+        }
+        const li = document.createElement('li');
+        if (h.tagName === 'H3') li.classList.add('depth-3');
+        const a = document.createElement('a');
+        a.href = '#' + h.id;
+        a.textContent = h.textContent || '';
+        li.appendChild(a);
+        tocOl.appendChild(li);
+      });
+
+      // Active-section highlight via IntersectionObserver.
+      const links = new Map<string, HTMLAnchorElement>();
+      tocOl.querySelectorAll<HTMLAnchorElement>('a').forEach(a => {
+        const id = a.getAttribute('href')?.slice(1) ?? '';
+        links.set(id, a);
+      });
+      let activeId = '';
+      const setActive = (id: string) => {
+        if (id === activeId) return;
+        activeId = id;
+        links.forEach((a, k) => a.classList.toggle('is-active', k === id));
+      };
+      const visible = new Set<string>();
+      const io = new IntersectionObserver(entries => {
+        for (const e of entries) {
+          const id = e.target.id;
+          if (e.isIntersecting) visible.add(id); else visible.delete(id);
+        }
+        // Pick the first visible heading in document order.
+        for (const h of headings) {
+          if (visible.has(h.id)) { setActive(h.id); break; }
+        }
+      }, { rootMargin: '-15% 0px -65% 0px', threshold: 0 });
+      headings.forEach(h => io.observe(h));
+    }
+  }
+</script>

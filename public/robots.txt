@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://drbaher-cli.vercel.app/sitemap-index.xml

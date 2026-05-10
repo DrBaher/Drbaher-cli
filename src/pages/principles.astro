@@ -13,9 +13,29 @@ import Callout from '../components/Callout.astro';
   </p>
 
   <Callout label="TL;DR">
-    Local-first by default. Deterministic where possible. Audit-grade evidence baked in.
-    No SaaS account required. No vendor lock-in. Each tool replaceable.
+    Built for an agent-driven workflow. Local-first by default. Deterministic where possible.
+    Audit-grade evidence baked in. No SaaS account required. No vendor lock-in. Each tool replaceable.
   </Callout>
+
+  <h2>0 — Agents do the operations; humans approve the commitments</h2>
+  <p>
+    These tools were designed for a world where an LLM agent does most of the operational work and
+    a human is in the loop only for the gates that legitimately need a human. Drafting, scoring,
+    proposing amendments, sending, tracking, verifying — agent. Signing a contract, accepting a
+    final position, overruling an escalation — human, with a deliberate gesture.
+  </p>
+  <p>
+    Concretely, that shows up as: the sign-cli MCP server exposes every command to any MCP-aware
+    client; per-signer approval tokens are scoped to a signer's email and have a TTL, so a runaway
+    agent can't sign on a human's behalf; negotiation rounds are hash-chained so a human can audit
+    what an agent did between sessions; findings carry severity scores so escalation to a human is
+    automatic for the things humans actually need to see.
+  </p>
+  <p>
+    This is the principle every other principle on this page is in service of. If you only care
+    about local-first or deterministic behavior because <em>you</em> want to operate the tools
+    yourself, that works too — but the design is optimized for the agent-plus-human shape.
+  </p>
 
   <h2>1 — Local-first by default</h2>
   <p>

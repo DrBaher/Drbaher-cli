@@ -1,0 +1,45 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout title="Not found" description="That page doesn't exist (yet). Try the search palette or jump to one of the tools.">
+  <p class="eyebrow">404</p>
+  <h1>That page doesn't exist (yet).</h1>
+
+  <p class="text-lg text-ink-700 dark:text-night-100">
+    The link you followed is stale, mistyped, or points to a section we haven't written yet.
+    Hit <kbd class="rounded bg-cream-200 px-1.5 py-0.5 font-mono text-[12px] dark:bg-night-500">⌘K</kbd>
+    (or <kbd class="rounded bg-cream-200 px-1.5 py-0.5 font-mono text-[12px] dark:bg-night-500">Ctrl+K</kbd>)
+    to search the site, or jump straight to one of the popular pages below.
+  </p>
+
+  <div class="not-prose mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
+    <a href="/" class="rounded-lg border border-ink-700/10 p-4 transition-colors hover:border-accent-300 hover:bg-cream-50 dark:border-night-300/15 dark:hover:border-accent-400/40 dark:hover:bg-night-600">
+      <div class="font-serif font-semibold text-ink-900 dark:text-night-50">Overview →</div>
+      <div class="mt-1 text-[13px] text-ink-600 dark:text-night-200">The three-CLI suite at a glance.</div>
+    </a>
+    <a href="/workflow/" class="rounded-lg border border-ink-700/10 p-4 transition-colors hover:border-accent-300 hover:bg-cream-50 dark:border-night-300/15 dark:hover:border-accent-400/40 dark:hover:bg-night-600">
+      <div class="font-serif font-semibold text-ink-900 dark:text-night-50">The workflow →</div>
+      <div class="mt-1 text-[13px] text-ink-600 dark:text-night-200">Five steps from blank page to signed agreement.</div>
+    </a>
+    <a href="/install/" class="rounded-lg border border-ink-700/10 p-4 transition-colors hover:border-accent-300 hover:bg-cream-50 dark:border-night-300/15 dark:hover:border-accent-400/40 dark:hover:bg-night-600">
+      <div class="font-serif font-semibold text-ink-900 dark:text-night-50">Install →</div>
+      <div class="mt-1 text-[13px] text-ink-600 dark:text-night-200">All three CLIs, one page.</div>
+    </a>
+    <a href="/compare/" class="rounded-lg border border-ink-700/10 p-4 transition-colors hover:border-accent-300 hover:bg-cream-50 dark:border-night-300/15 dark:hover:border-accent-400/40 dark:hover:bg-night-600">
+      <div class="font-serif font-semibold text-ink-900 dark:text-night-50">Compare vs SaaS →</div>
+      <div class="mt-1 text-[13px] text-ink-600 dark:text-night-200">Honest table of trade-offs.</div>
+    </a>
+    <a href="/changelog/" class="rounded-lg border border-ink-700/10 p-4 transition-colors hover:border-accent-300 hover:bg-cream-50 dark:border-night-300/15 dark:hover:border-accent-400/40 dark:hover:bg-night-600">
+      <div class="font-serif font-semibold text-ink-900 dark:text-night-50">Changelog →</div>
+      <div class="mt-1 text-[13px] text-ink-600 dark:text-night-200">What's new across the suite.</div>
+    </a>
+    <a href="https://github.com/DrBaher" target="_blank" rel="noopener" class="rounded-lg border border-ink-700/10 p-4 transition-colors hover:border-accent-300 hover:bg-cream-50 dark:border-night-300/15 dark:hover:border-accent-400/40 dark:hover:bg-night-600">
+      <div class="font-serif font-semibold text-ink-900 dark:text-night-50">GitHub ↗</div>
+      <div class="mt-1 text-[13px] text-ink-600 dark:text-night-200">All three repos and their issue trackers.</div>
+    </a>
+  </div>
+
+  <p class="mt-8 text-[13px] text-ink-500 dark:text-night-200">
+    Think this page should exist? <a href="https://github.com/DrBaher/nda-review-cli/issues/new" target="_blank" rel="noopener">File an issue</a> and we'll write it.
+  </p>
+</BaseLayout>

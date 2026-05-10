@@ -1,0 +1,97 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Callout from '../components/Callout.astro';
+import TryDemo from '../components/TryDemo.astro';
+
+interface Row {
+  label: string;
+  cli: string;
+  saas: string;
+}
+
+const rows: Row[] = [
+  { label: 'Where your contracts live',           cli: 'Your filesystem (or your Git repo).',                             saas: 'Vendor database. You access via their UI/API.' },
+  { label: 'Auth model',                          cli: 'No accounts. Local config files.',                                 saas: 'SSO + per-seat licenses. Often $30–$120/user/month.' },
+  { label: 'Audit trail',                         cli: 'Hash-chained, RFC 3161 timestamped, on-disk JSON.',                saas: 'Internal log surfaced through their UI. Export to PDF.' },
+  { label: 'AI usage',                            cli: 'Opt-in per call. Provider of your choice. Disabled by default.',   saas: 'Bundled in higher tiers. Provider chosen by vendor.' },
+  { label: 'Templates',                           cli: 'Bring your own .docx; bundled CC-licensed defaults.',              saas: 'Vendor-curated library; hard to fork or modify.' },
+  { label: 'Negotiation',                         cli: 'File-based protocol. Hash-chained. Send the file by any channel.', saas: 'In-app redlining + threaded comments behind the SaaS auth.' },
+  { label: 'PDF rendering',                       cli: 'Pluggable: LibreOffice, Word, Pandoc, or Gotenberg.',              saas: 'Vendor-controlled rendering pipeline.' },
+  { label: 'E-signature provider',                cli: 'Multi-provider (Dropbox Sign, DocuSign, SignWell, local).',        saas: 'Bundled provider; switching means migrating.' },
+  { label: 'MCP / agent integration',             cli: 'Native MCP server in sign-cli; CLIs are agent-friendly by design.', saas: 'Generally web-app-only; agents need scraping or custom RPA.' },
+  { label: 'What you pay',                        cli: 'Free. MIT licensed. You pay for the e-sign provider you choose.',  saas: 'Per-seat licenses + signature volume + add-on AI module.' },
+  { label: 'Vendor lock-in',                      cli: 'Standard file formats. You can leave any time with all your data.', saas: 'Migration takes weeks; data export often partial.' },
+  { label: 'Telemetry',                           cli: 'None.',                                                            saas: 'Usage analytics by default; disable per tenant if available.' },
+  { label: 'Source code',                         cli: 'On GitHub, MIT licensed. Read end-to-end in an afternoon.',         saas: 'Closed source. SOC2 reports gate the trust conversation.' },
+];
+---
+<BaseLayout
+  title="Compare"
+  active="compare"
+  description="An honest comparison: nda-review-cli + sign-cli + docx2pdf-cli vs. SaaS contract suites. What you trade and what you get."
+  toc
+>
+  <p class="eyebrow">Compare</p>
+  <h1>CLIs vs. SaaS contract suites.</h1>
+
+  <p class="text-lg text-ink-700 dark:text-night-100">
+    The honest version. SaaS suites win on team chat features, polished UIs, and "manager-friendly"
+    dashboards. The CLIs win on auditability, cost, lock-in resistance, and being trivially scriptable.
+    Pick the row that matters most to you.
+  </p>
+
+  <Callout label="TL;DR">
+    Pick CLIs if you care about auditability, cost, agent-friendliness, and not being locked into
+    a vendor. Pick SaaS if you need polished cross-team UI, in-app redlining workflows, and
+    don't mind paying per seat for things you can do with open source.
+  </Callout>
+
+  <div class="not-prose my-8 overflow-x-auto rounded-lg border border-ink-700/10 dark:border-night-300/15">
+    <table class="w-full border-collapse text-[14.5px]">
+      <thead>
+        <tr class="border-b border-ink-700/15 bg-cream-100 dark:border-night-300/20 dark:bg-night-600">
+          <th class="px-4 py-3 text-left font-semibold text-ink-900 dark:text-night-50 w-[26%]">Dimension</th>
+          <th class="px-4 py-3 text-left font-semibold text-accent-700 dark:text-accent-300">Local-first CLIs</th>
+          <th class="px-4 py-3 text-left font-semibold text-ink-700 dark:text-night-100">SaaS contract suites</th>
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((r, i) => (
+          <tr class={`border-b border-ink-700/10 dark:border-night-300/15 ${i % 2 === 0 ? 'bg-white dark:bg-night-700' : 'bg-cream-50 dark:bg-night-600/40'}`}>
+            <td class="px-4 py-3 align-top font-medium text-ink-900 dark:text-night-50">{r.label}</td>
+            <td class="px-4 py-3 align-top text-ink-800 dark:text-night-100">{r.cli}</td>
+            <td class="px-4 py-3 align-top text-ink-600 dark:text-night-200">{r.saas}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Where SaaS still wins</h2>
+  <ul>
+    <li><strong>Cross-team UI.</strong> If your finance, legal, and sales teams all need a shared dashboard with comments and assignment, a CLI suite isn't a substitute.</li>
+    <li><strong>Permissioning.</strong> Per-clause, per-team access controls inside a single product are hard to replicate with file permissions.</li>
+    <li><strong>Procurement integration.</strong> Vendors like Ironclad and LinkSquares plug into procurement workflows out of the box; a CLI requires you to wire that up.</li>
+  </ul>
+
+  <h2>Where the CLIs are clearly better</h2>
+  <ul>
+    <li><strong>Audit defensibility.</strong> Hash-chained rounds + RFC 3161 timestamps are a stronger evidentiary record than most SaaS audit logs, which are vendor-controlled and disappear if you stop paying.</li>
+    <li><strong>Agent integration.</strong> The CLIs are MCP-native or stdio-friendly by design. Most SaaS suites need scraping or custom RPA glue for an agent to drive.</li>
+    <li><strong>Cost.</strong> $0 / seat for the tools themselves. You pay only for the third-party signing provider you choose.</li>
+    <li><strong>Forkability.</strong> You can read every line of the source and change the behavior without filing a feature request.</li>
+  </ul>
+
+  <h2>Hybrid is fine</h2>
+  <p>
+    Plenty of teams use a SaaS contract suite for the cross-team workflow but quietly run the CLIs
+    on the side for the audit-grade evidence and the agent integrations. There's nothing weird about that.
+    The CLIs are designed to be a useful complement, not a religion.
+  </p>
+
+  <TryDemo
+    href="https://nda-review-cli-production.up.railway.app/"
+    title="Try the review live before you compare"
+    blurb="Run the NDA review on a sample document and see what 'audit-grade evidence' actually looks like. ~10 seconds."
+  />
+</BaseLayout>

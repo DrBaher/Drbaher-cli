@@ -1,12 +1,14 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Callout from '../components/Callout.astro';
+import InstallTabs from '../components/InstallTabs.astro';
+import CodeBlock from '../components/CodeBlock.astro';
 ---
-<BaseLayout title="Install" active="install" description="Install all three CLIs in under two minutes — pipx for nda-review-cli, npm for sign-cli and docx2pdf-cli.">
+<BaseLayout title="Install" active="install" description="Install all three CLIs in under two minutes — pipx for nda-review-cli, npm for sign-cli and docx2pdf-cli." toc>
   <p class="eyebrow">Install</p>
   <h1>Three installs, one workflow.</h1>
 
-  <p class="text-lg text-ink-700">
+  <p class="text-lg text-ink-700 dark:text-night-100">
     Each CLI is a standalone package on its native registry. Install whichever ones you need;
     they don't depend on each other and there's no shared runtime to set up.
   </p>
@@ -25,26 +27,36 @@ import Callout from '../components/Callout.astro';
 
   <h2>nda-review-cli</h2>
   <p>The Python CLI for drafting, reviewing, and negotiating NDAs. Stdlib-only at runtime — pipx installs it cleanly into its own environment.</p>
-  <pre class="codeblock"><code>pipx install nda-review-cli
-nda-review-cli --version
-# nda-review-cli 0.5.0 (or later)
 
-# First-run setup: 16 quick questions to write your house policy
-nda-review-cli quickstart</code></pre>
-  <p>
-    Already have Python and don't want pipx? <code class="chip">pip install --user nda-review-cli</code>
-    works too, or clone the repo and run <code class="chip">./nda_review_cli.py</code> directly — the
-    CLI is single-file Python with stdlib-only dependencies.
-  </p>
+  <InstallTabs
+    id="nda-tabs"
+    tabs={[
+      { id: 'pipx', label: 'pipx', command: 'pipx install nda-review-cli\nnda-review-cli --version', note: 'Recommended — isolates dependencies and adds the CLI to your $PATH.' },
+      { id: 'pip',  label: 'pip',  command: 'pip install --user nda-review-cli', note: 'Use if you don\'t have pipx. Make sure ~/.local/bin is on your $PATH.' },
+      { id: 'src',  label: 'from source', command: 'git clone https://github.com/DrBaher/nda-review-cli.git\ncd nda-review-cli && ./nda_review_cli.py --help', note: 'Single-file stdlib-only Python — runs straight from a clone.' },
+    ]}
+  />
+
+  <CodeBlock label="first-run setup">{`# 16 quick questions write your house policy
+nda-review-cli quickstart`}</CodeBlock>
 
   <h2>docx2pdf-cli</h2>
   <p>The Node.js CLI for DOCX → PDF conversion with hybrid backends.</p>
-  <pre class="codeblock"><code>npm i -g docx2pdf-cli
-docx2pdf --version
 
-# Sanity-check what backends are detected on your machine
+  <InstallTabs
+    id="d2p-tabs"
+    tabs={[
+      { id: 'npm',  label: 'npm',  command: 'npm i -g docx2pdf-cli\ndocx2pdf --version' },
+      { id: 'pnpm', label: 'pnpm', command: 'pnpm add -g docx2pdf-cli' },
+      { id: 'yarn', label: 'yarn', command: 'yarn global add docx2pdf-cli' },
+      { id: 'npx',  label: 'npx',  command: 'npx docx2pdf-cli@latest --doctor', note: 'No install — runs the latest version once.' },
+    ]}
+  />
+
+  <CodeBlock label="sanity check">{`# Probe what backends are detected on this machine
 docx2pdf --doctor
-docx2pdf --list-backends</code></pre>
+docx2pdf --list-backends`}</CodeBlock>
+
   <p>
     The <code class="chip">--doctor</code> probe walks every backend candidate (LibreOffice, Word,
     Pandoc, Gotenberg) and reports which ones are usable. Pick one with <code class="chip">--backend</code>
@@ -53,11 +65,17 @@ docx2pdf --list-backends</code></pre>
 
   <h2>sign-cli</h2>
   <p>The TypeScript CLI for multi-provider e-signature with audit trails.</p>
-  <pre class="codeblock"><code>npm i -g sign-cli
-sign-cli --version
 
-# Or run a one-shot offline demo without installing
-npx sign-cli demo</code></pre>
+  <InstallTabs
+    id="sign-tabs"
+    tabs={[
+      { id: 'npm',  label: 'npm',  command: 'npm i -g sign-cli\nsign-cli --version' },
+      { id: 'pnpm', label: 'pnpm', command: 'pnpm add -g sign-cli' },
+      { id: 'yarn', label: 'yarn', command: 'yarn global add sign-cli' },
+      { id: 'npx',  label: 'npx',  command: 'npx sign-cli@latest demo', note: 'One-shot offline demo — no install required.' },
+    ]}
+  />
+
   <p>
     The offline demo walks the full flow (send → token → sign → verify → receipt) using a built-in
     local provider — no signup, no third-party calls, ~5 seconds end to end.
@@ -67,19 +85,19 @@ npx sign-cli demo</code></pre>
   <p>Each tool keeps its config in standard places. Nothing is shared across tools.</p>
   <table class="not-prose mt-4 w-full border-collapse text-[14px]">
     <thead>
-      <tr class="border-b border-ink-700/15 text-left">
-        <th class="py-2 pr-4 font-semibold text-ink-900">Tool</th>
-        <th class="py-2 pr-4 font-semibold text-ink-900">Config</th>
-        <th class="py-2 pr-4 font-semibold text-ink-900">Sensitive bits</th>
+      <tr class="border-b border-ink-700/15 text-left dark:border-night-300/20">
+        <th class="py-2 pr-4 font-semibold text-ink-900 dark:text-night-50">Tool</th>
+        <th class="py-2 pr-4 font-semibold text-ink-900 dark:text-night-50">Config</th>
+        <th class="py-2 pr-4 font-semibold text-ink-900 dark:text-night-50">Sensitive bits</th>
       </tr>
     </thead>
-    <tbody class="text-ink-700">
-      <tr class="border-b border-ink-700/10">
+    <tbody class="text-ink-700 dark:text-night-100">
+      <tr class="border-b border-ink-700/10 dark:border-night-300/15">
         <td class="py-2 pr-4 font-mono">nda-review-cli</td>
         <td class="py-2 pr-4"><code class="chip">config/org-policy.json</code>, <code class="chip">profiles/</code>, optional <code class="chip">config/llm.json</code></td>
         <td class="py-2 pr-4">LLM provider keys (gitignored)</td>
       </tr>
-      <tr class="border-b border-ink-700/10">
+      <tr class="border-b border-ink-700/10 dark:border-night-300/15">
         <td class="py-2 pr-4 font-mono">docx2pdf-cli</td>
         <td class="py-2 pr-4">Optional <code class="chip">.docx2pdfrc</code></td>
         <td class="py-2 pr-4">Gotenberg URL if remote backend in use</td>
@@ -93,14 +111,14 @@ npx sign-cli demo</code></pre>
   </table>
 
   <h2>Updating</h2>
-  <pre class="codeblock"><code>pipx upgrade nda-review-cli
-npm update -g docx2pdf-cli sign-cli</code></pre>
+  <CodeBlock>{`pipx upgrade nda-review-cli
+npm update -g docx2pdf-cli sign-cli`}</CodeBlock>
 
   <h2>Uninstalling</h2>
   <p>
     Each tool comes off cleanly. There are no daemons, services, or system-wide modifications to
     clean up afterwards.
   </p>
-  <pre class="codeblock"><code>pipx uninstall nda-review-cli
-npm rm -g docx2pdf-cli sign-cli</code></pre>
+  <CodeBlock>{`pipx uninstall nda-review-cli
+npm rm -g docx2pdf-cli sign-cli`}</CodeBlock>
 </BaseLayout>

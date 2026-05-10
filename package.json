@@ -1,21 +1,29 @@
 {
   "name": "drbaher-cli-site",
-  "version": "0.1.0",
+  "version": "0.4.0",
   "type": "module",
   "private": true,
   "description": "Showcase site for nda-review-cli, sign-cli, and docx2pdf-cli — three composable, local-first CLIs for the contract operations workflow.",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "astro build && pagefind --site dist",
     "preview": "astro preview",
     "check": "astro check",
+    "casts": "python3 scripts/gen-casts.py",
     "astro": "astro"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",
+    "@astrojs/rss": "^4.0.10",
+    "@astrojs/sitemap": "3.2.1",
     "@astrojs/tailwind": "^5.1.2",
+    "@resvg/resvg-js": "^2.6.2",
     "@tailwindcss/typography": "^0.5.15",
     "astro": "^4.16.13",
+    "pagefind": "^1.1.1",
+    "rehype-autolink-headings": "^7.1.0",
+    "rehype-slug": "^6.0.0",
+    "satori": "^0.11.2",
     "tailwindcss": "^3.4.13",
     "typescript": "^5.6.3"
   }

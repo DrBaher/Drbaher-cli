@@ -1,68 +1,112 @@
 ---
-// SVG workflow diagram: NDA draft → review → negotiate → docx2pdf → sign → done.
-// Static, no JS. Designed to render well at 720px wide and scale down on mobile.
+// Animated SVG workflow diagram. Five steps with traveling dots that flow
+// across the arrows in sequence (handoff metaphor). Pure SVG SMIL — no JS,
+// works in static export, respects prefers-reduced-motion via CSS.
 ---
-<div class="not-prose my-8 overflow-x-auto rounded-lg border border-ink-700/10 bg-white p-5">
+<div class="not-prose my-8 overflow-x-auto rounded-lg border border-ink-700/10 bg-white p-5 dark:border-night-300/15 dark:bg-night-600">
   <svg viewBox="0 0 720 220" class="mx-auto block h-auto w-full max-w-[720px]" role="img" aria-label="Contract workflow: draft, review, negotiate, convert to PDF, sign">
     <defs>
       <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-        <path d="M 0 0 L 10 5 L 0 10 z" fill="#7a7066"/>
+        <path d="M 0 0 L 10 5 L 0 10 z" class="fill-ink-500 dark:fill-night-200"/>
       </marker>
       <linearGradient id="boxGrad" x1="0" y1="0" x2="0" y2="1">
         <stop offset="0%" stop-color="#fdfcf9"/>
         <stop offset="100%" stop-color="#faf8f3"/>
       </linearGradient>
+      <linearGradient id="boxGradDark" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#1c1916"/>
+        <stop offset="100%" stop-color="#15120f"/>
+      </linearGradient>
+      <radialGradient id="dotGrad">
+        <stop offset="0%" stop-color="#3d9a78" stop-opacity="1"/>
+        <stop offset="60%" stop-color="#1f7d5d" stop-opacity="0.6"/>
+        <stop offset="100%" stop-color="#1f7d5d" stop-opacity="0"/>
+      </radialGradient>
     </defs>
 
     <!-- "your machine" enclosing box -->
-    <rect x="6" y="6" width="708" height="208" rx="10" fill="none" stroke="#cfe9df" stroke-width="1" stroke-dasharray="4 4"/>
-    <text x="20" y="24" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#0f6e51" letter-spacing="0.14em">YOUR MACHINE · NO SAAS · NO TELEMETRY</text>
+    <rect x="6" y="6" width="708" height="208" rx="10" fill="none" class="stroke-accent-200 dark:stroke-accent-700/40" stroke-width="1" stroke-dasharray="4 4"/>
+    <text x="20" y="24" font-family="Inter, sans-serif" font-size="11" font-weight="600" letter-spacing="0.14em" class="fill-accent-700 dark:fill-accent-300">YOUR MACHINE · NO SAAS · NO TELEMETRY</text>
 
-    <!-- Step boxes -->
-    <!-- 1. Draft -->
-    <rect x="20" y="60" width="120" height="64" rx="6" fill="url(#boxGrad)" stroke="#cfe9df"/>
-    <text x="80" y="84" font-family="JetBrains Mono, monospace" font-size="11" text-anchor="middle" fill="#0f6e51" font-weight="600">nda-review-cli</text>
-    <text x="80" y="105" font-family="Inter, sans-serif" font-size="13" text-anchor="middle" fill="#1a1612" font-weight="600">draft</text>
+    <!-- Step boxes — same look in light, swapped fill in dark via class -->
+    <g class="step-box">
+      <rect x="20" y="60" width="120" height="64" rx="6" fill="url(#boxGrad)" class="dark:[fill:url(#boxGradDark)] stroke-accent-200 dark:stroke-accent-700/40"/>
+      <text x="80" y="84" font-family="JetBrains Mono, monospace" font-size="11" text-anchor="middle" font-weight="600" class="fill-accent-700 dark:fill-accent-300">nda-review-cli</text>
+      <text x="80" y="105" font-family="Inter, sans-serif" font-size="13" text-anchor="middle" font-weight="600" class="fill-ink-900 dark:fill-night-50">draft</text>
+    </g>
+    <g class="step-box">
+      <rect x="160" y="60" width="120" height="64" rx="6" fill="url(#boxGrad)" class="dark:[fill:url(#boxGradDark)] stroke-accent-200 dark:stroke-accent-700/40"/>
+      <text x="220" y="84" font-family="JetBrains Mono, monospace" font-size="11" text-anchor="middle" font-weight="600" class="fill-accent-700 dark:fill-accent-300">nda-review-cli</text>
+      <text x="220" y="105" font-family="Inter, sans-serif" font-size="13" text-anchor="middle" font-weight="600" class="fill-ink-900 dark:fill-night-50">review</text>
+    </g>
+    <g class="step-box">
+      <rect x="300" y="60" width="120" height="64" rx="6" fill="url(#boxGrad)" class="dark:[fill:url(#boxGradDark)] stroke-accent-200 dark:stroke-accent-700/40"/>
+      <text x="360" y="84" font-family="JetBrains Mono, monospace" font-size="11" text-anchor="middle" font-weight="600" class="fill-accent-700 dark:fill-accent-300">nda-review-cli</text>
+      <text x="360" y="105" font-family="Inter, sans-serif" font-size="13" text-anchor="middle" font-weight="600" class="fill-ink-900 dark:fill-night-50">negotiate</text>
+    </g>
+    <g class="step-box">
+      <rect x="440" y="60" width="120" height="64" rx="6" fill="url(#boxGrad)" class="dark:[fill:url(#boxGradDark)] stroke-accent-200 dark:stroke-accent-700/40"/>
+      <text x="500" y="84" font-family="JetBrains Mono, monospace" font-size="11" text-anchor="middle" font-weight="600" class="fill-accent-700 dark:fill-accent-300">docx2pdf-cli</text>
+      <text x="500" y="105" font-family="Inter, sans-serif" font-size="13" text-anchor="middle" font-weight="600" class="fill-ink-900 dark:fill-night-50">convert</text>
+    </g>
+    <g class="step-box">
+      <rect x="580" y="60" width="120" height="64" rx="6" fill="url(#boxGrad)" class="dark:[fill:url(#boxGradDark)] stroke-accent-200 dark:stroke-accent-700/40"/>
+      <text x="640" y="84" font-family="JetBrains Mono, monospace" font-size="11" text-anchor="middle" font-weight="600" class="fill-accent-700 dark:fill-accent-300">sign-cli</text>
+      <text x="640" y="105" font-family="Inter, sans-serif" font-size="13" text-anchor="middle" font-weight="600" class="fill-ink-900 dark:fill-night-50">sign</text>
+    </g>
 
-    <!-- 2. Review -->
-    <rect x="160" y="60" width="120" height="64" rx="6" fill="url(#boxGrad)" stroke="#cfe9df"/>
-    <text x="220" y="84" font-family="JetBrains Mono, monospace" font-size="11" text-anchor="middle" fill="#0f6e51" font-weight="600">nda-review-cli</text>
-    <text x="220" y="105" font-family="Inter, sans-serif" font-size="13" text-anchor="middle" fill="#1a1612" font-weight="600">review</text>
+    <!-- Arrow paths (also used as motion paths for the traveling dots) -->
+    <path id="flow1" d="M142 92 L158 92" class="stroke-ink-500 dark:stroke-night-200" stroke-width="1.4" fill="none" marker-end="url(#arrow)"/>
+    <path id="flow2" d="M282 92 L298 92" class="stroke-ink-500 dark:stroke-night-200" stroke-width="1.4" fill="none" marker-end="url(#arrow)"/>
+    <path id="flow3" d="M422 92 L438 92" class="stroke-ink-500 dark:stroke-night-200" stroke-width="1.4" fill="none" marker-end="url(#arrow)"/>
+    <path id="flow4" d="M562 92 L578 92" class="stroke-ink-500 dark:stroke-night-200" stroke-width="1.4" fill="none" marker-end="url(#arrow)"/>
 
-    <!-- 3. Negotiate -->
-    <rect x="300" y="60" width="120" height="64" rx="6" fill="url(#boxGrad)" stroke="#cfe9df"/>
-    <text x="360" y="84" font-family="JetBrains Mono, monospace" font-size="11" text-anchor="middle" fill="#0f6e51" font-weight="600">nda-review-cli</text>
-    <text x="360" y="105" font-family="Inter, sans-serif" font-size="13" text-anchor="middle" fill="#1a1612" font-weight="600">negotiate</text>
-
-    <!-- 4. docx2pdf -->
-    <rect x="440" y="60" width="120" height="64" rx="6" fill="url(#boxGrad)" stroke="#cfe9df"/>
-    <text x="500" y="84" font-family="JetBrains Mono, monospace" font-size="11" text-anchor="middle" fill="#0f6e51" font-weight="600">docx2pdf-cli</text>
-    <text x="500" y="105" font-family="Inter, sans-serif" font-size="13" text-anchor="middle" fill="#1a1612" font-weight="600">convert</text>
-
-    <!-- 5. sign -->
-    <rect x="580" y="60" width="120" height="64" rx="6" fill="url(#boxGrad)" stroke="#cfe9df"/>
-    <text x="640" y="84" font-family="JetBrains Mono, monospace" font-size="11" text-anchor="middle" fill="#0f6e51" font-weight="600">sign-cli</text>
-    <text x="640" y="105" font-family="Inter, sans-serif" font-size="13" text-anchor="middle" fill="#1a1612" font-weight="600">sign</text>
-
-    <!-- Arrows between -->
-    <line x1="142" y1="92" x2="158" y2="92" stroke="#7a7066" stroke-width="1.4" marker-end="url(#arrow)"/>
-    <line x1="282" y1="92" x2="298" y2="92" stroke="#7a7066" stroke-width="1.4" marker-end="url(#arrow)"/>
-    <line x1="422" y1="92" x2="438" y2="92" stroke="#7a7066" stroke-width="1.4" marker-end="url(#arrow)"/>
-    <line x1="562" y1="92" x2="578" y2="92" stroke="#7a7066" stroke-width="1.4" marker-end="url(#arrow)"/>
+    <!-- Traveling dots — one per arrow, staggered begin times so it reads as a relay -->
+    <circle r="4.5" fill="url(#dotGrad)" class="flow-dot">
+      <animateMotion dur="8s" repeatCount="indefinite" begin="0s" rotate="auto">
+        <mpath href="#flow1"/>
+      </animateMotion>
+      <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.05;0.95;1" dur="8s" repeatCount="indefinite" begin="0s"/>
+    </circle>
+    <circle r="4.5" fill="url(#dotGrad)" class="flow-dot">
+      <animateMotion dur="8s" repeatCount="indefinite" begin="2s" rotate="auto">
+        <mpath href="#flow2"/>
+      </animateMotion>
+      <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.05;0.95;1" dur="8s" repeatCount="indefinite" begin="2s"/>
+    </circle>
+    <circle r="4.5" fill="url(#dotGrad)" class="flow-dot">
+      <animateMotion dur="8s" repeatCount="indefinite" begin="4s" rotate="auto">
+        <mpath href="#flow3"/>
+      </animateMotion>
+      <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.05;0.95;1" dur="8s" repeatCount="indefinite" begin="4s"/>
+    </circle>
+    <circle r="4.5" fill="url(#dotGrad)" class="flow-dot">
+      <animateMotion dur="8s" repeatCount="indefinite" begin="6s" rotate="auto">
+        <mpath href="#flow4"/>
+      </animateMotion>
+      <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.05;0.95;1" dur="8s" repeatCount="indefinite" begin="6s"/>
+    </circle>
 
     <!-- Output labels under each transition -->
-    <text x="80"  y="148" font-family="Inter, sans-serif" font-size="11" text-anchor="middle" fill="#5e544a">.md / .docx</text>
-    <text x="220" y="148" font-family="Inter, sans-serif" font-size="11" text-anchor="middle" fill="#5e544a">findings + score</text>
-    <text x="360" y="148" font-family="Inter, sans-serif" font-size="11" text-anchor="middle" fill="#5e544a">agreed text</text>
-    <text x="500" y="148" font-family="Inter, sans-serif" font-size="11" text-anchor="middle" fill="#5e544a">.pdf</text>
-    <text x="640" y="148" font-family="Inter, sans-serif" font-size="11" text-anchor="middle" fill="#5e544a">signed.pdf + audit</text>
+    <text x="80"  y="148" font-family="Inter, sans-serif" font-size="11" text-anchor="middle" class="fill-ink-600 dark:fill-night-200">.md / .docx</text>
+    <text x="220" y="148" font-family="Inter, sans-serif" font-size="11" text-anchor="middle" class="fill-ink-600 dark:fill-night-200">findings + score</text>
+    <text x="360" y="148" font-family="Inter, sans-serif" font-size="11" text-anchor="middle" class="fill-ink-600 dark:fill-night-200">agreed text</text>
+    <text x="500" y="148" font-family="Inter, sans-serif" font-size="11" text-anchor="middle" class="fill-ink-600 dark:fill-night-200">.pdf</text>
+    <text x="640" y="148" font-family="Inter, sans-serif" font-size="11" text-anchor="middle" class="fill-ink-600 dark:fill-night-200">signed.pdf + audit</text>
 
     <!-- Bottom strip with role labels -->
-    <line x1="20" y1="170" x2="700" y2="170" stroke="#e6f4ef" stroke-width="1"/>
-    <text x="80"  y="190" font-family="Inter, sans-serif" font-size="11" text-anchor="middle" fill="#5e544a">house policy</text>
-    <text x="220" y="190" font-family="Inter, sans-serif" font-size="11" text-anchor="middle" fill="#5e544a">your rules</text>
-    <text x="360" y="190" font-family="Inter, sans-serif" font-size="11" text-anchor="middle" fill="#5e544a">two-party</text>
-    <text x="500" y="190" font-family="Inter, sans-serif" font-size="11" text-anchor="middle" fill="#5e544a">hybrid backend</text>
-    <text x="640" y="190" font-family="Inter, sans-serif" font-size="11" text-anchor="middle" fill="#5e544a">hash-chained</text>
+    <line x1="20" y1="170" x2="700" y2="170" class="stroke-accent-100 dark:stroke-accent-700/30" stroke-width="1"/>
+    <text x="80"  y="190" font-family="Inter, sans-serif" font-size="11" text-anchor="middle" class="fill-ink-600 dark:fill-night-200">house policy</text>
+    <text x="220" y="190" font-family="Inter, sans-serif" font-size="11" text-anchor="middle" class="fill-ink-600 dark:fill-night-200">your rules</text>
+    <text x="360" y="190" font-family="Inter, sans-serif" font-size="11" text-anchor="middle" class="fill-ink-600 dark:fill-night-200">two-party</text>
+    <text x="500" y="190" font-family="Inter, sans-serif" font-size="11" text-anchor="middle" class="fill-ink-600 dark:fill-night-200">hybrid backend</text>
+    <text x="640" y="190" font-family="Inter, sans-serif" font-size="11" text-anchor="middle" class="fill-ink-600 dark:fill-night-200">hash-chained</text>
   </svg>
 </div>
+
+<style>
+  /* Pause animation for users who prefer reduced motion. */
+  @media (prefers-reduced-motion: reduce) {
+    .flow-dot { display: none; }
+  }
+</style>
