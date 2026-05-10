@@ -1,0 +1,93 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Callout from '../../components/Callout.astro';
+---
+<BaseLayout title="sign-cli" active="tools/sign-cli" description="Multi-provider e-signature CLI with hash-chained audit events, RFC 3161 timestamps, per-signer approval tokens, and an MCP server for AI agents.">
+  <p class="eyebrow">Tool · TypeScript</p>
+  <h1><span class="font-mono">sign-cli</span></h1>
+  <p class="text-lg text-ink-700">
+    A command-line e-signature tool for humans, ops teams, and AI agents. Send PDFs to multiple signers
+    across multiple providers, capture every event in a hash-chained audit log, and prove what was
+    signed and when with RFC 3161 timestamps.
+  </p>
+
+  <Callout label="TL;DR">
+    <code class="chip">npm i -g sign-cli</code> — or <code class="chip">npx sign-cli demo</code> for an
+    offline five-second walkthrough. Pick a provider (Dropbox Sign, DocuSign, SignWell, or the local
+    test provider) and send a PDF with one command.
+  </Callout>
+
+  <h2>What it does</h2>
+
+  <ul>
+    <li><strong>Multi-provider sending.</strong> Dropbox Sign, DocuSign, and SignWell are wired in; the local provider runs offline for testing and CI.</li>
+    <li><strong>Per-signer approval tokens with TTL.</strong> Every signer gets an explicit token tied to their email; agents can't impersonate humans, and tokens expire.</li>
+    <li><strong>Hash-chained audit events.</strong> Every signing event hashes into the previous event. Tampering with any past entry breaks the chain and fails verification.</li>
+    <li><strong>RFC 3161 timestamping.</strong> External timestamp authority anchors prove a signature existed by a given date — durable evidence that survives even if the provider disappears.</li>
+    <li><strong>Bulk via CSV.</strong> Send the same document to many signers, or many documents to one signer, from a single CSV file.</li>
+    <li><strong>PDF verification.</strong> Verify a signed PDF later, off-line, with the receipt bundle.</li>
+    <li><strong>MCP server included.</strong> An LLM agent (Claude, Cursor, Codex, etc.) can drive the signing workflow with the same primitives you use from the shell.</li>
+  </ul>
+
+  <h2>Quickstart</h2>
+
+  <pre class="codeblock"><code># Install
+npm i -g sign-cli
+
+# Or run the offline demo without installing
+npx sign-cli demo
+
+# Send a single document to two signers
+sign-cli send \
+  --file contract.pdf \
+  --signer "alice@acme.com:Alice Founder" \
+  --signer "bob@beta.com:Bob Counsel" \
+  --provider sign-well</code></pre>
+
+  <h2>Verify a signed PDF</h2>
+
+  <p>
+    Verification is offline and works on any signed PDF the tool produced. The receipt bundle
+    contains the audit chain, the timestamp anchor, and metadata you can hand to opposing counsel
+    or a court without further cooperation from the signing provider.
+  </p>
+
+  <pre class="codeblock"><code>sign-cli verify contract.signed.pdf
+# OK · 2 signers · audit chain intact · timestamp anchor verified</code></pre>
+
+  <h2>MCP server for agents</h2>
+
+  <p>
+    Every CLI command is also exposed as an MCP tool over stdio. Wire it into Claude Code, Cursor,
+    or any other MCP-aware client and your agent can drive the signing workflow with the same
+    primitives — including the per-signer approval-token guardrail, so a runaway agent can't sign
+    on a human's behalf.
+  </p>
+
+  <pre class="codeblock"><code>npx sign-cli mcp        # start the MCP server on stdio</code></pre>
+
+  <h2>Where it fits in the workflow</h2>
+
+  <p>
+    <code class="chip">sign-cli</code> is the last step in the contract pipeline — after
+    <a href="/tools/nda-review-cli/">nda-review-cli</a> produces the agreed text and
+    <a href="/tools/docx2pdf-cli/">docx2pdf-cli</a> renders the PDF. <a href="/workflow/">See the
+    full workflow page</a> for the chained commands.
+  </p>
+
+  <p>
+    It also stands alone for any document that needs signing — vendor agreements, employment
+    documents, board consents, anything PDF.
+  </p>
+
+  <h2>Live demo</h2>
+
+  <p>
+    There's a live read-only browser demo of the full flow at
+    <a href="https://sign-cli-demo-production.up.railway.app/web-demo/" target="_blank" rel="noopener">sign-cli-demo-production.up.railway.app</a>.
+    Sandboxes reset every few hours; nothing you enter is preserved.
+  </p>
+
+  <h2>Repo</h2>
+  <p><a href="https://github.com/DrBaher/sign-cli" target="_blank" rel="noopener">github.com/DrBaher/sign-cli</a> · MIT licensed · TypeScript · MCP server included.</p>
+</BaseLayout>

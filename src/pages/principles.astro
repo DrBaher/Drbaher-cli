@@ -1,0 +1,96 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Callout from '../components/Callout.astro';
+---
+<BaseLayout title="Principles" active="principles" description="The shared design ethos behind nda-review-cli, docx2pdf-cli, and sign-cli — local-first, deterministic, auditable, no vendor lock-in.">
+  <p class="eyebrow">Principles</p>
+  <h1>What these tools have in common.</h1>
+
+  <p class="text-lg text-ink-700">
+    The three CLIs were built independently for different problems, but they share a small set of
+    convictions. If you find yourself disagreeing with one of these, the suite probably isn't the
+    right fit for you — and that's fine.
+  </p>
+
+  <Callout label="TL;DR">
+    Local-first by default. Deterministic where possible. Audit-grade evidence baked in.
+    No SaaS account required. No vendor lock-in. Each tool replaceable.
+  </Callout>
+
+  <h2>1 — Local-first by default</h2>
+  <p>
+    Every tool runs offline as the default mode. If a step needs the network — calling an LLM,
+    posting to a signature provider, hitting a remote PDF backend — it's behind an explicit flag,
+    with the destination disclosed before the call goes out. Nothing phones home. There is no
+    telemetry endpoint to disable because there is no telemetry.
+  </p>
+
+  <h2>2 — Deterministic where possible</h2>
+  <p>
+    Same input plus same configuration should produce the same output. Reviews don't change between
+    runs. Drafts don't include a timestamp inside the contract body. Signature receipts hash-chain
+    the events so a third party can replay the audit trail and verify it independently.
+  </p>
+  <p>
+    LLM augmentation is opt-in and isolated under its own keys in the output — the deterministic
+    rule output is never overwritten by the model's suggestions.
+  </p>
+
+  <h2>3 — Audit-grade evidence baked in</h2>
+  <p>
+    These tools are useful precisely when you need to defend what happened. Negotiation rounds are
+    hash-chained. Signature events are hash-chained and RFC 3161 timestamped. Draft outputs include
+    the policy snapshot they were rendered against. If you ever have to reconstruct who agreed to
+    what, on which day, and why, the evidence is on disk in a format another tool can read.
+  </p>
+
+  <h2>4 — Composable over monolithic</h2>
+  <p>
+    Each CLI does one thing. The output of one tool is a standard file format that any other tool
+    can read. There's no shared database, no daemon process, no proprietary glue. If a better
+    DOCX-to-PDF converter shows up tomorrow, swap it in. If you'd rather sign with a notary than an
+    e-signature provider, skip <code class="chip">sign-cli</code> entirely. The workflow doesn't
+    care.
+  </p>
+
+  <h2>5 — Honest failure</h2>
+  <p>
+    When something can't work, the tool says so loudly and exits with a non-zero status. Documents
+    don't get silently mangled. Fonts that aren't installed get flagged before conversion, not
+    substituted invisibly. Hash-chain mismatches halt processing. There's no "best effort" mode
+    where the tool quietly does the wrong thing — that's a category of bug that costs people
+    trust, and trust is the whole point.
+  </p>
+
+  <h2>6 — No new runtime dependencies, when avoidable</h2>
+  <p>
+    The Python CLI is stdlib-only at runtime — no Flask, no <code class="chip">requests</code>,
+    no SDKs. The Node CLIs keep their dep trees small and audited. This isn't dogma; it's a
+    forcing function for clarity. Fewer dependencies means a smaller attack surface, fewer
+    install surprises, and code that's easier to read end to end.
+  </p>
+
+  <h2>7 — Open source, MIT licensed</h2>
+  <p>
+    Every line of code is on GitHub under the MIT license. Fork it, vendor it, modify it for
+    your firm's house style. The only thing we ask is the standard MIT attribution; that's it.
+  </p>
+
+  <h2>What we deliberately don't do</h2>
+
+  <ul>
+    <li><strong>No multi-tenant SaaS.</strong> Each install belongs to one user or one team. There is no shared backend to compromise.</li>
+    <li><strong>No clause-by-clause AI-generated drafts.</strong> The tools render templates with your policy's preferred language; they don't fabricate clauses on the fly.</li>
+    <li><strong>No "automatic" signing without explicit per-signer approval tokens.</strong> Every signature requires a human gesture, even when an agent kicked off the workflow.</li>
+    <li><strong>No telemetry or usage analytics.</strong> We don't know who installs these tools. We'd rather not.</li>
+    <li><strong>No ML-driven contract generation.</strong> LLM features (where they exist) augment a deterministic baseline; they don't replace it.</li>
+  </ul>
+
+  <h2>Where this comes from</h2>
+  <p>
+    Most legal-tech products optimize for vendor-side metrics: lock-in, daily active users, premium
+    tiers. The three CLIs here optimize for the user-side metric instead — would I, the person doing
+    actual contract work, trust this output enough to put my name on it? Everything in the design
+    follows from that question.
+  </p>
+</BaseLayout>

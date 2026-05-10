@@ -1,0 +1,59 @@
+---
+import '../styles/global.css';
+import Sidebar from '../components/Sidebar.astro';
+import Footer from '../components/Footer.astro';
+
+export interface Props {
+  title: string;
+  description?: string;
+  /** Active path key for sidebar highlight (e.g. 'overview', 'workflow', 'tools/nda-review-cli'). */
+  active?: string;
+}
+
+const { title, description, active } = Astro.props as Props;
+const fullTitle = title === 'Overview' ? 'CLI tools for the contract workflow' : `${title} — CLI tools for contracts`;
+const desc = description ?? 'Three composable, local-first CLIs for drafting, reviewing, signing, and converting contracts. Open source, deterministic, no SaaS.';
+---
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="generator" content={Astro.generator} />
+  <title>{fullTitle}</title>
+  <meta name="description" content={desc} />
+  <meta property="og:title" content={fullTitle} />
+  <meta property="og:description" content={desc} />
+  <meta property="og:type" content="website" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+</head>
+<body class="min-h-screen bg-cream-50 text-ink-800 antialiased">
+  <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded focus:bg-ink-900 focus:px-3 focus:py-1.5 focus:text-cream-50">Skip to content</a>
+
+  <div class="mx-auto flex max-w-[1180px] flex-col lg:grid lg:grid-cols-[260px_1fr]">
+    <Sidebar active={active} />
+
+    <main id="main" class="min-w-0 px-5 py-8 sm:px-8 lg:px-10 lg:py-12">
+      <article class="prose prose-ink max-w-none">
+        <slot />
+      </article>
+      <Footer />
+    </main>
+  </div>
+
+  <script>
+    // Mobile sidebar toggle (no framework — vanilla)
+    const btn = document.getElementById('nav-toggle');
+    const sidebar = document.getElementById('sidebar');
+    const close = document.getElementById('nav-close');
+    function open() { sidebar?.classList.remove('hidden'); sidebar?.classList.add('flex'); document.body.classList.add('overflow-hidden'); }
+    function shut() { sidebar?.classList.add('hidden'); sidebar?.classList.remove('flex'); document.body.classList.remove('overflow-hidden'); }
+    btn?.addEventListener('click', open);
+    close?.addEventListener('click', shut);
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') shut(); });
+  </script>
+</body>
+</html>

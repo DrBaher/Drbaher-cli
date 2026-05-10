@@ -1,0 +1,127 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Callout from '../components/Callout.astro';
+import WorkflowDiagram from '../components/WorkflowDiagram.astro';
+---
+<BaseLayout title="The workflow" active="workflow" description="How nda-review-cli, docx2pdf-cli, and sign-cli chain together into a complete contract pipeline — with copy-paste commands at each step.">
+  <p class="eyebrow">The workflow</p>
+  <h1>From blank page to signed agreement, on your machine.</h1>
+
+  <p class="text-lg text-ink-700">
+    Five steps. Each is a single CLI invocation. The output of one step is the input of the next.
+    Stop at any point — the artifacts you have are useful on their own.
+  </p>
+
+  <Callout label="TL;DR">
+    <code class="chip">draft</code> → <code class="chip">review</code> → <code class="chip">negotiate</code> →
+    <code class="chip">docx2pdf</code> → <code class="chip">sign</code>. Three tools, five commands, no SaaS,
+    no shared database. Files in, files out.
+  </Callout>
+
+  <WorkflowDiagram />
+
+  <h2>1 — Draft</h2>
+  <p>
+    Start with <code class="chip">nda-review-cli</code>. Pick a template (the bundled mutual or one-way templates,
+    or the Common Paper Mutual NDA Version 1.0 that ships with the tool), fill in the parties and purpose,
+    and render the document. You get markdown plus a <code class="chip">.docx</code> ready to send.
+  </p>
+  <pre class="codeblock"><code>nda-review-cli draft \
+  --template common-paper-mutual \
+  --party-a "Acme Inc." --party-a-address "123 Main St" \
+  --party-b "Beta LLC"  --party-b-address "10 Market Way" \
+  --purpose "evaluating a partnership" \
+  --governing-law "California" \
+  --out output/nda.md \
+  --out-docx output/nda.docx</code></pre>
+
+  <h2>2 — Review</h2>
+  <p>
+    Whether the document was drafted by you or arrived from the other side, run it through
+    <code class="chip">review</code> to score it against your house policy. Findings come with severity,
+    matched rule patterns, and clause-level evidence. Optionally add <code class="chip">--llm</code>
+    to layer in a second-pass adjudication from your model of choice.
+  </p>
+  <pre class="codeblock"><code>nda-review-cli review --file output/nda.md --why \
+  --out-md output/review.md</code></pre>
+
+  <h2>3 — Negotiate</h2>
+  <p>
+    If the counterparty has the CLI installed too, you can run a structured back-and-forth on a single
+    state file that bounces between you (email, Drive, Git — whatever channel you prefer). Each round
+    is signed and hash-chained; tampering is detected on load. Stance, clause priorities, and
+    non-negotiable redlines all live in your local policy.
+  </p>
+  <pre class="codeblock"><code># Party A starts the negotiation
+nda-review-cli negotiate init --template common-paper-mutual ... --out neg.json
+
+# Party B counters using their own policy and stance
+nda-review-cli negotiate counter --state neg.json --as b --auto
+
+# Party A reviews the diff and accepts
+nda-review-cli negotiate diff   --state neg.json --out-md round-2.md
+nda-review-cli negotiate accept --state neg.json --as a
+
+# Both sign off; finalize emits the agreed text
+nda-review-cli negotiate sign-off --state neg.json --as a --yes
+nda-review-cli negotiate sign-off --state neg.json --as b --yes
+nda-review-cli negotiate finalize --state neg.json \
+  --out-md output/agreed.md --out-docx output/agreed.docx</code></pre>
+
+  <p>
+    No counterparty CLI install? Send them the <code class="chip">.docx</code> directly and skip ahead.
+    Negotiation is opt-in; the workflow doesn't depend on it.
+  </p>
+
+  <h2>4 — Convert to PDF</h2>
+  <p>
+    Once you have an agreed <code class="chip">.docx</code>, hand it to <code class="chip">docx2pdf-cli</code>.
+    Single-file or batch, parallel processing, font validation, and a hybrid backend strategy that picks
+    the right converter for what's on your machine. No silent fallbacks — failures are loud, fonts are
+    checked, the output is honest.
+  </p>
+  <pre class="codeblock"><code>docx2pdf output/agreed.docx output/agreed.pdf
+
+# or for a folder full of contracts:
+docx2pdf --concurrency 4 --out-dir ./pdfs ./drafts/*.docx</code></pre>
+
+  <h2>5 — Sign</h2>
+  <p>
+    Hand the PDF to <code class="chip">sign-cli</code>. Pick a provider (Dropbox Sign, DocuSign, SignWell,
+    or the local provider for testing). Each signer gets a per-recipient approval token with a TTL.
+    Every signing event lands in a hash-chained audit log, and the final receipt bundle includes
+    RFC 3161 timestamps so you can prove what was signed and when, even years later.
+  </p>
+  <pre class="codeblock"><code>sign-cli send \
+  --file output/agreed.pdf \
+  --signer "alice@acme.com:Alice Founder" \
+  --signer "bob@beta.com:Bob Counsel" \
+  --provider sign-well
+
+# verify a signed PDF later
+sign-cli verify output/agreed.signed.pdf</code></pre>
+
+  <h2>What you end up with</h2>
+
+  <ul>
+    <li><code class="chip">output/agreed.md</code> — the human-readable agreed text</li>
+    <li><code class="chip">output/agreed.docx</code> — the same content as a Word document</li>
+    <li><code class="chip">output/agreed.pdf</code> — the rendered PDF</li>
+    <li><code class="chip">output/agreed.signed.pdf</code> — the signed PDF, with embedded signatures</li>
+    <li>A <strong>negotiation state file</strong> with every round, every amendment, every signature, hash-chained</li>
+    <li>A <strong>signing receipt bundle</strong> with all audit events and timestamps</li>
+  </ul>
+
+  <p>
+    All of these live on your machine. Nothing is held by a vendor. You can archive them, version-control
+    them, or hand them to opposing counsel as evidence of what was agreed and when. That's the whole
+    point.
+  </p>
+
+  <h2>Skipping or substituting steps</h2>
+  <p>
+    Each tool stands alone. If you already have a Word template, skip step 1. If you sign with a
+    notary or a different e-signature provider, skip step 5 — you'll still have a clean PDF from step 4.
+    The point isn't that you must use all three; it's that they compose cleanly when you do.
+  </p>
+</BaseLayout>

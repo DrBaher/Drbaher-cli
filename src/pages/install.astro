@@ -1,0 +1,106 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Callout from '../components/Callout.astro';
+---
+<BaseLayout title="Install" active="install" description="Install all three CLIs in under two minutes — pipx for nda-review-cli, npm for sign-cli and docx2pdf-cli.">
+  <p class="eyebrow">Install</p>
+  <h1>Three installs, one workflow.</h1>
+
+  <p class="text-lg text-ink-700">
+    Each CLI is a standalone package on its native registry. Install whichever ones you need;
+    they don't depend on each other and there's no shared runtime to set up.
+  </p>
+
+  <Callout label="TL;DR">
+    <code class="chip">pipx install nda-review-cli</code> · <code class="chip">npm i -g docx2pdf-cli</code> · <code class="chip">npm i -g sign-cli</code>.
+    Verify with <code class="chip">--version</code> on each.
+  </Callout>
+
+  <h2>Prerequisites</h2>
+  <ul>
+    <li><strong>Python 3.9+</strong> with <code class="chip">pipx</code> for nda-review-cli. Install pipx via <code class="chip">brew install pipx</code> or your distro package manager, then <code class="chip">pipx ensurepath</code>.</li>
+    <li><strong>Node.js 18+</strong> for sign-cli and docx2pdf-cli. Install via <code class="chip">brew install node</code>, <code class="chip">nvm</code>, or your platform's installer.</li>
+    <li><strong>A PDF backend</strong> (only for docx2pdf-cli) — LibreOffice, Microsoft Word, Pandoc, or a Gotenberg server. The tool auto-detects what's installed.</li>
+  </ul>
+
+  <h2>nda-review-cli</h2>
+  <p>The Python CLI for drafting, reviewing, and negotiating NDAs. Stdlib-only at runtime — pipx installs it cleanly into its own environment.</p>
+  <pre class="codeblock"><code>pipx install nda-review-cli
+nda-review-cli --version
+# nda-review-cli 0.5.0 (or later)
+
+# First-run setup: 16 quick questions to write your house policy
+nda-review-cli quickstart</code></pre>
+  <p>
+    Already have Python and don't want pipx? <code class="chip">pip install --user nda-review-cli</code>
+    works too, or clone the repo and run <code class="chip">./nda_review_cli.py</code> directly — the
+    CLI is single-file Python with stdlib-only dependencies.
+  </p>
+
+  <h2>docx2pdf-cli</h2>
+  <p>The Node.js CLI for DOCX → PDF conversion with hybrid backends.</p>
+  <pre class="codeblock"><code>npm i -g docx2pdf-cli
+docx2pdf --version
+
+# Sanity-check what backends are detected on your machine
+docx2pdf --doctor
+docx2pdf --list-backends</code></pre>
+  <p>
+    The <code class="chip">--doctor</code> probe walks every backend candidate (LibreOffice, Word,
+    Pandoc, Gotenberg) and reports which ones are usable. Pick one with <code class="chip">--backend</code>
+    or let the tool auto-select.
+  </p>
+
+  <h2>sign-cli</h2>
+  <p>The TypeScript CLI for multi-provider e-signature with audit trails.</p>
+  <pre class="codeblock"><code>npm i -g sign-cli
+sign-cli --version
+
+# Or run a one-shot offline demo without installing
+npx sign-cli demo</code></pre>
+  <p>
+    The offline demo walks the full flow (send → token → sign → verify → receipt) using a built-in
+    local provider — no signup, no third-party calls, ~5 seconds end to end.
+  </p>
+
+  <h2>Configuration locations</h2>
+  <p>Each tool keeps its config in standard places. Nothing is shared across tools.</p>
+  <table class="not-prose mt-4 w-full border-collapse text-[14px]">
+    <thead>
+      <tr class="border-b border-ink-700/15 text-left">
+        <th class="py-2 pr-4 font-semibold text-ink-900">Tool</th>
+        <th class="py-2 pr-4 font-semibold text-ink-900">Config</th>
+        <th class="py-2 pr-4 font-semibold text-ink-900">Sensitive bits</th>
+      </tr>
+    </thead>
+    <tbody class="text-ink-700">
+      <tr class="border-b border-ink-700/10">
+        <td class="py-2 pr-4 font-mono">nda-review-cli</td>
+        <td class="py-2 pr-4"><code class="chip">config/org-policy.json</code>, <code class="chip">profiles/</code>, optional <code class="chip">config/llm.json</code></td>
+        <td class="py-2 pr-4">LLM provider keys (gitignored)</td>
+      </tr>
+      <tr class="border-b border-ink-700/10">
+        <td class="py-2 pr-4 font-mono">docx2pdf-cli</td>
+        <td class="py-2 pr-4">Optional <code class="chip">.docx2pdfrc</code></td>
+        <td class="py-2 pr-4">Gotenberg URL if remote backend in use</td>
+      </tr>
+      <tr>
+        <td class="py-2 pr-4 font-mono">sign-cli</td>
+        <td class="py-2 pr-4"><code class="chip">~/.config/sign-cli/</code> or env vars</td>
+        <td class="py-2 pr-4">Provider API keys (Dropbox Sign, DocuSign, SignWell)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Updating</h2>
+  <pre class="codeblock"><code>pipx upgrade nda-review-cli
+npm update -g docx2pdf-cli sign-cli</code></pre>
+
+  <h2>Uninstalling</h2>
+  <p>
+    Each tool comes off cleanly. There are no daemons, services, or system-wide modifications to
+    clean up afterwards.
+  </p>
+  <pre class="codeblock"><code>pipx uninstall nda-review-cli
+npm rm -g docx2pdf-cli sign-cli</code></pre>
+</BaseLayout>

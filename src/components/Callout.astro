@@ -1,0 +1,16 @@
+---
+export interface Props {
+  /** Eyebrow label like "TL;DR" or "Heads up". */
+  label?: string;
+  /** Visual flavor. `info` is the default green; `warn` is amber. */
+  variant?: 'info' | 'warn';
+}
+const { label = 'TL;DR', variant = 'info' } = Astro.props as Props;
+const cls = variant === 'warn'
+  ? 'border-l-2 border-amber-600 bg-amber-50'
+  : 'border-l-2 border-accent-600 bg-mint-50';
+---
+<div class={`my-6 rounded-r px-5 py-3.5 text-ink-800 ${cls}`}>
+  <strong class="font-semibold text-ink-900">{label} —</strong>
+  <span class="ml-1"><slot /></span>
+</div>

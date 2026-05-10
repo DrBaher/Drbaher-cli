@@ -1,0 +1,87 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Callout from '../components/Callout.astro';
+import ToolCard from '../components/ToolCard.astro';
+import WorkflowDiagram from '../components/WorkflowDiagram.astro';
+---
+<BaseLayout title="Overview" active="overview" description="Three composable, local-first CLIs for the contract workflow: draft and review NDAs, convert documents to PDF, and collect signatures with an audit trail.">
+  <p class="eyebrow">Overview</p>
+  <h1>Three CLIs for the contract workflow.</h1>
+  <p class="text-lg text-ink-700">
+    Draft an NDA against your house playbook. Review what counterparties send you. Negotiate, convert to PDF,
+    collect signatures with a tamper-evident audit trail. Each tool is independently useful; together they
+    cover the full lifecycle from blank page to signed agreement.
+  </p>
+
+  <Callout label="TL;DR">
+    Three open-source CLIs, three repositories, one workflow. Local-first by default —
+    no SaaS account, no telemetry, no vendor lock-in. Use them piecemeal or chain them together.
+  </Callout>
+
+  <h2>The workflow at a glance</h2>
+  <WorkflowDiagram />
+
+  <p>
+    Each box is a separate CLI you install and use on its own. The arrows are file types — the agreed
+    text flows out of one tool and into the next. There is no proprietary glue, no shared database,
+    no daemon process. Just three command-line tools that read and write standard file formats.
+  </p>
+
+  <h2>The tools</h2>
+
+  <div class="not-prose mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
+    <ToolCard
+      title="nda-review-cli"
+      tagline="Draft, review, and negotiate NDAs against your own house playbook. Deterministic by default; opt-in LLM augmentation."
+      language="Python"
+      install="pipx install nda-review-cli"
+      href="/tools/nda-review-cli/"
+      github="https://github.com/DrBaher/nda-review-cli"
+      glyph="◐"
+    />
+    <ToolCard
+      title="docx2pdf-cli"
+      tagline="Honest DOCX → PDF conversion with batch processing, parallel runs, font validation, and pluggable backends."
+      language="Node.js"
+      install="npm i -g docx2pdf-cli"
+      href="/tools/docx2pdf-cli/"
+      github="https://github.com/DrBaher/docx2pdf-cli"
+      glyph="⇆"
+    />
+    <ToolCard
+      title="sign-cli"
+      tagline="Multi-provider e-signature with hash-chained audit events, RFC 3161 timestamps, and an MCP server for agents."
+      language="TypeScript"
+      install="npx sign-cli@latest"
+      href="/tools/sign-cli/"
+      github="https://github.com/DrBaher/sign-cli"
+      glyph="✓"
+    />
+  </div>
+
+  <h2>Why three small tools instead of one big platform</h2>
+
+  <p>
+    Most contract operations products are SaaS suites. They want every step in one dashboard, every
+    document in their database, every signature behind their identity provider. That's a fine
+    business model for them, but it makes contract operations expensive, opaque, and hard to leave.
+  </p>
+
+  <p>
+    The three CLIs here take the opposite stance. Each does one thing well. None of them require
+    an account, a subscription, or a network call you didn't ask for. You can swap any one of them
+    for an alternative, fork them, or audit the source end to end. Together they cover the same
+    workflow a SaaS suite would, but you keep the documents and the audit trail on your machine.
+  </p>
+
+  <h2>Where to go from here</h2>
+
+  <ul>
+    <li><a href="/workflow/">The workflow</a> — step-by-step walkthrough of how the three tools chain together, with copy-paste commands.</li>
+    <li><a href="/install/">Install</a> — one page covering all three install paths.</li>
+    <li><a href="/tools/nda-review-cli/">nda-review-cli</a> — drafting, reviewing, and negotiating NDAs against your house policy.</li>
+    <li><a href="/tools/docx2pdf-cli/">docx2pdf-cli</a> — DOCX to PDF, honestly. No surprises, no hidden conversions.</li>
+    <li><a href="/tools/sign-cli/">sign-cli</a> — multi-provider e-signature with audit-grade evidence.</li>
+    <li><a href="/principles/">Principles</a> — what these tools have in common and what they refuse to do.</li>
+  </ul>
+</BaseLayout>

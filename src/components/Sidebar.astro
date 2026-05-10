@@ -1,0 +1,95 @@
+---
+export interface Props {
+  active?: string;
+}
+const { active } = Astro.props as Props;
+
+const sections = [
+  {
+    label: 'Start',
+    items: [
+      { key: 'overview',   href: '/',           label: 'Overview' },
+      { key: 'workflow',   href: '/workflow/',  label: 'The workflow' },
+      { key: 'install',    href: '/install/',   label: 'Install' },
+      { key: 'principles', href: '/principles/', label: 'Principles' },
+    ],
+  },
+  {
+    label: 'Tools',
+    items: [
+      { key: 'tools/nda-review-cli', href: '/tools/nda-review-cli/', label: 'nda-review-cli' },
+      { key: 'tools/sign-cli',       href: '/tools/sign-cli/',       label: 'sign-cli' },
+      { key: 'tools/docx2pdf-cli',   href: '/tools/docx2pdf-cli/',   label: 'docx2pdf-cli' },
+    ],
+  },
+  {
+    label: 'External',
+    items: [
+      { key: '_gh', href: 'https://github.com/DrBaher', label: 'All repos on GitHub', external: true },
+    ],
+  },
+] as const;
+---
+
+<!-- Mobile top bar -->
+<div class="flex items-center justify-between border-b border-ink-700/10 bg-cream-50 px-5 py-3 lg:hidden">
+  <a href="/" class="flex items-center gap-2 font-serif text-lg font-semibold text-ink-900">
+    <span class="inline-block h-2.5 w-2.5 rounded-full bg-accent-500 shadow-[0_0_0_4px_rgba(31,125,93,0.15)]"></span>
+    contract.cli
+  </a>
+  <button id="nav-toggle" aria-label="Open navigation" class="pill">
+    <svg viewBox="0 0 16 16" class="h-4 w-4" aria-hidden="true">
+      <path d="M2 4h12M2 8h12M2 12h12" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+    </svg>
+    Menu
+  </button>
+</div>
+
+<!-- Sidebar (slide-out on mobile, fixed on desktop) -->
+<aside
+  id="sidebar"
+  class="hidden flex-col border-r border-ink-700/10 bg-cream-100 lg:sticky lg:top-0 lg:flex lg:h-screen lg:overflow-y-auto nice-scroll"
+>
+  <div class="flex items-center justify-between p-5">
+    <a href="/" class="flex items-center gap-2.5 font-serif text-lg font-semibold text-ink-900">
+      <span class="inline-block h-2.5 w-2.5 rounded-full bg-accent-500 shadow-[0_0_0_4px_rgba(31,125,93,0.15)]"></span>
+      contract.cli
+    </a>
+    <button id="nav-close" aria-label="Close navigation" class="pill lg:hidden">
+      <svg viewBox="0 0 16 16" class="h-4 w-4" aria-hidden="true">
+        <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </div>
+
+  <nav class="px-2 pb-8">
+    {sections.map(section => (
+      <>
+        <div class="nav-section">{section.label}</div>
+        <ul>
+          {section.items.map(item => {
+            const isActive = active === item.key;
+            const external = (item as any).external;
+            return (
+              <li>
+                <a
+                  href={item.href}
+                  class={`nav-link ${isActive ? 'active' : ''}`}
+                  target={external ? '_blank' : undefined}
+                  rel={external ? 'noopener' : undefined}
+                >
+                  {item.label}{external ? ' ↗' : ''}
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      </>
+    ))}
+  </nav>
+
+  <div class="mt-auto border-t border-ink-700/10 p-5 text-[12px] leading-relaxed text-ink-500">
+    Built by <a href="https://github.com/DrBaher" class="text-accent-600 hover:underline">@DrBaher</a>.<br/>
+    Three CLIs · MIT licensed · No telemetry.
+  </div>
+</aside>

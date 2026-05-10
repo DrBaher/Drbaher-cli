@@ -1,0 +1,93 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Callout from '../../components/Callout.astro';
+---
+<BaseLayout title="docx2pdf-cli" active="tools/docx2pdf-cli" description="Honest, batch-aware DOCX to PDF converter with hybrid backends, parallel processing, font validation, and a doctor probe.">
+  <p class="eyebrow">Tool · Node.js</p>
+  <h1><span class="font-mono">docx2pdf-cli</span></h1>
+  <p class="text-lg text-ink-700">
+    Convert Word documents to PDF, one file at a time or by the thousand. Hybrid backend strategy
+    picks the right converter for what's installed on your machine. No silent fallbacks; missing
+    fonts get flagged before they cost you a re-render.
+  </p>
+
+  <Callout label="TL;DR">
+    <code class="chip">npm i -g docx2pdf-cli</code>, then <code class="chip">docx2pdf input.docx output.pdf</code>.
+    Run <code class="chip">--doctor</code> first to see which backends are detected on your machine.
+  </Callout>
+
+  <h2>What it does</h2>
+
+  <ul>
+    <li><strong>Single-file or batch conversion.</strong> One file in, one file out — or point at a folder of <code class="chip">.docx</code> files and an output directory.</li>
+    <li><strong>Parallel processing.</strong> <code class="chip">--concurrency N</code> runs N conversions simultaneously, useful for large batches.</li>
+    <li><strong>Hybrid backends.</strong> LibreOffice, Microsoft Word (where licensed), Pandoc, and Gotenberg are all supported; the tool picks the best available unless you override with <code class="chip">--backend</code>.</li>
+    <li><strong>Font validation.</strong> <code class="chip">--check-fonts</code> verifies the document's referenced fonts are present before converting, so you don't get silent substitutions in the rendered PDF.</li>
+    <li><strong>Doctor probe.</strong> <code class="chip">--doctor</code> walks every backend candidate and reports which are usable on this machine, with explanations for the ones that aren't.</li>
+    <li><strong>Honest failure.</strong> If a backend can't render a file, the tool exits non-zero and tells you why. Nothing gets quietly mangled.</li>
+  </ul>
+
+  <h2>Quickstart</h2>
+
+  <pre class="codeblock"><code># Install
+npm i -g docx2pdf-cli
+docx2pdf --version
+
+# What backends does this machine have?
+docx2pdf --doctor
+docx2pdf --list-backends
+
+# Single file
+docx2pdf contract.docx contract.pdf
+
+# Whole folder, in parallel, into a different output directory
+docx2pdf --concurrency 4 --out-dir ./pdfs ./drafts/*.docx
+
+# Pin a specific backend
+docx2pdf --backend gotenberg contract.docx contract.pdf
+
+# Check fonts before rendering
+docx2pdf --check-fonts contract.docx</code></pre>
+
+  <h2>Why hybrid backends matter</h2>
+
+  <p>
+    There is no single DOCX-to-PDF converter that works perfectly everywhere. LibreOffice is the
+    most reliable open-source option but produces slightly different output than Word. Pandoc is
+    great for content-heavy documents but has known limitations with complex Word features.
+    Gotenberg is a containerized service that's perfect when you need consistent output across a
+    fleet, but requires running a server.
+  </p>
+  <p>
+    Rather than pretend any single backend is universally correct, this tool lets you pick. The
+    <code class="chip">--doctor</code> probe makes the choice explicit; the <code class="chip">--backend</code>
+    flag makes it auditable.
+  </p>
+
+  <h2>For agents and automation</h2>
+
+  <p>
+    The tool ships with an <code class="chip">AGENTS.md</code> guide and JSON schemas for the
+    output format. AI agents driving a contract pipeline (review → convert → sign) can call
+    <code class="chip">docx2pdf-cli</code> as the conversion step and parse structured success or
+    failure information programmatically.
+  </p>
+
+  <h2>Where it fits in the workflow</h2>
+
+  <p>
+    The middle step in the three-CLI workflow: take the agreed
+    <code class="chip">.docx</code> from <a href="/tools/nda-review-cli/">nda-review-cli</a>'s
+    <code class="chip">finalize</code> step and produce a PDF for
+    <a href="/tools/sign-cli/">sign-cli</a> to sign. <a href="/workflow/">See the full workflow</a>
+    for the chained commands.
+  </p>
+
+  <p>
+    It's also useful on its own for any DOCX-to-PDF need — invoices, board materials, internal docs,
+    anything. The contract pipeline is just one application.
+  </p>
+
+  <h2>Repo</h2>
+  <p><a href="https://github.com/DrBaher/docx2pdf-cli" target="_blank" rel="noopener">github.com/DrBaher/docx2pdf-cli</a> · MIT licensed · Node.js · npm-installable.</p>
+</BaseLayout>
