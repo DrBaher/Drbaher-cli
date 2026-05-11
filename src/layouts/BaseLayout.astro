@@ -89,7 +89,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://drbaher-cli
 <body class="min-h-screen bg-cream-50 text-ink-800 antialiased dark:bg-night-700 dark:text-night-50">
   <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded focus:bg-ink-900 focus:px-3 focus:py-1.5 focus:text-cream-50">Skip to content</a>
 
-  <div class="mx-auto flex max-w-[1180px] flex-col lg:grid lg:grid-cols-[260px_1fr]">
+  <div class={`mx-auto flex max-w-[1320px] flex-col lg:grid lg:grid-cols-[260px_minmax(0,1fr)] ${toc ? 'xl:grid-cols-[260px_minmax(0,1fr)_220px]' : ''}`}>
     <Sidebar active={active} />
 
     <main id="main" class="min-w-0 px-5 py-8 sm:px-8 lg:px-10 lg:py-12">
@@ -99,9 +99,10 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://drbaher-cli
       <EditOnGitHub path={editPath} />
       <Footer />
     </main>
+
+    {toc && <TOC />}
   </div>
 
-  {toc && <TOC />}
   <SearchPalette />
 
   <script>

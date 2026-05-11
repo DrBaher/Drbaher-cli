@@ -1,9 +1,9 @@
 ---
 // Right-rail Table of Contents.
 // Auto-built client-side from H2/H3s inside <article data-pagefind-body>.
-// Sticky on lg+; hidden on smaller screens.
+// Renders as the third column of BaseLayout's grid on xl+ screens; hidden below.
 ---
-<aside class="hidden xl:block xl:fixed xl:right-[max(2rem,calc((100vw-1180px)/2))] xl:top-24 xl:w-56" aria-label="Table of contents">
+<aside class="hidden xl:block xl:sticky xl:top-12 xl:self-start xl:max-h-[calc(100vh-6rem)] xl:overflow-y-auto xl:py-12 xl:pl-2 xl:pr-6 nice-scroll" aria-label="Table of contents">
   <nav id="toc" class="text-[12.5px]" data-toc>
     <p class="mb-2 font-semibold uppercase tracking-[0.14em] text-ink-500 dark:text-night-200">On this page</p>
     <ol class="space-y-1.5 border-l border-ink-700/15 dark:border-night-300/20"></ol>
@@ -12,7 +12,7 @@
 
 <style is:global>
   [data-toc] a {
-    @apply -ml-px block border-l border-transparent pl-3 text-ink-600 transition-colors hover:border-accent-300 hover:text-accent-700;
+    @apply -ml-px block border-l border-transparent pl-3 leading-snug text-ink-600 transition-colors hover:border-accent-300 hover:text-accent-700;
   }
   .dark [data-toc] a {
     @apply text-night-200 hover:text-accent-300;
@@ -72,7 +72,6 @@
           const id = e.target.id;
           if (e.isIntersecting) visible.add(id); else visible.delete(id);
         }
-        // Pick the first visible heading in document order.
         for (const h of headings) {
           if (visible.has(h.id)) { setActive(h.id); break; }
         }
