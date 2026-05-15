@@ -14,7 +14,7 @@ import CodeBlock from '../components/CodeBlock.astro';
   </p>
 
   <Callout label="TL;DR">
-    <code class="chip">pipx install nda-review-cli</code> · <code class="chip">npm i -g docx2pdf-cli</code> · <code class="chip">npm i -g sign-cli</code>.
+    <code class="chip">pipx install nda-review-cli</code> · <code class="chip">npm i -g docx2pdf-cli</code> · <code class="chip">npm i -g @drbaher/sign-cli</code>.
     Verify with <code class="chip">--version</code> on each.
   </Callout>
 
@@ -73,10 +73,10 @@ docx2pdf --list-backends`}</CodeBlock>
   <InstallTabs
     id="sign-tabs"
     tabs={[
-      { id: 'npm',  label: 'npm',  command: 'npm i -g sign-cli\nsign --version' },
-      { id: 'pnpm', label: 'pnpm', command: 'pnpm add -g sign-cli' },
-      { id: 'yarn', label: 'yarn', command: 'yarn global add sign-cli' },
-      { id: 'npx',  label: 'npx',  command: 'npx sign-cli demo', note: 'One-shot offline demo — no install required.' },
+      { id: 'npm',  label: 'npm',  command: 'npm i -g @drbaher/sign-cli\nsign --version' },
+      { id: 'pnpm', label: 'pnpm', command: 'pnpm add -g @drbaher/sign-cli' },
+      { id: 'yarn', label: 'yarn', command: 'yarn global add @drbaher/sign-cli' },
+      { id: 'npx',  label: 'npx',  command: 'npx @drbaher/sign-cli demo', note: 'One-shot offline demo — no install required.' },
     ]}
   />
 

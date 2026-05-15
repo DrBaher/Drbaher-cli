@@ -109,7 +109,7 @@ export async function getCliMeta(): Promise<Record<string, CliMeta>> {
   const targets: Array<{ key: string; npm?: string; pypi?: string; repo?: string }> = [
     { key: 'nda-review-cli', pypi: 'nda-review-cli', repo: 'DrBaher/nda-review-cli' },
     { key: 'docx2pdf-cli',   npm: 'docx2pdf-cli',   repo: 'DrBaher/docx2pdf-cli' },
-    { key: 'sign-cli',       npm: 'sign-cli',       repo: 'DrBaher/sign-cli' },
+    { key: 'sign-cli',       npm: '@drbaher/sign-cli', repo: 'DrBaher/sign-cli' },
   ];
 
   const out: Record<string, CliMeta> = {};

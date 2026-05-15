@@ -32,7 +32,7 @@ import CodeBlock from '../components/CodeBlock.astro';
 sign mcp serve
 
 # Or via npx, no install required:
-npx sign-cli mcp serve
+npx @drbaher/sign-cli mcp serve
 
 # Discover the catalog without spinning up the server:
 sign mcp tools --format markdown`}</CodeBlock>
@@ -43,7 +43,7 @@ sign mcp tools --format markdown`}</CodeBlock>
   "mcpServers": {
     "sign-cli": {
       "command": "npx",
-      "args": ["-y", "sign-cli", "mcp", "serve"]
+      "args": ["-y", "@drbaher/sign-cli", "mcp", "serve"]
     }
   }
 }`}</CodeBlock>
@@ -60,7 +60,7 @@ sign mcp tools --format markdown`}</CodeBlock>
   "mcpServers": {
     "sign-cli": {
       "command": "npx",
-      "args": ["-y", "sign-cli", "mcp", "serve"],
+      "args": ["-y", "@drbaher/sign-cli", "mcp", "serve"],
       "env": {}
     }
   }

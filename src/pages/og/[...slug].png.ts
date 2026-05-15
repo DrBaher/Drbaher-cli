@@ -34,7 +34,7 @@ const pages: Record<string, Page> = {
   install: {
     eyebrow: 'Install',
     title: 'Three installs, one workflow',
-    description: 'pipx install nda-review-cli · npm i -g docx2pdf-cli sign-cli',
+    description: 'pipx install nda-review-cli · npm i -g docx2pdf-cli @drbaher/sign-cli',
   },
   principles: {
     eyebrow: 'Principles',
