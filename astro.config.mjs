@@ -7,7 +7,7 @@ import remarkCliLinks from './src/plugins/remark-cli-links.js';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://drbaher-cli.vercel.app',
+  site: 'https://cli.drbaher.com',
   integrations: [
     tailwind(),
     sitemap({

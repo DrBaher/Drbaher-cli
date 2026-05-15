@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://drbaher-cli.vercel.app/sitemap-index.xml
+Sitemap: https://cli.drbaher.com/sitemap-index.xml

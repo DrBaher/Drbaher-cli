@@ -42,7 +42,7 @@ vercel        # follow the prompts
 To enable Plausible analytics, set the env var on Vercel (Settings → Environment Variables):
 
 ```
-PUBLIC_PLAUSIBLE_DOMAIN=drbaher-cli.vercel.app
+PUBLIC_PLAUSIBLE_DOMAIN=cli.drbaher.com
 ```
 
 The script only loads when the variable is set; locally it's a no-op.

@@ -26,8 +26,8 @@ const { title, description, active, image, withCasts = false, toc = false, editP
 const fullTitle = title === 'Overview' ? 'CLI tools for the contract workflow' : `${title} — CLI tools for contracts`;
 const desc = description ?? 'Three composable, local-first CLIs for drafting, reviewing, signing, and converting contracts. Open source, deterministic, no SaaS.';
 const ogPath = image ?? `/og/${active ?? 'default'}.png`;
-const ogImageAbs = new URL(ogPath, Astro.site ?? 'https://drbaher-cli.vercel.app').toString();
-const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://drbaher-cli.vercel.app').toString();
+const ogImageAbs = new URL(ogPath, Astro.site ?? 'https://cli.drbaher.com').toString();
+const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://cli.drbaher.com').toString();
 ---
 <!doctype html>
 <html lang="en">
