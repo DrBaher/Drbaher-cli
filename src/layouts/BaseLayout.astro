@@ -7,6 +7,7 @@ import EditOnGitHub from '../components/EditOnGitHub.astro';
 import TOC from '../components/TOC.astro';
 
 const PLAUSIBLE_DOMAIN = import.meta.env.PUBLIC_PLAUSIBLE_DOMAIN || '';
+const GOOGLE_SITE_VERIFICATION = import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION || '';
 
 export interface Props {
   title: string;
@@ -38,6 +39,8 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://cli.drbaher
   <title>{fullTitle}</title>
   <meta name="description" content={desc} />
   <link rel="canonical" href={canonical} />
+
+  {GOOGLE_SITE_VERIFICATION && <meta name="google-site-verification" content={GOOGLE_SITE_VERIFICATION} />}
 
   <meta property="og:title" content={fullTitle} />
   <meta property="og:description" content={desc} />

@@ -47,6 +47,16 @@ PUBLIC_PLAUSIBLE_DOMAIN=cli.drbaher.com
 
 The script only loads when the variable is set; locally it's a no-op.
 
+### Optional: Google Search Console verification
+
+For Google Search Console "URL prefix" verification via HTML meta tag, set:
+
+```
+PUBLIC_GOOGLE_SITE_VERIFICATION=<token-from-search-console>
+```
+
+A `<meta name="google-site-verification" content="...">` only renders when the variable is set.
+
 ## Structure
 
 ```
