@@ -88,19 +88,29 @@ docx2pdf --concurrency 4 --out-dir ./pdfs ./drafts/*.docx`}</CodeBlock>
 
   <h2 data-reveal>5 — Sign</h2>
   <p data-reveal>
-    Hand the PDF to <code class="chip">sign-cli</code>. Pick a provider (Dropbox Sign, DocuSign, SignWell,
-    or the local provider for testing). Each signer gets a per-recipient approval token with a TTL.
-    Every signing event lands in a hash-chained audit log, and the final receipt bundle includes
-    RFC 3161 timestamps so you can prove what was signed and when, even years later.
+    Hand the PDF to <code class="chip">sign-cli</code>. Pick a provider — the built-in
+    <code class="chip">local</code> provider produces real PAdES-signed PDFs fully offline (no
+    signup, no API keys), or route through Dropbox Sign, DocuSign, or SignWell for an external
+    trust anchor. Each signer gets a per-recipient approval token with a TTL. Every signing event
+    lands in a hash-chained audit log, and the receipt bundle includes RFC 3161 timestamps so you
+    can prove what was signed and when, even years later.
   </p>
-  <CodeBlock label="step 5 · sign">{`sign-cli send \\
-  --file output/agreed.pdf \\
-  --signer "alice@acme.com:Alice Founder" \\
-  --signer "bob@beta.com:Bob Counsel" \\
-  --provider sign-well
+  <CodeBlock label="step 5 · sign">{`sign request create \\
+  --title "Mutual NDA" \\
+  --document output/agreed.pdf \\
+  --signer "name:Alice Founder,email:alice@acme.com" \\
+  --signer "name:Bob Counsel,email:bob@beta.com" \\
+  --provider signwell
 
-# verify a signed PDF later
-sign-cli verify output/agreed.signed.pdf`}</CodeBlock>
+# Or skip steps 4 + 5 and seal a DOCX in one shot (offline, PAdES)
+sign document --input output/agreed.docx \\
+  --signer-name "Alice Founder" --signer-email "alice@acme.com" \\
+  --name-signature true --auto-place first \\
+  --out output/agreed.sealed.pdf
+
+# Verify a signed PDF later, offline
+sign request verify-signed-pdf output/agreed.signed.pdf
+sign audit verify --request-id <id>`}</CodeBlock>
 
   <h2>What you end up with</h2>
 

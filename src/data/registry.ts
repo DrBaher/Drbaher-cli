@@ -24,7 +24,7 @@ export interface CliMeta {
 const FALLBACKS: Record<string, string> = {
   'nda-review-cli': '0.5.0',
   'docx2pdf-cli': '0.2.1',
-  'sign-cli': '1.1.1',
+  'sign-cli': '0.6.0',
 };
 
 async function safeFetch(url: string, init: RequestInit = {}): Promise<Response | null> {

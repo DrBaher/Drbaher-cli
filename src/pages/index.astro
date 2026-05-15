@@ -8,7 +8,7 @@ import { getCliMeta } from '../data/registry';
 
 const meta = await getCliMeta();
 ---
-<BaseLayout title="Overview" active="overview" description="Three composable, local-first CLIs built for an agent-driven contract workflow: agents do the operational work, humans approve the gates that matter.">
+<BaseLayout title="Overview" active="overview" description="Three composable, local-first CLIs built for an agent-first contract workflow: agents do the operational work, humans approve the gates that matter.">
   <div class="not-prose hero-band">
     <p class="eyebrow">Built for the agent era</p>
     <h1 class="!mt-2">Agents do the work. You approve what matters.</h1>
@@ -73,7 +73,7 @@ const meta = await getCliMeta();
     />
     <ToolCard
       title="sign-cli"
-      tagline="Multi-provider e-signature with hash-chained audit events, RFC 3161 timestamps, and an MCP server for agents."
+      tagline="Fully-offline PAdES e-signature with hash-chained audit events, RFC 3161 timestamps, named profiles, and a 19-tool MCP server for agents."
       language="TypeScript"
       install="npx sign-cli@latest"
       href="/tools/sign-cli/"
@@ -92,7 +92,7 @@ const meta = await getCliMeta();
     blurb="Sandboxed browser demo runs draft, review, and the negotiation simulator end-to-end. No install. No sign-in."
   />
 
-  <h2>Built for an agent-driven workflow</h2>
+  <h2>Built for an agent-first workflow</h2>
 
   <p>
     Most legal-tech assumes a human at a desk: dashboards, threaded comments, in-app redlining.
@@ -136,7 +136,7 @@ const meta = await getCliMeta();
     Most contract operations products are SaaS suites. They want every step in one dashboard, every
     document in their database, every signature behind their identity provider. That's a fine
     business model for them, but it makes contract operations expensive, opaque, and — critically
-    for an agent-driven workflow — hard for an agent to drive without scraping or RPA glue.
+    for an agent-first workflow — hard for an agent to drive without scraping or RPA glue.
   </p>
 
   <p>

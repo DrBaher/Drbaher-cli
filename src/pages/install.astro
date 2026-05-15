@@ -64,21 +64,28 @@ docx2pdf --list-backends`}</CodeBlock>
   </p>
 
   <h2>sign-cli</h2>
-  <p>The TypeScript CLI for multi-provider e-signature with audit trails.</p>
+  <p>
+    The TypeScript CLI for fully-offline PAdES signing (built-in PKCS#7 signer with a self-issued
+    cert) plus optional Dropbox Sign / DocuSign / SignWell routing. Installs as
+    <code class="chip">sign</code> on your PATH.
+  </p>
 
   <InstallTabs
     id="sign-tabs"
     tabs={[
-      { id: 'npm',  label: 'npm',  command: 'npm i -g sign-cli\nsign-cli --version' },
+      { id: 'npm',  label: 'npm',  command: 'npm i -g sign-cli\nsign --version' },
       { id: 'pnpm', label: 'pnpm', command: 'pnpm add -g sign-cli' },
       { id: 'yarn', label: 'yarn', command: 'yarn global add sign-cli' },
-      { id: 'npx',  label: 'npx',  command: 'npx sign-cli@latest demo', note: 'One-shot offline demo — no install required.' },
+      { id: 'npx',  label: 'npx',  command: 'npx sign-cli demo', note: 'One-shot offline demo — no install required.' },
     ]}
   />
 
   <p>
-    The offline demo walks the full flow (send → token → sign → verify → receipt) using a built-in
-    local provider — no signup, no third-party calls, ~5 seconds end to end.
+    The offline demo walks the full lifecycle (create → approve → send → sign → audit verify →
+    bundle export) using the built-in local PAdES signer — no signup, no third-party calls,
+    ~5 seconds end to end. After install, run <code class="chip">sign init</code> for a guided
+    provider setup or <code class="chip">sign doctor preflight</code> for a structured per-check
+    readiness report.
   </p>
 
   <h2>Configuration locations</h2>
@@ -104,8 +111,8 @@ docx2pdf --list-backends`}</CodeBlock>
       </tr>
       <tr>
         <td class="py-2 pr-4 font-mono">sign-cli</td>
-        <td class="py-2 pr-4"><code class="chip">~/.config/sign-cli/</code> or env vars</td>
-        <td class="py-2 pr-4">Provider API keys (Dropbox Sign, DocuSign, SignWell)</td>
+        <td class="py-2 pr-4"><code class="chip">$XDG_CONFIG_HOME/sign-cli/profiles.json</code> (named profile bundles) · project-level <code class="chip">sign-profile.json</code> (git-style upward discovery) · env vars (<code class="chip">SIGN_PROFILE</code>, <code class="chip">SIGN_DB_PATH</code>, etc.)</td>
+        <td class="py-2 pr-4">Provider API keys via shell env + <code class="chip">{`{{env:VAR}}`}</code> profile references — credentials never live in the profile file</td>
       </tr>
     </tbody>
   </table>

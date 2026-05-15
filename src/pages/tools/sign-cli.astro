@@ -20,14 +20,14 @@ const jsonLd = {
   license: 'https://opensource.org/licenses/MIT',
   url: 'https://drbaher-cli.vercel.app/tools/sign-cli/',
   codeRepository: 'https://github.com/DrBaher/sign-cli',
-  description: 'Multi-provider e-signature CLI with hash-chained audit events, RFC 3161 timestamps, per-signer approval tokens, and an MCP server for AI agents.',
+  description: 'Fully-offline PAdES e-signature CLI with hash-chained audit events, RFC 3161 timestamps, per-signer approval tokens, named profiles, and a 19-tool MCP server for agents.',
   offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
 };
 ---
 <BaseLayout
   title="sign-cli"
   active="tools/sign-cli"
-  description="Multi-provider e-signature CLI with hash-chained audit events, RFC 3161 timestamps, per-signer approval tokens, and an MCP server for AI agents."
+  description="Fully-offline PAdES e-signature CLI with hash-chained audit events, RFC 3161 timestamps, per-signer approval tokens, named profiles, and a 19-tool MCP server for agents."
   withCasts
   toc
 >
@@ -36,15 +36,18 @@ const jsonLd = {
   <h1><span class="font-mono">sign-cli</span></h1>
   <FreshHeader name="sign-cli" version={meta.version} source={meta.source} fetchedAt={meta.fetchedAt} stars={meta.stars} weeklyDownloads={meta.weeklyDownloads} github="https://github.com/DrBaher/sign-cli" />
   <p class="text-lg text-ink-700 dark:text-night-100">
-    A command-line e-signature tool for humans, ops teams, and AI agents. Send PDFs to multiple signers
-    across multiple providers, capture every event in a hash-chained audit log, and prove what was
-    signed and when with RFC 3161 timestamps.
+    A command-line e-signature tool for humans, ops teams, and AI agents. The built-in PAdES
+    signer (PKCS#7 in <code class="chip">/ByteRange</code>, self-issued cert) produces real,
+    cryptographically verifiable signed PDFs <strong>fully offline</strong> — no signup, no API
+    keys, no third-party SaaS. Route through Dropbox Sign, DocuSign, or SignWell when you need an
+    external provider.
   </p>
 
   <Callout label="TL;DR">
-    <code class="chip">npm i -g sign-cli</code> — or <code class="chip">npx sign-cli demo</code> for an
-    offline five-second walkthrough. Pick a provider (Dropbox Sign, DocuSign, SignWell, or the local
-    test provider) and send a PDF with one command.
+    <code class="chip">npm i -g sign-cli</code> — or <code class="chip">npx sign-cli demo</code> for
+    a five-second offline walkthrough of the full lifecycle (create → send → sign → verify →
+    receipt). Pick the local PAdES signer or a hosted provider (Dropbox Sign, DocuSign, SignWell)
+    and send a PDF with one command.
   </Callout>
 
   <CastPlayer src="/casts/sign-cli-demo.cast" title="sign-cli — offline demo flow" />
@@ -58,59 +61,158 @@ const jsonLd = {
   <h2>What it does</h2>
 
   <ul>
-    <li><strong>Multi-provider sending.</strong> Dropbox Sign, DocuSign, and SignWell are wired in; the local provider runs offline for testing and CI.</li>
+    <li><strong>Fully-offline PAdES signing.</strong> The built-in local provider produces real PKCS#7 signed PDFs with a self-issued X.509 cert — verifiable with any standard PDF-signature inspector. Zero network calls.</li>
+    <li><strong>Multi-provider hosted sending.</strong> Dropbox Sign, DocuSign, and SignWell are wired in for when you need an external trust anchor. Same surface across all four providers.</li>
     <li><strong>Per-signer approval tokens with TTL.</strong> Every signer gets an explicit token tied to their email; agents can't impersonate humans, and tokens expire.</li>
-    <li><strong>Hash-chained audit events.</strong> Every signing event hashes into the previous event. Tampering with any past entry breaks the chain and fails verification.</li>
-    <li><strong>RFC 3161 timestamping.</strong> External timestamp authority anchors prove a signature existed by a given date — durable evidence that survives even if the provider disappears.</li>
-    <li><strong>Bulk via CSV.</strong> Send the same document to many signers, or many documents to one signer, from a single CSV file.</li>
-    <li><strong>PDF verification.</strong> Verify a signed PDF later, off-line, with the receipt bundle.</li>
-    <li><strong>MCP server included.</strong> An LLM agent (Claude, Cursor, Codex, etc.) can drive the signing workflow with the same primitives you use from the shell.</li>
+    <li><strong>Hash-chained audit events.</strong> Every event hashes into the previous one and into append-only DB triggers. Tampering breaks <code class="chip">audit verify</code>.</li>
+    <li><strong>RFC 3161 timestamping.</strong> External TSA anchors prove a signature existed by a given date — durable evidence that survives even if the provider disappears.</li>
+    <li><strong>Auto-place signatures.</strong> Detect AcroForm <code>/Sig</code> widgets and anchor text (<code>Signature:</code>, <code>Date:</code>, <code>Sign here</code>, French/EU conventions) and stamp at the right rectangle. Multi-candidate selectors (<code>first</code>, <code>last</code>, <code>all</code>, <code>page:N</code>, <code>index:N</code>) handle the foot-gun where multiple anchors exist.</li>
+    <li><strong>One-shot DOCX → sealed PDF.</strong> <code class="chip">sign document</code> takes a <code>.docx</code> (or <code>.pdf</code>), converts via the bundled <a href="/tools/docx2pdf-cli/">docx2pdf-cli</a>, auto-places, stamps, PAdES-seals, and verifies — all in one call against a scoped temp database.</li>
+    <li><strong>Named profiles.</strong> Bundle provider + dbPath + credentials under a name; activate by flag, env, or project-level <code>sign-profile.json</code> (git/npm-style upward discovery). Secrets reference shell env via <code>{`{{env:VAR}}`}</code> — credentials never live in the profile file.</li>
+    <li><strong>Path-traversal guards.</strong> Every input and output path runs through a validator; an agent or buggy caller can't read or write outside the working directory unless you opt in with <code>SIGN_ALLOW_ABSOLUTE_DOCS=1</code>.</li>
+    <li><strong>PDF verification.</strong> Verify a signed PDF later, offline, with the receipt bundle.</li>
+    <li><strong>19-tool MCP server.</strong> Every operationally-useful CLI command is also an MCP tool over stdio — plus a 20-route HTTP API at <code>/v1/*</code> for non-MCP clients.</li>
   </ul>
 
   <h2>Quickstart</h2>
 
-  <CodeBlock label="install + send">{`# Install
+  <CodeBlock label="install + offline demo">{`# Install
 npm i -g sign-cli
 
-# Or run the offline demo without installing
-npx sign-cli demo
+# Five-second offline walkthrough: create → send → sign → verify → receipt
+sign demo
 
-# Send a single document to two signers
-sign-cli send \\
-  --file contract.pdf \\
-  --signer "alice@acme.com:Alice Founder" \\
-  --signer "bob@beta.com:Bob Counsel" \\
-  --provider sign-well`}</CodeBlock>
+# Or run without installing
+npx sign-cli demo`}</CodeBlock>
+
+  <h2>Send a real document</h2>
+
+  <CodeBlock label="local PAdES (offline) or hosted">{`# Fully-offline: built-in local provider produces a real PAdES-signed PDF
+sign request create \\
+  --title "Vendor MSA" \\
+  --document contract.pdf \\
+  --signer "name:Alice Founder,email:alice@acme.com" \\
+  --signer "name:Bob Counsel,email:bob@beta.com" \\
+  --provider local
+
+# Or via a hosted provider
+sign request create \\
+  --title "Vendor MSA" \\
+  --document contract.pdf \\
+  --signer "name:Alice Founder,email:alice@acme.com" \\
+  --signer "name:Bob Counsel,email:bob@beta.com" \\
+  --provider signwell`}</CodeBlock>
+
+  <h2>One-shot: DOCX → sealed PDF</h2>
+
+  <p>
+    <code class="chip">sign document</code> chains conversion, auto-placement, stamping, sealing,
+    and chain-verify in one call. All intermediate state lives in a temp database scoped to the
+    call — your main <code>./data/sign.db</code> is untouched.
+  </p>
+
+  <CodeBlock label="one-shot pipeline">{`sign document \\
+  --input contract.docx \\
+  --signer-name "Alice Founder" \\
+  --signer-email "alice@acme.com" \\
+  --name-signature true \\
+  --auto-place first \\
+  --out contract.sealed.pdf`}</CodeBlock>
+
+  <h2>Preview placement before committing</h2>
+
+  <CodeBlock label="iterate offline">{`# See where the detector would place a signature — no DB writes, no PAdES envelope
+sign pdf detect-signature-field --pdf contract.pdf
+
+# Stamp a preview to inspect visually
+sign preview --pdf contract.pdf \\
+  --name-signature "Alice Founder" \\
+  --auto-place first --preserve-aspect-ratio true \\
+  --out preview.pdf`}</CodeBlock>
 
   <h2>Verify a signed PDF</h2>
 
   <p>
-    Verification is offline and works on any signed PDF the tool produced. The receipt bundle
-    contains the audit chain, the timestamp anchor, and metadata you can hand to opposing counsel
-    or a court without further cooperation from the signing provider.
+    Verification is offline and works on any signed PDF the tool produced — including the
+    self-issued PAdES output. The receipt bundle contains the audit chain, the timestamp anchor,
+    a per-signer event subset, and a detached <code>manifest.sig</code> + <code>manifest.cert.pem</code>
+    you can hand to opposing counsel or a court without further cooperation from the signing provider.
   </p>
 
-  <CodeBlock label="verify">{`sign-cli verify contract.signed.pdf
-# OK · 2 signers · audit chain intact · timestamp anchor verified`}</CodeBlock>
+  <CodeBlock label="verify offline">{`# Re-parse the PDF, recompute the digest, extract signer certs
+sign request verify-signed-pdf contract.signed.pdf
+
+# Verify the hash-chained audit log for a specific request
+sign audit verify --request-id req_abc
+
+# Verify a stored chain-bundle (dir or .tar.gz)
+sign audit verify-chain-bundle ./bundle.tar.gz`}</CodeBlock>
+
+  <h2>Named profiles for credentials and DBs</h2>
+
+  <p>
+    Profiles bundle provider, dbPath, and credentials under a name. The credentials block uses
+    <code class="chip">{`{{env:VAR}}`}</code> references that resolve from the shell at call time —
+    so secrets never live in the profile file. Activate via <code class="chip">--profile prod</code>,
+    <code class="chip">SIGN_PROFILE=prod</code>, or implicitly via a project-level
+    <code class="chip">sign-profile.json</code>.
+  </p>
+
+  <CodeBlock>{`sign profile init --name prod \\
+  --provider signwell --db "~/.sign-cli/prod.db" --strict-provider true
+sign profile set --name prod \\
+  --key credentials.SIGNWELL_API_KEY --value "{{env:SIGNWELL_API_KEY}}"
+
+sign --profile prod request show --request-id req_abc`}</CodeBlock>
+
+  <h2>Preflight check</h2>
+
+  <p>
+    <code class="chip">sign doctor preflight</code> runs a structured per-check report: Node
+    version, DB-path writability, provider env vars, provider API reachability, filesystem
+    permissions. Exit <code>0</code> on <code>verdict: "ok"</code>; <code>1</code> on any failure.
+    Branch on <code>checks[].name</code> for agent self-recovery.
+  </p>
+
+  <CodeBlock>{`sign doctor preflight --provider signwell
+# stderr: [sign] preflight: ok (provider=signwell, 7 ok, 0 failed, 0 skipped)`}</CodeBlock>
 
   <h2>MCP server for agents</h2>
 
   <p>
-    Every CLI command is also exposed as an MCP tool over stdio. Wire it into Claude Code, Cursor,
-    or any other MCP-aware client and your agent can drive the signing workflow with the same
-    primitives — including the per-signer approval-token guardrail, so a runaway agent can't sign
-    on a human's behalf.
+    Every operationally-useful CLI command is also exposed as an MCP tool over stdio — 19 tools in
+    total, split read-only vs. mutating. Wire it into Claude Code, Cursor, or any other MCP-aware
+    client and your agent can drive the workflow with the same primitives — including the
+    per-signer approval-token guardrail, so a runaway agent can't sign on a human's behalf. Total
+    tool count is live in the catalog — call <code class="chip">sign mcp tools</code> rather than
+    hardcoding.
   </p>
 
-  <CodeBlock>{`npx sign-cli mcp        # start the MCP server on stdio`}</CodeBlock>
+  <CodeBlock>{`sign mcp serve                  # start the MCP server on stdio
+sign mcp serve --read-only true # sandboxed: blocks mutating tools
+sign mcp tools                  # print the catalog without booting the server`}</CodeBlock>
+
+  <p>See the <a href="/mcp/">MCP guide</a> for the full tool list, wire-up snippets, and the read-only mode walkthrough. The agent quickstart contract — output envelope, exit codes, discovery, failure → recovery — is in <a href="https://github.com/DrBaher/sign-cli/blob/main/AGENTS.md"><code class="chip">AGENTS.md</code></a>; provider setup in <a href="https://github.com/DrBaher/sign-cli/tree/main/docs/setup"><code class="chip">docs/setup/</code></a>; concept deep-dives (audit chain, profiles, security model, legal posture) in <a href="https://github.com/DrBaher/sign-cli/tree/main/docs/reference"><code class="chip">docs/reference/</code></a>.</p>
+
+  <h2>HTTP API for non-MCP clients</h2>
+
+  <p>
+    Twenty routes under <code class="chip">/v1/*</code> mirror the MCP surface — same input shape,
+    same path-traversal guards, same read-only gating. Useful for agents and integrations that
+    speak REST rather than MCP.
+  </p>
+
+  <CodeBlock>{`sign serve --read-only true --rate-limit 5
+curl http://localhost:8787/v1/openapi.json    # discover the route catalog`}</CodeBlock>
 
   <h2>Where it fits in the workflow</h2>
 
   <p>
     <code class="chip">sign-cli</code> is the last step in the contract pipeline — after
     <a href="/tools/nda-review-cli/">nda-review-cli</a> produces the agreed text and
-    <a href="/tools/docx2pdf-cli/">docx2pdf-cli</a> renders the PDF. <a href="/workflow/">See the
-    full workflow page</a> for the chained commands.
+    <a href="/tools/docx2pdf-cli/">docx2pdf-cli</a> renders the PDF. Or skip the chain entirely
+    and hand a <code>.docx</code> straight to <code class="chip">sign document</code>. <a
+    href="/workflow/">See the full workflow page</a> for the chained commands.
   </p>
 
   <p>
@@ -119,5 +221,5 @@ sign-cli send \\
   </p>
 
   <h2>Repo</h2>
-  <p><a href="https://github.com/DrBaher/sign-cli" target="_blank" rel="noopener">github.com/DrBaher/sign-cli</a> · MIT licensed · TypeScript · MCP server included.</p>
+  <p><a href="https://github.com/DrBaher/sign-cli" target="_blank" rel="noopener">github.com/DrBaher/sign-cli</a> · MIT licensed · TypeScript · MCP server + HTTP API included.</p>
 </BaseLayout>

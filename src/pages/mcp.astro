@@ -6,28 +6,36 @@ import CodeBlock from '../components/CodeBlock.astro';
 <BaseLayout
   title="MCP server"
   active="mcp"
-  description="Drive sign-cli from any MCP-aware client (Claude Code, Cursor, Codex). Same per-signer approval guardrails — no agent can sign on a human's behalf."
+  description="Drive sign-cli from any MCP-aware client (Claude Code, Cursor, Codex). 19 tools over stdio, same per-signer approval guardrails — no agent can sign on a human's behalf."
   toc
 >
   <p class="eyebrow">MCP server</p>
   <h1>The agent drives. You approve.</h1>
 
   <p class="text-lg text-ink-700 dark:text-night-100">
-    The whole suite is designed for an agent-driven workflow. sign-cli is the most concrete
-    expression of that: every CLI command is exposed as an MCP tool over stdio, so any MCP-aware
-    client (Claude Code, Cursor, Codex) can drive sending, tracking, and verification — while the
-    actual signing remains gated behind a per-signer human gesture.
+    The whole suite is designed for an agent-first workflow. sign-cli is the most concrete
+    expression of that: every CLI command worth automating is exposed as an MCP tool over stdio,
+    so any MCP-aware client (Claude Code, Cursor, Codex) can drive sending, tracking, detection,
+    stamping, and verification — while the actual signing remains gated behind a per-signer human
+    gesture.
   </p>
 
   <Callout label="The guardrail">
-    Agents can <em>send</em> documents and <em>track</em> status, but they can't sign. Every signature
-    requires a per-signer token tied to that signer's email, with a TTL. The agent never sees the
-    token. The human does. That asymmetry is the whole architecture.
+    Agents can <em>send</em> documents, <em>detect</em> signature fields, <em>stamp</em> previews,
+    <em>track</em> status, and <em>verify</em> receipts — but they can't sign on a human's behalf.
+    Every signature requires a per-signer token tied to that signer's email, with a TTL. The agent
+    never sees the token. The human does. That asymmetry is the whole architecture.
   </Callout>
 
   <h2>Start the server</h2>
   <CodeBlock label="stdio MCP server">{`# Boots the MCP server on stdio. Wire it into any MCP-aware client.
-npx sign-cli mcp`}</CodeBlock>
+sign mcp serve
+
+# Or via npx, no install required:
+npx sign-cli mcp serve
+
+# Discover the catalog without spinning up the server:
+sign mcp tools --format markdown`}</CodeBlock>
 
   <h2>Wire it into Claude Code</h2>
   <p>Add to your <code class="chip">~/.config/claude-code/settings.json</code> (or the project-level <code class="chip">.claude/settings.json</code>):</p>
@@ -35,15 +43,15 @@ npx sign-cli mcp`}</CodeBlock>
   "mcpServers": {
     "sign-cli": {
       "command": "npx",
-      "args": ["-y", "sign-cli", "mcp"]
+      "args": ["-y", "sign-cli", "mcp", "serve"]
     }
   }
 }`}</CodeBlock>
 
   <p>
-    After that, every sign-cli command shows up as an MCP tool inside Claude Code. Ask the agent
-    to "send the contract.pdf to alice@acme.com and bob@beta.com via SignWell" and it will call
-    the right MCP tool with the right arguments.
+    After that, every sign-cli MCP tool shows up inside Claude Code. Ask the agent to "detect the
+    signature field on contract.pdf and send it to alice@acme.com and bob@beta.com via SignWell"
+    and it will call the right tools with the right arguments.
   </p>
 
   <h2>Wire it into Cursor</h2>
@@ -52,15 +60,34 @@ npx sign-cli mcp`}</CodeBlock>
   "mcpServers": {
     "sign-cli": {
       "command": "npx",
-      "args": ["-y", "sign-cli", "mcp"],
+      "args": ["-y", "sign-cli", "mcp", "serve"],
       "env": {}
     }
   }
 }`}</CodeBlock>
 
-  <h2>Available tools</h2>
-  <p>Every shell command has a 1:1 MCP tool. The most useful ones:</p>
+  <h2>Read-only mode for sandboxed agents</h2>
+  <p>
+    Run with <code class="chip">--read-only true</code> to block every mutating tool with a
+    <code class="chip">FORBIDDEN_READ_ONLY</code> error. Useful for letting an agent inspect and
+    track without any side effects. Pair with <code class="chip">--tool</code> to allow-list a
+    specific subset, or <code class="chip">--capability</code> to disable resources/prompts.
+  </p>
+  <CodeBlock>{`sign mcp serve --read-only true \\
+  --tool request_show --tool audit_verify --tool pdf_detect_signature_field \\
+  --emit-events ./mcp-events.ndjson \\
+  --emit-events-redact true`}</CodeBlock>
 
+  <h2>Available tools — 19 in total</h2>
+  <p>
+    Every tool ships with an <code class="chip">inputSchema</code> and (where applicable) an
+    <code class="chip">outputSchema</code>. <code class="chip">request_watch</code> also streams
+    <code class="chip">notifications/progress</code> when the client supplies a
+    <code class="chip">progressToken</code>. Don't hardcode this list — call
+    <code class="chip">sign mcp tools</code> for the live catalog.
+  </p>
+
+  <h3>Read-only (safe to call without approval)</h3>
   <table class="not-prose mt-4 w-full border-collapse text-[14px]">
     <thead>
       <tr class="border-b border-ink-700/15 text-left dark:border-night-300/20">
@@ -70,41 +97,143 @@ npx sign-cli mcp`}</CodeBlock>
     </thead>
     <tbody class="text-ink-700 dark:text-night-100">
       <tr class="border-b border-ink-700/10 dark:border-night-300/15">
-        <td class="py-2 pr-4 font-mono text-accent-700 dark:text-accent-300">send_document</td>
-        <td class="py-2 pr-4">Send a PDF to one or more signers via the chosen provider. Returns per-signer tokens.</td>
+        <td class="py-2 pr-4 font-mono text-accent-700 dark:text-accent-300">signer_list</td>
+        <td class="py-2 pr-4">List pending local-provider requests where the signer is a recipient.</td>
       </tr>
       <tr class="border-b border-ink-700/10 dark:border-night-300/15">
-        <td class="py-2 pr-4 font-mono text-accent-700 dark:text-accent-300">verify_pdf</td>
-        <td class="py-2 pr-4">Verify a signed PDF + receipt bundle. Confirms the audit chain and timestamp anchor.</td>
+        <td class="py-2 pr-4 font-mono text-accent-700 dark:text-accent-300">signer_fetch_document</td>
+        <td class="py-2 pr-4">Read (and optionally save) the unsigned PDF for a request. Requires the per-signer token.</td>
       </tr>
       <tr class="border-b border-ink-700/10 dark:border-night-300/15">
-        <td class="py-2 pr-4 font-mono text-accent-700 dark:text-accent-300">get_status</td>
-        <td class="py-2 pr-4">Check the signing status of a previously-sent document.</td>
+        <td class="py-2 pr-4 font-mono text-accent-700 dark:text-accent-300">request_show</td>
+        <td class="py-2 pr-4">Enriched snapshot: approvals, signedBy[], declinedBy, and a nextSteps[] hint array.</td>
       </tr>
       <tr class="border-b border-ink-700/10 dark:border-night-300/15">
-        <td class="py-2 pr-4 font-mono text-accent-700 dark:text-accent-300">list_audit_events</td>
-        <td class="py-2 pr-4">List all hash-chained events for a given document — useful for replay or post-mortem.</td>
+        <td class="py-2 pr-4 font-mono text-accent-700 dark:text-accent-300">request_status</td>
+        <td class="py-2 pr-4">Poll the provider for the latest status of a request.</td>
+      </tr>
+      <tr class="border-b border-ink-700/10 dark:border-night-300/15">
+        <td class="py-2 pr-4 font-mono text-accent-700 dark:text-accent-300">request_watch</td>
+        <td class="py-2 pr-4">Poll until terminal (completed/declined/canceled/timeout). Streams progress notifications.</td>
+      </tr>
+      <tr class="border-b border-ink-700/10 dark:border-night-300/15">
+        <td class="py-2 pr-4 font-mono text-accent-700 dark:text-accent-300">audit_verify</td>
+        <td class="py-2 pr-4">Verify the hash-chained audit log for a request; reports any break.</td>
+      </tr>
+      <tr class="border-b border-ink-700/10 dark:border-night-300/15">
+        <td class="py-2 pr-4 font-mono text-accent-700 dark:text-accent-300">audit_scan</td>
+        <td class="py-2 pr-4">Cross-request audit search with filters (request id, event type, time window).</td>
+      </tr>
+      <tr class="border-b border-ink-700/10 dark:border-night-300/15">
+        <td class="py-2 pr-4 font-mono text-accent-700 dark:text-accent-300">pdf_detect_signature_field</td>
+        <td class="py-2 pr-4">Ranked signature-field candidates (AcroForm /Sig + anchor text). Read-only.</td>
+      </tr>
+      <tr class="border-b border-ink-700/10 dark:border-night-300/15">
+        <td class="py-2 pr-4 font-mono text-accent-700 dark:text-accent-300">pdf_detect_date_field</td>
+        <td class="py-2 pr-4">Date-anchor candidates with an <code>alreadyFilled</code> flag to avoid overwrites.</td>
+      </tr>
+      <tr class="border-b border-ink-700/10 dark:border-night-300/15">
+        <td class="py-2 pr-4 font-mono text-accent-700 dark:text-accent-300">pdf_inspect_signatures</td>
+        <td class="py-2 pr-4">Parse a signed PDF's PKCS#7: <code>/ByteRange</code> digest match, signer certs, trust label.</td>
+      </tr>
+      <tr class="border-b border-ink-700/10 dark:border-night-300/15">
+        <td class="py-2 pr-4 font-mono text-accent-700 dark:text-accent-300">profile_list</td>
+        <td class="py-2 pr-4">List named profiles (provider, dbPath, credentials bundle) and the active one.</td>
       </tr>
       <tr>
-        <td class="py-2 pr-4 font-mono text-accent-700 dark:text-accent-300">list_providers</td>
-        <td class="py-2 pr-4">List configured signing providers and their status.</td>
+        <td class="py-2 pr-4 font-mono text-accent-700 dark:text-accent-300">profile_show</td>
+        <td class="py-2 pr-4">Show resolved profile state. Credentials redacted by default; <code>show_secrets: true</code> to reveal.</td>
       </tr>
     </tbody>
   </table>
 
+  <h3>Mutating (gated by <code class="chip">--read-only true</code>)</h3>
+  <table class="not-prose mt-4 w-full border-collapse text-[14px]">
+    <thead>
+      <tr class="border-b border-ink-700/15 text-left dark:border-night-300/20">
+        <th class="py-2 pr-4 font-semibold text-ink-900 dark:text-night-50">Tool</th>
+        <th class="py-2 pr-4 font-semibold text-ink-900 dark:text-night-50">What it does</th>
+      </tr>
+    </thead>
+    <tbody class="text-ink-700 dark:text-night-100">
+      <tr class="border-b border-ink-700/10 dark:border-night-300/15">
+        <td class="py-2 pr-4 font-mono text-accent-700 dark:text-accent-300">sign</td>
+        <td class="py-2 pr-4">Sign a local request as the holder of a per-signer token. Requires <code>--provider local</code>.</td>
+      </tr>
+      <tr class="border-b border-ink-700/10 dark:border-night-300/15">
+        <td class="py-2 pr-4 font-mono text-accent-700 dark:text-accent-300">signer_decline</td>
+        <td class="py-2 pr-4">Decline a local request as the token holder. Records a <code>request.signer_declined</code> event.</td>
+      </tr>
+      <tr class="border-b border-ink-700/10 dark:border-night-300/15">
+        <td class="py-2 pr-4 font-mono text-accent-700 dark:text-accent-300">signer_reissue_token</td>
+        <td class="py-2 pr-4">Mint a fresh token in place of an expired/lost one. Tied to the original signer email.</td>
+      </tr>
+      <tr class="border-b border-ink-700/10 dark:border-night-300/15">
+        <td class="py-2 pr-4 font-mono text-accent-700 dark:text-accent-300">pdf_stamp_text</td>
+        <td class="py-2 pr-4">Stamp plain text (dates, names) onto a PDF without producing a PAdES envelope.</td>
+      </tr>
+      <tr class="border-b border-ink-700/10 dark:border-night-300/15">
+        <td class="py-2 pr-4 font-mono text-accent-700 dark:text-accent-300">preview</td>
+        <td class="py-2 pr-4">Stamp a signature image or rendered name onto a PDF — no envelope, no audit mutation. Iterate before committing.</td>
+      </tr>
+      <tr class="border-b border-ink-700/10 dark:border-night-300/15">
+        <td class="py-2 pr-4 font-mono text-accent-700 dark:text-accent-300">document</td>
+        <td class="py-2 pr-4">One-shot DOCX|PDF → sealed PDF: convert, auto-place, stamp, PAdES-seal, verify chain.</td>
+      </tr>
+      <tr>
+        <td class="py-2 pr-4 font-mono text-accent-700 dark:text-accent-300">request_receipt</td>
+        <td class="py-2 pr-4">Export a cryptographically-signed receipt bundle (manifest + detached signature + cert chain).</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>HTTP API for non-MCP clients</h2>
+  <p>
+    Every MCP tool has a 1:1 HTTP equivalent under <code class="chip">/v1/*</code>, served by
+    <code class="chip">sign serve</code>. Same input shape, same path-traversal guards, same
+    read-only gating. Useful for agents and integrations that speak REST rather than MCP.
+  </p>
+  <CodeBlock>{`# Boot the HTTP API. Auth via SIGN_HTTP_BEARER_TOKEN.
+sign serve --read-only true --rate-limit 5
+
+# Discover the route catalog:
+curl http://localhost:8787/v1/openapi.json`}</CodeBlock>
+
+  <h2>Profiles for credential isolation</h2>
+  <p>
+    Named profiles bundle <code class="chip">provider</code>, <code class="chip">dbPath</code>,
+    <code class="chip">strictProvider</code>, and a <code class="chip">credentials</code> block
+    (with <code class="chip">{`{{env:VAR}}`}</code> references that point at shell-managed
+    secrets). The agent never holds API keys — it activates a profile by name; the credentials
+    resolve from environment variables at call time.
+  </p>
+  <CodeBlock>{`# Create a profile that reads its API key from the shell environment
+sign profile init --name prod \\
+  --provider signwell --db "~/.sign-cli/prod.db" \\
+  --strict-provider true
+sign profile set --name prod \\
+  --key credentials.SIGNWELL_API_KEY --value "{{env:SIGNWELL_API_KEY}}"
+
+# Activate per-call
+sign --profile prod request show --request-id req_abc
+
+# Or implicitly via a project-level sign-profile.json (git/npm-style discovery)`}</CodeBlock>
+
   <h2>What the agent can't do</h2>
   <ul>
-    <li><strong>Sign on a human's behalf.</strong> The signing step requires an explicit per-signer token. Tokens are scoped to one signer's email and expire after a configurable TTL.</li>
-    <li><strong>Modify past audit events.</strong> The audit chain is hash-chained; tampering breaks verification.</li>
+    <li><strong>Sign on a human's behalf.</strong> The <code>sign</code> tool requires an explicit per-signer token. Tokens are scoped to one signer's email and expire after a configurable TTL.</li>
+    <li><strong>Modify past audit events.</strong> The audit chain is hash-chained with append-only triggers; tampering breaks <code>audit_verify</code>.</li>
     <li><strong>Bypass the timestamp anchor.</strong> RFC 3161 anchors are external — the agent can't forge one.</li>
+    <li><strong>Read or write paths outside the working directory.</strong> Every input/output path runs through <code>validateDocumentPath</code> / <code>validateOutputPath</code>. Opt out with <code>SIGN_ALLOW_ABSOLUTE_DOCS=1</code>.</li>
+    <li><strong>Leak its credentials.</strong> Profile-injected secrets flow through the error-message redactor — even custom keys never show up in stack traces.</li>
   </ul>
 
   <h2>Why this matters</h2>
   <p>
     Most "agent-friendly" SaaS products are agent-friendly in the sense that they have an API.
     They aren't agent-safe. The MCP boundary here is designed so an agent can do all the
-    operational work (sending, tracking, verifying, reporting) while the actual legal commitment
-    — the signature — stays gated behind a human gesture.
+    operational work (detecting, sending, stamping previews, tracking, verifying, reporting)
+    while the actual legal commitment — the signature — stays gated behind a human gesture.
   </p>
 
   <p>

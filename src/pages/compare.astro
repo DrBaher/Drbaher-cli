@@ -17,8 +17,10 @@ const rows: Row[] = [
   { label: 'Templates',                           cli: 'Bring your own .docx; bundled CC-licensed defaults.',              saas: 'Vendor-curated library; hard to fork or modify.' },
   { label: 'Negotiation',                         cli: 'File-based protocol. Hash-chained. Send the file by any channel.', saas: 'In-app redlining + threaded comments behind the SaaS auth.' },
   { label: 'PDF rendering',                       cli: 'Pluggable: LibreOffice, Word, Pandoc, or Gotenberg.',              saas: 'Vendor-controlled rendering pipeline.' },
-  { label: 'E-signature provider',                cli: 'Multi-provider (Dropbox Sign, DocuSign, SignWell, local).',        saas: 'Bundled provider; switching means migrating.' },
-  { label: 'MCP / agent integration',             cli: 'Native MCP server in sign-cli; CLIs are agent-friendly by design.', saas: 'Generally web-app-only; agents need scraping or custom RPA.' },
+  { label: 'E-signature provider',                cli: 'Built-in offline PAdES signer (PKCS#7, self-issued cert) OR Dropbox Sign / DocuSign / SignWell.', saas: 'Bundled provider; switching means migrating.' },
+  { label: 'Signing without API keys',            cli: 'Yes — fully-offline local provider produces real PAdES PDFs. No signup.',          saas: 'No — vendor signature service is the product.' },
+  { label: 'MCP / agent integration',             cli: '19-tool MCP server in sign-cli with read-only mode and per-signer token guardrails.', saas: 'Generally web-app-only; agents need scraping or custom RPA.' },
+  { label: 'Credential isolation',                cli: 'Named profiles bundle provider + dbPath; secrets resolve from shell env at call time.', saas: 'Org-level secret management inside the vendor; not portable.' },
   { label: 'What you pay',                        cli: 'Free. MIT licensed. You pay for the e-sign provider you choose.',  saas: 'Per-seat licenses + signature volume + add-on AI module.' },
   { label: 'Vendor lock-in',                      cli: 'Standard file formats. You can leave any time with all your data.', saas: 'Migration takes weeks; data export often partial.' },
   { label: 'Telemetry',                           cli: 'None.',                                                            saas: 'Usage analytics by default; disable per tenant if available.' },
@@ -76,9 +78,10 @@ const rows: Row[] = [
 
   <h2>Where the CLIs are clearly better</h2>
   <ul>
-    <li><strong>Audit defensibility.</strong> Hash-chained rounds + RFC 3161 timestamps are a stronger evidentiary record than most SaaS audit logs, which are vendor-controlled and disappear if you stop paying.</li>
-    <li><strong>Agent integration.</strong> The CLIs are MCP-native or stdio-friendly by design. Most SaaS suites need scraping or custom RPA glue for an agent to drive.</li>
-    <li><strong>Cost.</strong> $0 / seat for the tools themselves. You pay only for the third-party signing provider you choose.</li>
+    <li><strong>Audit defensibility.</strong> Hash-chained rounds + RFC 3161 timestamps + append-only DB triggers are a stronger evidentiary record than most SaaS audit logs, which are vendor-controlled and disappear if you stop paying.</li>
+    <li><strong>Agent integration.</strong> sign-cli ships a 19-tool MCP server (plus a 20-route HTTP API at <code class="chip">/v1/*</code>) with read-only mode, capability scoping, allow-list tools, and per-signer token guardrails. Most SaaS suites need scraping or custom RPA glue for an agent to drive.</li>
+    <li><strong>No-signup signing.</strong> The built-in PAdES signer produces real PKCS#7 signed PDFs offline with a self-issued cert. Useful for internal docs and CI / testing where you don't want a third-party trust anchor.</li>
+    <li><strong>Cost.</strong> $0 / seat for the tools themselves. You pay only for the third-party signing provider you choose — or nothing, if the offline PAdES signer is enough for your use case.</li>
     <li><strong>Forkability.</strong> You can read every line of the source and change the behavior without filing a feature request.</li>
   </ul>
 

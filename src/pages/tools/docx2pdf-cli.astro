@@ -19,14 +19,14 @@ const jsonLd = {
   license: 'https://opensource.org/licenses/MIT',
   url: 'https://drbaher-cli.vercel.app/tools/docx2pdf-cli/',
   codeRepository: 'https://github.com/DrBaher/docx2pdf-cli',
-  description: 'Honest, batch-aware DOCX to PDF converter with hybrid backends, parallel processing, font validation, and a doctor probe.',
+  description: 'Honest, batch-aware DOCX to PDF converter with hybrid backends, parallel processing, font validation, a --doctor probe, and machine-readable --capabilities for agent integration.',
   offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
 };
 ---
 <BaseLayout
   title="docx2pdf-cli"
   active="tools/docx2pdf-cli"
-  description="Honest, batch-aware DOCX to PDF converter with hybrid backends, parallel processing, font validation, and a doctor probe."
+  description="Honest, batch-aware DOCX to PDF converter with hybrid backends, parallel processing, font validation, a --doctor probe, and machine-readable --capabilities for agent integration."
   withCasts
   toc
 >
@@ -51,11 +51,14 @@ const jsonLd = {
 
   <ul>
     <li><strong>Single-file or batch conversion.</strong> One file in, one file out — or point at a folder of <code class="chip">.docx</code> files and an output directory.</li>
-    <li><strong>Parallel processing.</strong> <code class="chip">--concurrency N</code> runs N conversions simultaneously, useful for large batches.</li>
-    <li><strong>Hybrid backends.</strong> LibreOffice, Microsoft Word (where licensed), Pandoc, and Gotenberg are all supported; the tool picks the best available unless you override with <code class="chip">--backend</code>.</li>
+    <li><strong>Parallel processing with NDJSON output.</strong> <code class="chip">--concurrency N</code> runs N conversions simultaneously; <code class="chip">--json</code> emits one structured line per file (with <code>outputBytes</code>, <code>durationMs</code>, and on failure <code>exitCode</code>) so an agent or CI pipe doesn't have to scrape prose.</li>
+    <li><strong>Six hybrid backends.</strong> LibreOffice, Gotenberg, ConvertAPI, Apple Pages, Microsoft Word, and a text-only <code class="chip">textutil-cups</code> fallback. The tool picks the best available unless you override with <code class="chip">--backend</code>. Add <code class="chip">--strict-fidelity</code> to refuse the text-only downgrade.</li>
+    <li><strong>Smart doctor.</strong> <code class="chip">--doctor</code> walks every backend candidate and reports which are usable on this machine. The JSON output includes per-backend <code>install</code> commands (platform-aware: <code>apt</code>, <code>dnf</code>, <code>brew</code>, …) and a top-level <code>recommendation</code> — single best next step for this host. If Docker is installed, leads with <code>docker run gotenberg/gotenberg:8</code> so you don't need 700 MB of LibreOffice.</li>
+    <li><strong>Capability discovery.</strong> <code class="chip">--capabilities</code> emits a machine-readable manifest: capability-spec version, tool version, backend fidelity map, supported flags, strict-fidelity policy hints. Agents validate the contract before relying on it.</li>
+    <li><strong>Network retries.</strong> <code class="chip">--retries N</code> on the network backends (<code class="chip">gotenberg</code>, <code class="chip">convertapi</code>) retries transient failures with a non-busy backoff.</li>
     <li><strong>Font validation.</strong> <code class="chip">--check-fonts</code> verifies the document's referenced fonts are present before converting, so you don't get silent substitutions in the rendered PDF.</li>
-    <li><strong>Doctor probe.</strong> <code class="chip">--doctor</code> walks every backend candidate and reports which are usable on this machine, with explanations for the ones that aren't.</li>
-    <li><strong>Honest failure.</strong> If a backend can't render a file, the tool exits non-zero and tells you why. Nothing gets quietly mangled.</li>
+    <li><strong>Backend transparency.</strong> <code class="chip">--why</code> prints the full selection decision tree — no opaque "auto" mode that silently picks a low-fidelity fallback.</li>
+    <li><strong>Honest failure.</strong> Structured error envelopes carry an optional <code>kind</code> (e.g. <code>NO_BACKEND</code>) so library callers branch on error type, not message text. Non-zero exits; nothing gets quietly mangled.</li>
   </ul>
 
   <h2>Quickstart</h2>
@@ -68,14 +71,17 @@ docx2pdf --version
 docx2pdf --doctor
 docx2pdf --list-backends
 
+# Machine-readable capability manifest (for agents)
+docx2pdf --capabilities
+
 # Single file
 docx2pdf contract.docx contract.pdf
 
-# Whole folder, in parallel, into a different output directory
-docx2pdf --concurrency 4 --out-dir ./pdfs ./drafts/*.docx
+# Whole folder, in parallel, into a different output directory, NDJSON per file
+docx2pdf --concurrency 4 --json --out-dir ./pdfs ./drafts/*.docx
 
-# Pin a specific backend
-docx2pdf --backend gotenberg contract.docx contract.pdf
+# Pin a specific backend; retry network failures
+docx2pdf --backend gotenberg --retries 3 contract.docx contract.pdf
 
 # Check fonts before rendering
 docx2pdf --check-fonts contract.docx`}</CodeBlock>
@@ -98,10 +104,13 @@ docx2pdf --check-fonts contract.docx`}</CodeBlock>
   <h2>For agents and automation</h2>
 
   <p>
-    The tool ships with an <code class="chip">AGENTS.md</code> guide and JSON schemas for the
-    output format. AI agents driving a contract pipeline (review → convert → sign) can call
-    <code class="chip">docx2pdf-cli</code> as the conversion step and parse structured success or
-    failure information programmatically.
+    The agent affordances are first-class, not bolted on. <a href="https://github.com/DrBaher/docx2pdf-cli/blob/main/AGENTS.md"><code class="chip">AGENTS.md</code></a> documents the full contract (output envelope, exit codes, discovery, failure → recovery). <a href="https://github.com/DrBaher/docx2pdf-cli/blob/main/llms.txt"><code class="chip">llms.txt</code></a> and <code class="chip">examples/agent-defaults.json</code> ship recommended invocations. The <a href="https://github.com/DrBaher/docx2pdf-cli/tree/main/schemas"><code class="chip">schemas/</code></a> directory holds formal JSON schemas for both <code class="chip">--capabilities</code> and <code class="chip">--doctor</code> output, so an agent can validate against the schema rather than parse prose. Concept deep-dives live in <a href="https://github.com/DrBaher/docx2pdf-cli/tree/main/docs/reference"><code class="chip">docs/reference/</code></a>; per-backend setup in <a href="https://github.com/DrBaher/docx2pdf-cli/tree/main/docs/setup"><code class="chip">docs/setup/</code></a>.
+  </p>
+
+  <CodeBlock label="recommended agent defaults">{`docx2pdf --strict-fidelity --json --out-dir ./pdfs *.docx`}</CodeBlock>
+
+  <p>
+    The discovery loop for a fresh-host agent: call <code class="chip">--capabilities</code> to learn the feature set, call <code class="chip">--doctor</code> to find an installed backend (or read the <code>recommendation</code> field to install one), then invoke with <code class="chip">--strict-fidelity --json</code> and branch on <code>exitCode</code> per file.
   </p>
 
   <h2>Where it fits in the workflow</h2>

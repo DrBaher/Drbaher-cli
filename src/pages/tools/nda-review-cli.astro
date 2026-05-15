@@ -83,14 +83,34 @@ const jsonLd = {
   <h2>Quickstart</h2>
 
   <p>
-    The <code class="chip">quickstart</code> subcommand walks you through 16 questions to write your
+    The <code class="chip">quickstart</code> subcommand walks you through 14 questions to write your
     house policy. Each answer wires into the rule engine: clause keywords, preferred language,
     red-flag patterns, negotiation stance, clause priorities, non-negotiable redlines.
   </p>
 
   <CodeBlock>{`pipx install nda-review-cli
-nda-review-cli quickstart            # 16 questions, 3 minutes
+nda-review-cli quickstart            # 14 questions, 3 minutes
 nda-review-cli tutorial              # interactive primer + sandboxed sample review`}</CodeBlock>
+
+  <h2>For LLM agents</h2>
+
+  <p>
+    Every subcommand and flag is discoverable at runtime via <code class="chip">--catalog json</code>.
+    Don't hardcode the surface — call it at startup.
+  </p>
+
+  <CodeBlock>{`nda-review-cli --catalog json    # 23 subcommands, including 12 nested negotiate subcommands
+nda-review-cli doctor --check-llm    # confirms your LLM provider is reachable
+nda-review-cli examples              # 7 curated walkthroughs`}</CodeBlock>
+
+  <p>
+    The agent contract — output envelope, exit codes, failure → recovery, LLM consent rules — lives in
+    <a href="https://github.com/DrBaher/nda-review-cli/blob/main/AGENTS.md"><code class="chip">AGENTS.md</code></a>.
+    Concept deep-dives (policy, stance, fatigue concession, hash-chained state, scoring profiles) live in
+    <a href="https://github.com/DrBaher/nda-review-cli/tree/main/docs/reference"><code class="chip">docs/reference/</code></a>.
+    Per-provider LLM setup (Anthropic, OpenAI, Ollama, OpenAI-compatible) is in
+    <a href="https://github.com/DrBaher/nda-review-cli/tree/main/docs/setup"><code class="chip">docs/setup/</code></a>.
+  </p>
 
   <h2>Drafting</h2>
 
@@ -116,7 +136,10 @@ nda-review-cli draft --template common-paper-mutual \\
 
   <CodeBlock label="review">{`nda-review-cli review --file path/to/incoming.docx --why \\
   --counterparty "Vendor Co" --learn-profile \\
-  --out-md output/review.md`}</CodeBlock>
+  --out-md output/review.md
+
+# After wiring up an LLM provider, confirm reachability with a 1-token round-trip
+nda-review-cli doctor --check-llm`}</CodeBlock>
 
   <h2>Two-party negotiation</h2>
 
