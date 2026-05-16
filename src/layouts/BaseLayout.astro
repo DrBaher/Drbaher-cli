@@ -77,6 +77,9 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://cli.drbaher
     <script defer is:inline data-domain={PLAUSIBLE_DOMAIN} src="https://plausible.io/js/script.js"></script>
   )}
 
+  <!-- Vercel Web Analytics — free, privacy-friendly, no signup. Only fires on production. -->
+  <script defer is:inline src="/_vercel/insights/script.js"></script>
+
   <script is:inline>
     // Apply theme as early as possible to avoid FOUC.
     (function () {

@@ -19,6 +19,7 @@
     "@astrojs/tailwind": "^5.1.2",
     "@resvg/resvg-js": "^2.6.2",
     "@tailwindcss/typography": "^0.5.15",
+    "@vercel/analytics": "^2.0.1",
     "astro": "^4.16.13",
     "pagefind": "^1.1.1",
     "rehype-autolink-headings": "^7.1.0",

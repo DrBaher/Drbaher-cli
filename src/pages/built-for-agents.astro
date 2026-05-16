@@ -1,0 +1,238 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Callout from '../components/Callout.astro';
+import CodeBlock from '../components/CodeBlock.astro';
+---
+<BaseLayout
+  title="Built for agents"
+  active="built-for-agents"
+  description="Concrete wire-up for Claude Code, Claude Desktop, Cursor, Codex, OpenAI Agents, langchain, and other MCP-aware clients."
+  toc
+>
+  <p class="eyebrow">Agent integrations</p>
+  <h1>Built for Claude, Cursor, Codex — and anything that speaks MCP.</h1>
+
+  <p class="text-lg text-ink-700 dark:text-night-100">
+    sign-cli ships a 19-tool MCP stdio server. Wire it into any MCP-aware client and the agent gets typed,
+    schema-validated tools for the entire signing surface — with the per-signer-token guardrail intact so the
+    agent can drive every step except the actual signing gesture.
+  </p>
+
+  <Callout label="One install, every client">
+    <code class="chip">npm i -g @drbaher/sign-cli</code> — then drop the wire-up snippet below into your client's
+    MCP config. Every command is also a stable MCP tool with input/output schemas; agents discover the live
+    catalog via <code class="chip">sign mcp tools</code>.
+  </Callout>
+
+  <h2>Claude Code</h2>
+
+  <p>
+    Add to <code class="chip">~/.config/claude-code/settings.json</code> (or the project-level
+    <code class="chip">.claude/settings.json</code>):
+  </p>
+
+  <CodeBlock label=".claude/settings.json">{`{
+  "mcpServers": {
+    "sign-cli": {
+      "command": "npx",
+      "args": ["-y", "@drbaher/sign-cli", "mcp", "serve"]
+    }
+  }
+}`}</CodeBlock>
+
+  <p>
+    After Claude Code restarts, every sign-cli MCP tool shows up. Ask the agent to "send contract.pdf to
+    alice@acme.com and bob@beta.com via SignWell" and it will call the right tools with the right arguments.
+    The agent never sees per-signer tokens — those go to the human signers directly.
+  </p>
+
+  <h2>Claude Desktop</h2>
+
+  <p>Same as Claude Code, but the file is <code class="chip">~/Library/Application Support/Claude/claude_desktop_config.json</code> on macOS:</p>
+
+  <CodeBlock label="claude_desktop_config.json">{`{
+  "mcpServers": {
+    "sign-cli": {
+      "command": "npx",
+      "args": ["-y", "@drbaher/sign-cli", "mcp", "serve"],
+      "env": {
+        "SIGN_DB_PATH": "/Users/you/.sign-cli/data.db",
+        "SIGN_LOCAL_AUTOCOMPLETE": "false"
+      }
+    }
+  }
+}`}</CodeBlock>
+
+  <p>
+    The <code class="chip">env</code> block is optional. Setting <code class="chip">SIGN_DB_PATH</code> pins
+    the persistent storage location so multiple Claude Desktop sessions share state.
+    <code class="chip">SIGN_LOCAL_AUTOCOMPLETE=false</code> tells the local provider to hold at "sent" until a
+    signer explicitly runs <code class="chip">sign sign</code> — required for the agent-as-signer flow.
+  </p>
+
+  <h2>Cursor</h2>
+
+  <p>Cursor's MCP config lives at <code class="chip">~/.cursor/mcp.json</code>:</p>
+
+  <CodeBlock label="~/.cursor/mcp.json">{`{
+  "mcpServers": {
+    "sign-cli": {
+      "command": "npx",
+      "args": ["-y", "@drbaher/sign-cli", "mcp", "serve"],
+      "env": {}
+    }
+  }
+}`}</CodeBlock>
+
+  <p>
+    Cursor's agent will see the tool catalog on next restart. Ask it to verify a signed PDF or detect a
+    signature field in any document open in the workspace — the tool calls work the same way.
+  </p>
+
+  <h2>Codex / GitHub Copilot Workspace</h2>
+
+  <p>
+    Codex and similar OpenAI-based agents support MCP via the same <code class="chip">mcpServers</code>
+    config shape. The exact location varies; recent versions read
+    <code class="chip">~/.config/openai-codex/mcp.json</code>. Same JSON as Cursor:
+  </p>
+
+  <CodeBlock label="codex MCP config">{`{
+  "mcpServers": {
+    "sign-cli": {
+      "command": "npx",
+      "args": ["-y", "@drbaher/sign-cli", "mcp", "serve"]
+    }
+  }
+}`}</CodeBlock>
+
+  <h2>OpenAI Agents SDK</h2>
+
+  <p>
+    The OpenAI Agents SDK can attach MCP servers as tool sources. For Python:
+  </p>
+
+  <CodeBlock label="Python">{`from agents import Agent
+from agents.mcp import MCPServerStdio
+
+sign_server = MCPServerStdio(
+    name="sign-cli",
+    params={"command": "npx", "args": ["-y", "@drbaher/sign-cli", "mcp", "serve"]},
+)
+
+agent = Agent(
+    name="Contract Ops",
+    instructions="Help the user send, track, and verify PDFs for signature.",
+    mcp_servers=[sign_server],
+)`}</CodeBlock>
+
+  <h2>langchain (Python or JS)</h2>
+
+  <p>
+    langchain doesn't speak MCP natively, but you can either use the
+    <code class="chip">langchain-mcp-adapters</code> package or wrap the CLI directly. The langchain
+    wrapper starter is shipped in <a href="https://github.com/DrBaher/sign-cli/tree/main/integrations"><code class="chip">integrations/</code></a>
+    in the sign-cli repo.
+  </p>
+
+  <h2>HTTP / non-MCP clients</h2>
+
+  <p>
+    If your agent framework doesn't speak MCP, sign-cli also exposes the same 19-tool surface as 20 HTTP
+    routes at <code class="chip">/v1/*</code> via <code class="chip">sign serve</code>:
+  </p>
+
+  <CodeBlock>{`sign serve --port 4000 --auth-token <bearer> --read-only true --rate-limit 5
+curl http://localhost:4000/v1/openapi.json    # full OpenAPI 3.1 spec`}</CodeBlock>
+
+  <p>
+    Every MCP tool has a 1:1 HTTP equivalent. Same input shape, same path-traversal guards, same read-only
+    gating. Useful for langchain, Llama Index, AutoGen, CrewAI, or any framework that can speak REST.
+  </p>
+
+  <h2>Sandboxed mode</h2>
+
+  <p>
+    For agents that should inspect and track without mutating state, run with
+    <code class="chip">--read-only true</code> and an explicit tool allow-list:
+  </p>
+
+  <CodeBlock>{`sign mcp serve --read-only true \\
+  --tool request_show --tool audit_verify --tool pdf_detect_signature_field \\
+  --tool pdf_inspect_signatures \\
+  --emit-events ./mcp-events.ndjson \\
+  --emit-events-redact true`}</CodeBlock>
+
+  <p>
+    Mutating tools return <code class="chip">FORBIDDEN_READ_ONLY</code> with exit <code class="chip">3</code>.
+    <code class="chip">--emit-events</code> writes one NDJSON line per tool call to disk for replay or audit.
+    <code class="chip">--emit-events-redact true</code> masks token-shaped fields in the log.
+  </p>
+
+  <h2>The asymmetry: what the agent can and can't do</h2>
+
+  <table class="not-prose mt-4 w-full border-collapse text-[14px]">
+    <thead>
+      <tr class="border-b border-ink-700/15 text-left dark:border-night-300/20">
+        <th class="py-2 pr-4 font-semibold text-ink-900 dark:text-night-50">Agent does</th>
+        <th class="py-2 pr-4 font-semibold text-ink-900 dark:text-night-50">Human approves</th>
+      </tr>
+    </thead>
+    <tbody class="text-ink-700 dark:text-night-100">
+      <tr class="border-b border-ink-700/10 dark:border-night-300/15">
+        <td class="py-2 pr-4">Send a PDF to one or many signers</td>
+        <td class="py-2 pr-4">The actual signing gesture (per-signer token)</td>
+      </tr>
+      <tr class="border-b border-ink-700/10 dark:border-night-300/15">
+        <td class="py-2 pr-4">Track status, retry, rotate providers</td>
+        <td class="py-2 pr-4">Provider configuration changes (`sign init`, secret writes)</td>
+      </tr>
+      <tr class="border-b border-ink-700/10 dark:border-night-300/15">
+        <td class="py-2 pr-4">Verify signed PDFs + audit chains offline</td>
+        <td class="py-2 pr-4">Audit-chain anomalies surfaced for investigation</td>
+      </tr>
+      <tr class="border-b border-ink-700/10 dark:border-night-300/15">
+        <td class="py-2 pr-4">Anchor with RFC 3161 timestamps</td>
+        <td class="py-2 pr-4">Anything outside declared per-signer / TTL guardrails</td>
+      </tr>
+      <tr>
+        <td class="py-2 pr-4">Detect signature fields, stamp previews, draft NDAs</td>
+        <td class="py-2 pr-4">Sign-off before <code>finalize</code> on negotiations</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p class="mt-6">
+    The mechanism is the <strong>per-signer approval token</strong>: TTL-bounded, scoped to one email,
+    single-use. The requester (which can be the agent) holds the token at create-time and DMs it to the
+    human signer; the signer pastes it into <code class="chip">sign sign --token ...</code>. The agent
+    never sees signer tokens. Pre-sign safety checks
+    (<code class="chip">--require-hash</code> / <code class="chip">--require-title</code> /
+    <code class="chip">--require-signer-email</code>) throw structured errors <em>before</em> any state
+    mutation, so an agent computing a hash earlier can refuse to sign if the document was swapped in flight.
+  </p>
+
+  <h2>Discovery — never hardcode</h2>
+
+  <p>Three commands every agent should call at startup rather than parsing prose:</p>
+
+  <CodeBlock>{`sign --catalog json    # full CLI command + flag inventory
+sign mcp tools         # live MCP tool catalog (inputSchema + outputSchema per tool)
+sign --version`}</CodeBlock>
+
+  <p>
+    The same pattern works across the suite — <code class="chip">nda-review-cli --catalog json</code> and
+    <code class="chip">docx2pdf --capabilities</code> are the corresponding discovery commands for the
+    other two CLIs.
+  </p>
+
+  <h2>See also</h2>
+
+  <ul>
+    <li><a href="/mcp/">MCP guide</a> — full tool surface and read-only walkthrough.</li>
+    <li><a href="https://github.com/DrBaher/sign-cli/blob/main/AGENTS.md">sign-cli AGENTS.md</a> — agent quickstart (output contract, exit codes, failure → recovery).</li>
+    <li><a href="https://github.com/DrBaher/sign-cli/blob/main/docs/agent-guide.md">docs/agent-guide.md</a> — canonical agent reference with per-command schemas.</li>
+    <li><a href="https://github.com/DrBaher/sign-cli/tree/main/docs/recipes">docs/recipes/</a> — task-oriented agent recipes (preflight, agent-loop-mcp, weekly anchor, auditor handoff).</li>
+    <li><a href="/llms.txt">llms.txt</a> — site-wide agent briefing (loaded automatically by some agent crawlers).</li>
+  </ul>
+</BaseLayout>
