@@ -231,6 +231,62 @@ curl http://localhost:4000/v1/openapi.json    # full OpenAPI 3.1 spec`}</CodeBlo
     mutation, so an agent computing a hash earlier can refuse to sign if the document was swapped in flight.
   </p>
 
+  <h2>The other two CLIs — agent-friendly, not MCP servers</h2>
+
+  <p>
+    sign-cli ships an MCP server because it's the one with persistent state (a signing
+    request is a multi-step object that benefits from typed tools). The other two CLIs in the suite are
+    pure functions: they take input, return output. For those, agents drive them directly over stdio with
+    a stable JSON contract.
+  </p>
+
+  <h3><span class="font-mono">nda-review-cli</span> — drafting + reviewing + negotiating</h3>
+
+  <p>
+    Single-file Python (stdlib only at runtime). Every command emits structured output behind
+    <code class="chip">--json</code>; deterministic-by-default, opt-in LLM adjudication via
+    Anthropic / OpenAI / Ollama. The two-party negotiation flow uses a hash-chained JSON state file that
+    bounces between counterparties — each round is signed by exactly one party and tampering is detected
+    on load.
+  </p>
+
+  <CodeBlock label="agent loop: review a counterparty NDA">{`nda-review-cli --catalog json                     # discover commands + flags
+nda-review-cli draft --template mutual-nda > our.json  # seed our position
+nda-review-cli review counterparty.json --json   # score against house policy
+nda-review-cli negotiate --party-a our.json \\
+                          --party-b counterparty.json \\
+                          --stance-a conservative \\
+                          --json                  # round-by-round JSON output`}</CodeBlock>
+
+  <p>
+    Hash-chained state, deterministic stance + clause priority engine, fatigue-concession rule that
+    force-resolves clauses that have bounced too many times. The agent drives every step; humans only sign
+    each finalized round (via sign-cli, optionally).
+  </p>
+
+  <h3><span class="font-mono">docx2pdf-cli</span> — the conversion step</h3>
+
+  <p>
+    Node.js. Six hybrid backends auto-selected by availability (LibreOffice, Gotenberg, ConvertAPI, Pages,
+    Word, textutil-cups). <code class="chip">--capabilities</code> returns a stable JSON contract;
+    <code class="chip">--doctor</code> probes host readiness and emits per-host install commands so the
+    agent can self-check before invoking.
+  </p>
+
+  <CodeBlock label="agent preflight + batch convert">{`docx2pdf --capabilities                # which flags exist, on this version
+docx2pdf --doctor json                 # which backends are usable on this host
+docx2pdf --catalog json                # full CLI command + flag inventory
+docx2pdf in.docx out.pdf --json        # one-shot, structured success/error
+docx2pdf --batch jobs.ndjson \\
+         --concurrency 4 --json        # NDJSON in/out for batch flows`}</CodeBlock>
+
+  <p>
+    Success rows include <code class="chip">outputBytes</code> and <code class="chip">durationMs</code>;
+    failures include <code class="chip">exitCode</code>. <code class="chip">--strict-fidelity</code> refuses
+    the text-only fallback when the agent needs a guarantee that the visual layout was preserved.
+    <code class="chip">--why</code> prints the backend-selection decision tree for debugging.
+  </p>
+
   <h2>Discovery — never hardcode</h2>
 
   <p>Three commands every agent should call at startup rather than parsing prose:</p>
@@ -250,7 +306,9 @@ sign --version`}</CodeBlock>
   <ul>
     <li><a href="/mcp/">MCP guide</a> — full tool surface and read-only walkthrough.</li>
     <li><a href="https://github.com/DrBaher/sign-cli/blob/main/AGENTS.md">sign-cli AGENTS.md</a> — agent quickstart (output contract, exit codes, failure → recovery).</li>
-    <li><a href="https://github.com/DrBaher/sign-cli/blob/main/docs/agent-guide.md">docs/agent-guide.md</a> — canonical agent reference with per-command schemas.</li>
+    <li><a href="https://github.com/DrBaher/nda-review-cli/blob/main/AGENTS.md">nda-review-cli AGENTS.md</a> — agent quickstart for the drafting/negotiation flow.</li>
+    <li><a href="https://github.com/DrBaher/docx2pdf-cli/blob/main/AGENTS.md">docx2pdf-cli AGENTS.md</a> — agent quickstart for the conversion step.</li>
+    <li><a href="https://github.com/DrBaher/sign-cli/blob/main/docs/agent-guide.md">sign-cli docs/agent-guide.md</a> — canonical agent reference with per-command schemas.</li>
     <li><a href="https://github.com/DrBaher/sign-cli/tree/main/docs/recipes">docs/recipes/</a> — task-oriented agent recipes (preflight, agent-loop-mcp, weekly anchor, auditor handoff).</li>
     <li><a href="/llms.txt">llms.txt</a> — site-wide agent briefing (loaded automatically by some agent crawlers).</li>
   </ul>
