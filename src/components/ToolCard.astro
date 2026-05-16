@@ -9,12 +9,13 @@ export interface Props {
   href: string;
   github: string;
   glyph?: string;
+  icon?: string;
   version?: string;
   versionSource?: 'npm' | 'pypi' | 'repo' | 'fallback';
   stars?: number;
   weeklyDownloads?: number;
 }
-const { title, tagline, language, install, href, github, glyph, version, versionSource, stars, weeklyDownloads } = Astro.props as Props;
+const { title, tagline, language, install, href, github, glyph, icon, version, versionSource, stars, weeklyDownloads } = Astro.props as Props;
 const versionTitle =
   versionSource === 'npm'  ? 'Live from registry.npmjs.org' :
   versionSource === 'pypi' ? 'Live from pypi.org' :
@@ -31,7 +32,11 @@ const dlLabel = fmtCount(weeklyDownloads);
       <a href={href} class="block font-mono text-base font-semibold text-ink-900 hover:text-accent-700 focus-ring dark:text-night-50 dark:hover:text-accent-300">{title}</a>
       <p class="mt-1 text-[14px] leading-relaxed text-ink-700 dark:text-night-100">{tagline}</p>
     </div>
-    {glyph ? <span class="select-none text-2xl text-accent-200 transition-transform group-hover:scale-110 dark:text-accent-400/40" aria-hidden="true">{glyph}</span> : null}
+    {icon ? (
+      <img src={icon} alt="" class="h-10 w-10 flex-shrink-0 transition-transform group-hover:scale-110" />
+    ) : glyph ? (
+      <span class="select-none text-2xl text-accent-200 transition-transform group-hover:scale-110 dark:text-accent-400/40" aria-hidden="true">{glyph}</span>
+    ) : null}
   </div>
 
   <div class="mt-4 flex flex-wrap items-center gap-2 text-[12px]">

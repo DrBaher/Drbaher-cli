@@ -33,7 +33,10 @@ const jsonLd = {
 >
   <JsonLd data={jsonLd} />
   <p class="eyebrow">Tool · Python</p>
-  <h1><span class="font-mono">nda-review-cli</span></h1>
+  <h1 class="flex items-center gap-4">
+    <img src="/assets/icons/nda-review-cli.svg" alt="" class="h-12 w-12" />
+    <span class="font-mono">nda-review-cli</span>
+  </h1>
   <FreshHeader name="nda-review-cli" version={meta.version} source={meta.source} fetchedAt={meta.fetchedAt} stars={meta.stars} weeklyDownloads={meta.weeklyDownloads} github="https://github.com/DrBaher/nda-review-cli" />
   <p class="text-lg text-ink-700 dark:text-night-100">
     Draft, review, and negotiate NDAs against your own house playbook. Deterministic by default;
