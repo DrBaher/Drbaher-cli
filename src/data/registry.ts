@@ -25,6 +25,7 @@ const FALLBACKS: Record<string, string> = {
   'nda-review-cli': '0.5.0',
   'docx2pdf-cli': '0.2.1',
   'sign-cli': '0.6.0',
+  'draft-cli': '0.9.0',
 };
 
 async function safeFetch(url: string, init: RequestInit = {}): Promise<Response | null> {
@@ -107,6 +108,7 @@ async function readmeExcerpt(repo: string): Promise<{ heading?: string; excerpt?
 
 export async function getCliMeta(): Promise<Record<string, CliMeta>> {
   const targets: Array<{ key: string; npm?: string; pypi?: string; repo?: string }> = [
+    { key: 'draft-cli',      npm: '@drbaher/draft-cli', repo: 'DrBaher/draft-cli' },
     { key: 'nda-review-cli', pypi: 'nda-review-cli', repo: 'DrBaher/nda-review-cli' },
     { key: 'docx2pdf-cli',   npm: 'docx2pdf-cli',   repo: 'DrBaher/docx2pdf-cli' },
     { key: 'sign-cli',       npm: '@drbaher/sign-cli', repo: 'DrBaher/sign-cli' },

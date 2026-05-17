@@ -18,23 +18,23 @@ interface Page { title: string; eyebrow: string; description: string; }
 const pages: Record<string, Page> = {
   default: {
     eyebrow: 'contract.cli',
-    title: 'Three CLIs for the contract workflow',
-    description: 'Draft NDAs · review against your policy · convert to PDF · sign with audit trails. Local-first, MIT.',
+    title: 'Four CLIs for the contract workflow',
+    description: 'Fill templates · review against your policy · convert to PDF · sign with audit trails. Local-first, MIT.',
   },
   overview: {
     eyebrow: 'contract.cli',
-    title: 'Three CLIs for the contract workflow',
-    description: 'nda-review-cli · docx2pdf-cli · sign-cli. Local-first, deterministic, no SaaS.',
+    title: 'Four CLIs for the contract workflow',
+    description: 'draft-cli · nda-review-cli · docx2pdf-cli · sign-cli. Local-first, deterministic, no SaaS.',
   },
   workflow: {
     eyebrow: 'The workflow',
     title: 'From blank page to signed agreement',
-    description: 'Draft → review → negotiate → convert → sign. Five commands across three CLIs, all on your machine.',
+    description: 'Draft → review → negotiate → convert → sign. Five commands across four CLIs, all on your machine.',
   },
   install: {
     eyebrow: 'Install',
-    title: 'Three installs, one workflow',
-    description: 'pipx install nda-review-cli · npm i -g docx2pdf-cli @drbaher/sign-cli',
+    title: 'Four installs, one workflow',
+    description: 'npm i -g @drbaher/draft-cli · pipx install nda-review-cli · npm i -g docx2pdf-cli @drbaher/sign-cli',
   },
   principles: {
     eyebrow: 'Principles',
@@ -54,12 +54,17 @@ const pages: Record<string, Page> = {
   changelog: {
     eyebrow: 'Changelog',
     title: 'What’s new across the suite',
-    description: 'Releases, fixes, and roadmap notes for nda-review-cli, sign-cli, and docx2pdf-cli.',
+    description: 'Releases, fixes, and roadmap notes for draft-cli, nda-review-cli, docx2pdf-cli, and sign-cli.',
   },
   mcp: {
     eyebrow: 'MCP server',
     title: 'sign-cli speaks MCP',
     description: 'Drive signing from Claude, Cursor, or any MCP-aware client — same per-signer guardrails.',
+  },
+  'tools/draft-cli': {
+    eyebrow: 'Tool · Node.js',
+    title: 'draft-cli',
+    description: 'Fill placeholders in markdown or .docx templates. Typed/computed/positional params, multi-doc bundles.',
   },
   'tools/nda-review-cli': {
     eyebrow: 'Tool · Python',
@@ -186,12 +191,14 @@ export const GET: APIRoute = async ({ params }) => {
                     style: {
                       marginTop: 'auto',
                       display: 'flex',
-                      gap: '24px',
+                      gap: '20px',
                       fontFamily: 'Mono',
-                      fontSize: '22px',
+                      fontSize: '20px',
                       color: '#1f7d5d',
                     },
                     children: [
+                      'draft-cli',
+                      '·',
                       'nda-review-cli',
                       '·',
                       'docx2pdf-cli',

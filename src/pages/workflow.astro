@@ -4,7 +4,7 @@ import Callout from '../components/Callout.astro';
 import WorkflowDiagram from '../components/WorkflowDiagram.astro';
 import CodeBlock from '../components/CodeBlock.astro';
 ---
-<BaseLayout title="The workflow" active="workflow" description="How nda-review-cli, docx2pdf-cli, and sign-cli chain together into a complete contract pipeline — with copy-paste commands at each step." toc>
+<BaseLayout title="The workflow" active="workflow" description="How draft-cli, nda-review-cli, docx2pdf-cli, and sign-cli chain together into a complete contract pipeline — with copy-paste commands at each step." toc>
   <p class="eyebrow">The workflow</p>
   <h1>From blank page to signed agreement, on your machine.</h1>
 
@@ -15,7 +15,7 @@ import CodeBlock from '../components/CodeBlock.astro';
 
   <Callout label="TL;DR">
     <code class="chip">draft</code> → <code class="chip">review</code> → <code class="chip">negotiate</code> →
-    <code class="chip">docx2pdf</code> → <code class="chip">sign</code>. Three tools, five commands, no SaaS,
+    <code class="chip">docx2pdf</code> → <code class="chip">sign</code>. Four tools, five commands, no SaaS,
     no shared database. Files in, files out.
   </Callout>
 
@@ -23,18 +23,36 @@ import CodeBlock from '../components/CodeBlock.astro';
 
   <h2 data-reveal>1 — Draft</h2>
   <p data-reveal>
-    Start with <code class="chip">nda-review-cli</code>. Pick a template (the bundled mutual or one-way templates,
-    or the Common Paper Mutual NDA Version 1.0 that ships with the tool), fill in the parties and purpose,
-    and render the document. You get markdown plus a <code class="chip">.docx</code> ready to send.
+    Start with <code class="chip">draft-cli</code>. Point it at your template (markdown or
+    <code class="chip">.docx</code> — the Common Paper Mutual NDA, your own house template, a SAFE,
+    anything with placeholders) and pass the parameter values. <code class="chip">--list-placeholders</code>
+    first if you want to see what the template expects; <code class="chip">--diff</code> previews the
+    substitutions before writing. Output is markdown or a styling-preserving <code class="chip">.docx</code>
+    round-trip.
   </p>
-  <CodeBlock label="step 1 · draft">{`nda-review-cli draft \\
-  --template common-paper-mutual \\
-  --party-a "Acme Inc." --party-a-address "123 Main St" \\
-  --party-b "Beta LLC"  --party-b-address "10 Market Way" \\
+  <CodeBlock label="step 1 · draft">{`# Discover what the template needs (run once)
+draft templates/mutual-nda.docx --list-placeholders
+
+# Fill it, .docx → .docx with styling preserved
+draft templates/mutual-nda.docx \\
+  --party-a "Acme Inc." \\
+  --party-b "Beta LLC" \\
   --purpose "evaluating a partnership" \\
-  --governing-law "California" \\
-  --out output/nda.md \\
-  --out-docx output/nda.docx`}</CodeBlock>
+  --effective-date "2026-06-01" \\
+  --term "2 year(s)" \\
+  --governing-state "California" \\
+  --output output/nda.docx
+
+# Or feed unstructured prose and let the LLM tier extract values
+draft templates/mutual-nda.md --from-deal deal-notes.txt \\
+  --output output/nda.md`}</CodeBlock>
+  <p data-reveal>
+    <code class="chip">draft-cli</code> generalizes drafting: anything with placeholders can be
+    filled the same way (NDAs, SOWs, SAFEs, board consents). <a href="/tools/nda-review-cli/">nda-review-cli</a>
+    also ships a few bundled NDA templates and can render them directly via its own
+    <code class="chip">draft</code> subcommand — convenient when you're working with one of those known
+    templates and want the review step pre-wired in the same invocation.
+  </p>
 
   <h2 data-reveal>2 — Review</h2>
   <p data-reveal>
@@ -131,8 +149,8 @@ sign audit verify --request-id <id>`}</CodeBlock>
 
   <h2>Skipping or substituting steps</h2>
   <p>
-    Each tool stands alone. If you already have a Word template, skip step 1. If you sign with a
+    Each tool stands alone. If you already have a filled Word document, skip step 1. If you sign with a
     notary or a different e-signature provider, skip step 5 — you'll still have a clean PDF from step 4.
-    The point isn't that you must use all three; it's that they compose cleanly when you do.
+    The point isn't that you must use all four; it's that they compose cleanly when you do.
   </p>
 </BaseLayout>
