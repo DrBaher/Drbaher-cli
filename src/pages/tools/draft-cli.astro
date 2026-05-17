@@ -1,0 +1,135 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Callout from '../../components/Callout.astro';
+import CodeBlock from '../../components/CodeBlock.astro';
+import FreshHeader from '../../components/FreshHeader.astro';
+import JsonLd from '../../components/JsonLd.astro';
+import { getCliMeta } from '../../data/registry';
+
+const meta = (await getCliMeta())['draft-cli'];
+
+const jsonLd = {
+  '@type': 'SoftwareApplication',
+  name: 'draft-cli',
+  applicationCategory: 'DeveloperApplication',
+  operatingSystem: 'macOS, Linux, Windows',
+  softwareVersion: meta.version,
+  programmingLanguage: 'JavaScript',
+  license: 'https://opensource.org/licenses/MIT',
+  url: 'https://cli.drbaher.com/tools/draft-cli/',
+  codeRepository: 'https://github.com/DrBaher/draft-cli',
+  description: 'Agent-first placeholder-filler for legal-document templates. Markdown + .docx round-trip, typed/computed/positional params, parties.json registry, multi-doc bundles, optional LLM inference from prose deal notes.',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+};
+---
+<BaseLayout
+  title="draft-cli"
+  active="tools/draft-cli"
+  description="Agent-first placeholder-filler for legal-document templates. Markdown + .docx round-trip, typed/computed/positional params, parties.json registry, multi-doc bundles, optional LLM inference from prose deal notes."
+  toc
+>
+  <JsonLd data={jsonLd} />
+  <p class="eyebrow">Tool · Node.js</p>
+  <h1 class="flex items-center gap-4">
+    <img src="/assets/icons/draft-cli.svg" alt="" class="h-12 w-12" />
+    <span class="font-mono">draft-cli</span>
+  </h1>
+  <FreshHeader name="draft-cli" version={meta.version} source={meta.source} fetchedAt={meta.fetchedAt} stars={meta.stars} weeklyDownloads={meta.weeklyDownloads} github="https://github.com/DrBaher/draft-cli" />
+  <p class="text-lg text-ink-700 dark:text-night-100">
+    Fill placeholders in a legal-document template with parameter values. Five-tier detection
+    (literal brackets, mustache, <code class="chip">.docx</code> highlights, generic-name
+    heuristic, optional LLM), a locked parameter-schema contract, and a <code class="chip">.docx</code>
+    round-trip that preserves runs and styling. The drafting step at the start of the contract
+    pipeline.
+  </p>
+
+  <Callout label="TL;DR">
+    <code class="chip">npm i -g @drbaher/draft-cli</code>, then
+    <code class="chip">draft template.md --party-a "Acme" --output filled.md</code>. Hand
+    <code class="chip">.docx</code> in and out for a styling-preserving round-trip. Run
+    <code class="chip">--list-placeholders</code> first to see what the template needs.
+  </Callout>
+
+  <h2>What it does</h2>
+
+  <ul>
+    <li><strong>Five-tier detection cascade.</strong> Bracket syntax (<code class="chip">[Party A]</code>), mustache (<code class="chip">{`{{party_a}}`}</code>), <code class="chip">.docx</code> highlighted runs, a generic-name heuristic dictionary, and (only when configured) an LLM tier. First tier with ≥1 hit wins; the rest are skipped. Active tier is reported in <code class="chip">--why</code> and JSON output.</li>
+    <li><strong><code class="chip">.docx</code> round-trip with run preservation.</strong> Input <code class="chip">.docx</code>, output <code class="chip">.docx</code>. The Word package is unzipped, substitutions land inside the same <code class="chip">&lt;w:t&gt;</code> runs detection found, and everything else (relationships, images, headers, content types) passes through unchanged. v0.9.0 added smart run-merging for placeholders split across runs (the Common Paper case) with <code class="chip">--strict-runs</code> as the opt-out.</li>
+    <li><strong>Typed parameters.</strong> Schema declares <code class="chip">type</code> (<code class="chip">date</code> / <code class="chip">money</code> / <code class="chip">party</code>) and per-type <code class="chip">format</code> + <code class="chip">currency</code>. Inputs normalize before substitution — <code class="chip">"2026-06-01"</code> renders as <code class="chip">June 1, 2026</code>, <code class="chip">5000000</code> as <code class="chip">$5,000,000.00</code>.</li>
+    <li><strong>Computed placeholders.</strong> Date arithmetic via <code class="chip">computed.from</code> in the schema. <code class="chip">expiry_date</code> = <code class="chip">effective_date + term</code>, derived once at substitution time. No spreadsheet glue.</li>
+    <li><strong>Positional addressing.</strong> When the same role appears under different labels (YC SAFE: "Investor" on the cover page, "[Investor]" in the body), <code class="chip">positions</code> maps the role to its occurrence list so one CLI flag fills all positions.</li>
+    <li><strong><code class="chip">parties.json</code> registry.</strong> Resolve <code class="chip">ref:parties.acme_corp.name</code> across templates so the same legal entity definition is the single source of truth.</li>
+    <li><strong>Multi-document bundles.</strong> One parameter set, many output documents. NDA + SAFE + Side Letter all share the same <code class="chip">party_a</code>, <code class="chip">party_b</code>, <code class="chip">effective_date</code>; bundle config maps each template to its output path.</li>
+    <li><strong>LLM-from-deal inference (opt-in).</strong> <code class="chip">--from-deal deal-notes.txt</code> hands free-form prose to your configured LLM provider; only declared placeholder keys are extracted, CLI / <code class="chip">--params</code> always win on collision. Extra keys warned to stderr; <code class="chip">--no-llm</code> opts out.</li>
+    <li><strong>Honest discovery + diff.</strong> <code class="chip">--list-placeholders</code> enumerates what the template needs (keys, aliases, occurrence counts, tier). <code class="chip">--diff</code> shows the substitution table without writing output. <code class="chip">--why</code> prints a stable structured explanation.</li>
+  </ul>
+
+  <h2>Quickstart</h2>
+
+  <CodeBlock label="install + run">{`# Install
+npm i -g @drbaher/draft-cli
+draft --version
+
+# What placeholders does this template need?
+draft template.md --list-placeholders
+
+# Fill a markdown template; print to stdout
+draft template.md --party-a "Acme Corp" --party-b "Globex"
+
+# Fill a Word document; round-trip styling preserved
+draft contract.docx --params deal.json --output filled.docx
+
+# Preview substitutions without writing output
+draft template.md --params deal.json --diff
+
+# Validate completeness (CI / agent precheck)
+draft template.md --params deal.json --validate
+
+# Infer values from unstructured prose (LLM, when configured)
+draft nda.md --from-deal deal-notes.txt --output draft.md`}</CodeBlock>
+
+  <h2>Why a separate drafting tool</h2>
+
+  <p>
+    <a href="/tools/nda-review-cli/">nda-review-cli</a> ships a few bundled NDA templates and can
+    render them via <code class="chip">draft</code> — fine when you're drafting an NDA against
+    one of those known templates. <code class="chip">draft-cli</code> generalizes the same idea:
+    any markdown or <code class="chip">.docx</code> file with placeholders, any parameter set,
+    any output format. Side letters, SAFEs, employment agreements, board consents, vendor MSAs
+    — same shape, same substitution discipline, same <code class="chip">--why</code> /
+    <code class="chip">--diff</code> / <code class="chip">--validate</code> affordances.
+  </p>
+
+  <p>
+    The locked <a href="https://github.com/DrBaher/draft-cli/blob/main/PARAM_SCHEMA.md"><code class="chip">PARAM_SCHEMA.md</code></a> contract is the load-bearing part: schemas don't change between minor versions, so an agent or pipeline that reads the schema at startup can rely on the surface shape. <code class="chip">--json</code> output mirrors the same shape.
+  </p>
+
+  <h2>For agents and automation</h2>
+
+  <p>
+    Agent affordances are baked in. <a href="https://github.com/DrBaher/draft-cli/blob/main/AGENTS.md"><code class="chip">AGENTS.md</code></a> documents the output envelope, exit codes, and failure → recovery loop. <code class="chip">--list-placeholders --json</code> is a structured manifest of what a template needs (keys, aliases, types, defaults). <code class="chip">--validate</code> is the precheck before substitution. The LLM tier is opt-in and isolated under its own provider config (<code class="chip">ANTHROPIC_API_KEY</code> / <code class="chip">OPENAI_API_KEY</code> / explicit <code class="chip">DRAFT_LLM_*</code>); no network call without consent.
+  </p>
+
+  <CodeBlock label="recommended agent defaults">{`# Discover schema, then fill — error-fast at validation
+draft template.md --list-placeholders --json
+draft template.md --params deal.json --validate
+draft template.md --params deal.json --output filled.docx --json`}</CodeBlock>
+
+  <h2>Where it fits in the workflow</h2>
+
+  <p>
+    The first step in the four-CLI workflow: take a template you control (markdown or
+    <code class="chip">.docx</code>) and produce a filled draft to hand to
+    <a href="/tools/nda-review-cli/">nda-review-cli</a> for policy review or directly to
+    <a href="/tools/docx2pdf-cli/">docx2pdf-cli</a> for PDF rendering.
+    <a href="/workflow/">See the full workflow</a> for the chained commands.
+  </p>
+
+  <p>
+    It's also useful on its own for any templated drafting — SOWs, invoice prefaces, board
+    materials, anything with placeholders. The contract pipeline is one application.
+  </p>
+
+  <h2>Repo</h2>
+  <p><a href="https://github.com/DrBaher/draft-cli" target="_blank" rel="noopener">github.com/DrBaher/draft-cli</a> · MIT licensed · Node.js · npm-installable.</p>
+</BaseLayout>

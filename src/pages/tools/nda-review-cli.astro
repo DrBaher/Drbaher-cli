@@ -117,7 +117,11 @@ nda-review-cli examples              # 7 curated walkthroughs`}</CodeBlock>
 
   <h2>Drafting</h2>
 
-  <p>Three bundled templates, plus <code class="chip">--template-file</code> to bring your own.</p>
+  <p>
+    Three bundled templates, plus <code class="chip">--template-file</code> to bring your own. For
+    templates outside the NDA family (SAFE, side letter, SOW, etc.) reach for
+    <a href="/tools/draft-cli/"><code class="chip">draft-cli</code></a> — same idea, generalized.
+  </p>
   <CodeBlock label="draft">{`# Common Paper Mutual NDA — bundled, CC BY 4.0, attribution preserved
 nda-review-cli draft --template common-paper-mutual \\
   --party-a "Acme Inc." --party-a-address "123 Main St" \\
@@ -188,7 +192,9 @@ nda-review-cli doctor --check-llm`}</CodeBlock>
     the CLI shells out to user-configured commands in <code class="chip">config/integrations.json</code>.
     Wire it to <a href="/tools/docx2pdf-cli/"><code class="chip">docx2pdf-cli</code></a> and
     <a href="/tools/sign-cli/"><code class="chip">sign-cli</code></a> for the full pipeline,
-    or any other tool of your choosing.
+    or any other tool of your choosing. If the inbound document arrived as a template needing
+    placeholder fills (e.g. a counterparty's own draft), pipe it through
+    <a href="/tools/draft-cli/"><code class="chip">draft-cli</code></a> first.
   </p>
 
   <h2>Repo</h2>

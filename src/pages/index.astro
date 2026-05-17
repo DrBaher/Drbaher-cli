@@ -8,12 +8,12 @@ import { getCliMeta } from '../data/registry';
 
 const meta = await getCliMeta();
 ---
-<BaseLayout title="Overview" active="overview" description="Three composable, local-first CLIs built for an agent-first contract workflow: agents do the operational work, humans approve the gates that matter.">
+<BaseLayout title="Overview" active="overview" description="Four composable, local-first CLIs built for an agent-first contract workflow: agents do the operational work, humans approve the gates that matter.">
   <div class="not-prose hero-band">
     <p class="eyebrow">Built for the agent era</p>
     <h1 class="!mt-2">Agents do the work. You approve what matters.</h1>
     <p class="text-lg text-ink-700 dark:text-night-100 max-w-[62ch]">
-      Three CLIs for the contract workflow — drafting an NDA, reviewing what comes back, negotiating, converting to PDF,
+      Four CLIs for the contract workflow — drafting from a template, reviewing what comes back, negotiating, converting to PDF,
       collecting signatures with a tamper-evident audit trail. Designed so an LLM agent can run 90% of the operational
       work and a human stays in the loop only for the gates that actually need a human gesture.
     </p>
@@ -41,7 +41,7 @@ const meta = await getCliMeta();
   </div>
 
   <Callout label="TL;DR">
-    Three open-source CLIs, three repositories, one agent-friendly workflow. Local-first by default —
+    Four open-source CLIs, four repositories, one agent-friendly workflow. Local-first by default —
     no SaaS account, no telemetry, no vendor lock-in. The agent drives via MCP / stdio; the human approves
     signatures and escalations. Use them piecemeal or chain them together.
   </Callout>
@@ -59,7 +59,20 @@ const meta = await getCliMeta();
 
   <h2 data-reveal>The tools</h2>
 
-  <div class="not-prose mt-4 grid grid-cols-1 gap-4 md:grid-cols-3" data-reveal>
+  <div class="not-prose mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4" data-reveal>
+    <ToolCard
+      title="draft-cli"
+      tagline="Fill placeholders in markdown or .docx templates. Typed/computed/positional params, parties registry, multi-doc bundles."
+      language="Node.js"
+      install="npm i -g @drbaher/draft-cli"
+      href="/tools/draft-cli/"
+      github="https://github.com/DrBaher/draft-cli"
+      icon="/assets/icons/draft-cli.svg"
+      version={meta['draft-cli'].version}
+      versionSource={meta['draft-cli'].source}
+      stars={meta['draft-cli'].stars}
+      weeklyDownloads={meta['draft-cli'].weeklyDownloads}
+    />
     <ToolCard
       title="nda-review-cli"
       tagline="Draft, review, and negotiate NDAs against your own house playbook. Deterministic by default; opt-in LLM augmentation."
@@ -146,7 +159,7 @@ const meta = await getCliMeta();
     or grab the hosted listing on <a href="https://smithery.ai/servers/drbaher/sign-cli" target="_blank" rel="noopener">Smithery</a> for one-click install into Claude Desktop, Cursor, and friends.
   </p>
 
-  <h2>Why three small tools instead of one big platform</h2>
+  <h2>Why four small tools instead of one big platform</h2>
 
   <p>
     Most contract operations products are SaaS suites. They want every step in one dashboard, every
@@ -156,7 +169,7 @@ const meta = await getCliMeta();
   </p>
 
   <p>
-    The three CLIs here take the opposite stance. Each does one thing well. None of them require
+    The four CLIs here take the opposite stance. Each does one thing well. None of them require
     an account, a subscription, or a network call you didn't ask for. An agent can drive them over
     stdio or MCP; a human can drive them from a terminal. You can swap any one of them, fork them,
     or audit the source end to end. Together they cover the same workflow a SaaS suite would, with
@@ -166,8 +179,9 @@ const meta = await getCliMeta();
   <h2>Where to go from here</h2>
 
   <ul>
-    <li><a href="/workflow/">The workflow</a> — step-by-step walkthrough of how the three tools chain together, with copy-paste commands.</li>
-    <li><a href="/install/">Install</a> — one page covering all three install paths.</li>
+    <li><a href="/workflow/">The workflow</a> — step-by-step walkthrough of how the four tools chain together, with copy-paste commands.</li>
+    <li><a href="/install/">Install</a> — one page covering all four install paths.</li>
+    <li><a href="/tools/draft-cli/">draft-cli</a> — fill placeholders in markdown or .docx templates, typed/computed/positional params, multi-doc bundles.</li>
     <li><a href="/tools/nda-review-cli/">nda-review-cli</a> — drafting, reviewing, and negotiating NDAs against your house policy.</li>
     <li><a href="/tools/docx2pdf-cli/">docx2pdf-cli</a> — DOCX to PDF, honestly. No surprises, no hidden conversions.</li>
     <li><a href="/tools/sign-cli/">sign-cli</a> — multi-provider e-signature with audit-grade evidence.</li>

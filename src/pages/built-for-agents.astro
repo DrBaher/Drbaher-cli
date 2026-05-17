@@ -296,15 +296,17 @@ sign mcp tools         # live MCP tool catalog (inputSchema + outputSchema per t
 sign --version`}</CodeBlock>
 
   <p>
-    The same pattern works across the suite — <code class="chip">nda-review-cli --catalog json</code> and
+    The same pattern works across the suite — <code class="chip">draft --list-placeholders --json</code>,
+    <code class="chip">nda-review-cli --catalog json</code>, and
     <code class="chip">docx2pdf --capabilities</code> are the corresponding discovery commands for the
-    other two CLIs.
+    other CLIs.
   </p>
 
   <h2>See also</h2>
 
   <ul>
     <li><a href="/mcp/">MCP guide</a> — full tool surface and read-only walkthrough.</li>
+    <li><a href="https://github.com/DrBaher/draft-cli/blob/main/AGENTS.md">draft-cli AGENTS.md</a> — agent quickstart for the templated-drafting flow.</li>
     <li><a href="https://github.com/DrBaher/sign-cli/blob/main/AGENTS.md">sign-cli AGENTS.md</a> — agent quickstart (output contract, exit codes, failure → recovery).</li>
     <li><a href="https://github.com/DrBaher/nda-review-cli/blob/main/AGENTS.md">nda-review-cli AGENTS.md</a> — agent quickstart for the drafting/negotiation flow.</li>
     <li><a href="https://github.com/DrBaher/docx2pdf-cli/blob/main/AGENTS.md">docx2pdf-cli AGENTS.md</a> — agent quickstart for the conversion step.</li>

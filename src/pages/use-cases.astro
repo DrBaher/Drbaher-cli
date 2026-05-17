@@ -7,7 +7,7 @@ import TryDemo from '../components/TryDemo.astro';
 <BaseLayout
   title="Use cases"
   active="use-cases"
-  description="Concrete vignettes showing how the three CLIs solve real contract-ops problems: vendor onboarding, M&A diligence, employment NDAs."
+  description="Concrete vignettes showing how the four CLIs solve real contract-ops problems: vendor onboarding, M&A diligence, employment NDAs."
   toc
 >
   <p class="eyebrow">Use cases</p>
@@ -43,12 +43,13 @@ import TryDemo from '../components/TryDemo.astro';
 
   <CodeBlock label="vendor-onboarding flow">{`# In a CSV with vendor name, address, contact email
 while IFS=, read -r name addr email; do
-  nda-review-cli draft \\
-    --template common-paper-mutual \\
+  draft templates/mutual-nda.docx \\
     --party-a "Acme Inc." --party-a-address "123 Main St" \\
     --party-b "$name" --party-b-address "$addr" \\
     --purpose "vendor evaluation" \\
-    --out "out/$name.md" --out-docx "out/$name.docx"
+    --output "out/$name.docx"
+
+  nda-review-cli review --file "out/$name.docx" --why --silent
 
   docx2pdf "out/$name.docx" "out/$name.pdf"
 

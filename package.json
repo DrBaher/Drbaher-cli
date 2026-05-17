@@ -3,7 +3,7 @@
   "version": "0.4.0",
   "type": "module",
   "private": true,
-  "description": "Showcase site for nda-review-cli, sign-cli, and docx2pdf-cli — three composable, local-first CLIs for the contract operations workflow.",
+  "description": "Showcase site for draft-cli, nda-review-cli, docx2pdf-cli, and sign-cli — four composable, local-first CLIs for the contract operations workflow.",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build && pagefind --site dist",
