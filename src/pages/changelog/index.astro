@@ -7,6 +7,7 @@ const entries = (await getCollection('changelog')).sort(
 );
 
 const cliColor: Record<string, string> = {
+  'draft-cli':      'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-200 dark:border-emerald-700/40',
   'nda-review-cli': 'bg-accent-50 text-accent-700 border-accent-200 dark:bg-accent-900/20 dark:text-accent-300 dark:border-accent-700/40',
   'sign-cli':       'bg-blue-50  text-blue-700  border-blue-200  dark:bg-blue-900/20  dark:text-blue-200  dark:border-blue-700/40',
   'docx2pdf-cli':   'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/20 dark:text-amber-200 dark:border-amber-700/40',
@@ -17,7 +18,7 @@ function fmt(d: Date) {
   return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 }
 ---
-<BaseLayout title="Changelog" active="changelog" description="Release notes and roadmap items for nda-review-cli, sign-cli, docx2pdf-cli, and this site.">
+<BaseLayout title="Changelog" active="changelog" description="Release notes and roadmap items for draft-cli, nda-review-cli, sign-cli, docx2pdf-cli, and this site.">
   <p class="eyebrow">Changelog</p>
   <h1>What's new across the suite.</h1>
 
