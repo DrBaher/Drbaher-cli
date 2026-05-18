@@ -1,0 +1,164 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Callout from '../../components/Callout.astro';
+import CodeBlock from '../../components/CodeBlock.astro';
+import FreshHeader from '../../components/FreshHeader.astro';
+import JsonLd from '../../components/JsonLd.astro';
+import { getCliMeta } from '../../data/registry';
+
+const meta = (await getCliMeta())['compare-cli'];
+
+const jsonLd = {
+  '@type': 'SoftwareApplication',
+  name: 'compare-cli',
+  applicationCategory: 'DeveloperApplication',
+  operatingSystem: 'macOS, Linux, Windows',
+  softwareVersion: meta.version,
+  programmingLanguage: 'JavaScript',
+  license: 'https://opensource.org/licenses/MIT',
+  url: 'https://cli.drbaher.com/tools/compare-cli/',
+  codeRepository: 'https://github.com/DrBaher/compare-cli',
+  description: 'Clause-aware drift detection between two contract versions. Pre-signature gate for legal teams and agent pipelines. Single-file Node CLI, deterministic by design, no LLM tier.',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+};
+---
+<BaseLayout
+  title="compare-cli"
+  active="tools/compare-cli"
+  description="Clause-aware drift detection between two contract versions. Pre-signature gate for legal teams and agent pipelines. Single-file Node CLI, deterministic by design, no LLM tier."
+  toc
+>
+  <JsonLd data={jsonLd} />
+  <p class="eyebrow">Tool · Node.js</p>
+  <h1 class="flex items-center gap-4">
+    <span class="font-mono">compare-cli</span>
+  </h1>
+  <FreshHeader name="compare-cli" version={meta.version} source={meta.source} fetchedAt={meta.fetchedAt} stars={meta.stars} weeklyDownloads={meta.weeklyDownloads} github="https://github.com/DrBaher/compare-cli" />
+  <p class="text-lg text-ink-700 dark:text-night-100">
+    Compare two contract versions (the negotiated text vs the ready-to-sign artifact) and
+    classify every difference as <strong>cosmetic</strong>, <strong>typographic</strong>,
+    or <strong>substantive</strong>. The exit code is the contract: <code class="chip">0</code>
+    safe to sign, <code class="chip">2</code> substantive drift, <code class="chip">3</code>
+    cosmetic-only, <code class="chip">4</code> clauses moved but content identical. The
+    pre-signature gate in the workflow.
+  </p>
+
+  <Callout label="TL;DR">
+    <code class="chip">npm i -g compare-cli</code>, then
+    <code class="chip">compare negotiated.docx ready-to-sign.pdf</code>. Reads
+    <code class="chip">.docx</code> / <code class="chip">.pdf</code> /
+    <code class="chip">.md</code> / <code class="chip">.txt</code> / stdin on either side,
+    cross-format. Pair with <code class="chip">--from-negotiation negotiation.json</code> to
+    pull the agreed text from <a href="/tools/nda-review-cli/">nda-review-cli</a>'s state file.
+  </Callout>
+
+  <h2>What it does</h2>
+
+  <ul>
+    <li><strong>Clause detection cascade.</strong> H2 (<code class="chip">## Title</code>) →
+      bold-numbered (<code class="chip">**1. Title**</code>) → ALL-CAPS standalone →
+      synthetic single-clause fallback. Strict cascade — earlier tiers win, no
+      shadowing. The same rule is implemented in
+      <a href="https://github.com/DrBaher/template-vault-CLI">template-vault-CLI</a>
+      (Python); the spec lives at
+      <a href="https://github.com/DrBaher/compare-cli/blob/main/docs/clause-detection.md"><code class="chip">docs/clause-detection.md</code></a>.</li>
+    <li><strong>Five-class spectrum (locked).</strong> <code class="chip">clean</code>,
+      <code class="chip">cosmetic</code> (whitespace, curly quotes, em-dashes, NBSP),
+      <code class="chip">typographic</code> (case, number format, Oxford comma),
+      <code class="chip">substantive</code> (any word change, addition, deletion),
+      <code class="chip">moved</code> (byte-identical body in a different position).
+      Mapping to exit codes never changes within a major version.</li>
+    <li><strong>Two normalization passes</strong> define the cosmetic / typographic /
+      substantive boundary deterministically. What's <em>not</em> normalized away
+      (singular/plural, tense, negation, sentence punctuation) is captured in
+      <a href="https://github.com/DrBaher/compare-cli/blob/main/COMPARE_SCHEMA.md">COMPARE_SCHEMA.md</a>
+      §5–§6.</li>
+    <li><strong>Move detection via LIS</strong> over clause-title alignments. Exact, no fuzzy
+      threshold. <code class="chip">moved</code> is suppressed when the body class is
+      non-clean (substantive wins).</li>
+    <li><strong>Intra-clause word diff</strong> in human output (added in 0.2.0): substantive
+      changes render inline as <code class="chip">[-removed-]&#123;+added+&#125;</code>
+      (or red/green color in a TTY). <code class="chip">--no-intra-diff</code> opts out.</li>
+    <li><strong><code class="chip">--from-negotiation NEG.json</code></strong> reads the
+      agreed text from nda-review-cli's <code class="chip">negotiation.json</code> with a
+      three-tier resolution (top-level <code class="chip">status: converged</code> → per-round
+      <code class="chip">agreed: true</code> → per-round <code class="chip">clause_status</code>
+      all <code class="chip">"agreed"</code>). Pair with
+      <code class="chip">--require-signoffs</code> for unattended pipelines.</li>
+    <li><strong>Output formats:</strong> human (default, color-aware),
+      <code class="chip">--json</code> (stable shape locked across v1.x),
+      <code class="chip">--sarif</code> (SARIF v2.1.0 for GitHub code-scanning).
+      <code class="chip">--check</code> suppresses all output for CI-gate-only use.</li>
+    <li><strong>Track-changes metadata</strong> from <code class="chip">.docx</code>
+      <code class="chip">&lt;w:ins&gt;</code> / <code class="chip">&lt;w:del&gt;</code>
+      surfaces in <code class="chip">--json</code> output as
+      <code class="chip">base.track_changes</code> / <code class="chip">candidate.track_changes</code>
+      (added in 0.3.0). Author + date provenance alongside the text-diff verdict.</li>
+    <li><strong>Clause filters:</strong> <code class="chip">--only-clauses Term,Payment</code>
+      or <code class="chip">--ignore-clauses Notices</code> narrow the report and the
+      exit-code calculation. Suppressed count surfaces in JSON for auditability.</li>
+  </ul>
+
+  <h2>Quickstart</h2>
+
+  <CodeBlock label="install + run">{`# Install
+npm i -g compare-cli
+compare --version
+
+# Headline use: negotiated.docx vs ready-to-sign.pdf
+compare negotiated.docx ready-to-sign.pdf
+
+# Same comparison, structured JSON
+compare negotiated.docx ready-to-sign.pdf --json
+
+# From the negotiation state file
+compare --from-negotiation negotiation.json ready-to-sign.pdf
+
+# Unattended pipelines: require both parties signed off
+compare --from-negotiation negotiation.json ready-to-sign.pdf --require-signoffs
+
+# CI gate: exit code only
+compare base.docx cand.docx --check && echo "safe to sign"
+
+# SARIF for GitHub code-scanning
+compare base.docx cand.docx --sarif > drift.sarif`}</CodeBlock>
+
+  <h2>For agents and automation</h2>
+
+  <p>
+    Agent affordances are baked in.
+    <a href="https://github.com/DrBaher/compare-cli/blob/main/AGENTS.md"><code class="chip">AGENTS.md</code></a>
+    documents the stable <code class="chip">--json</code> shape, exit-code enumeration, and
+    the recommended invocation patterns (pre-signature gate, focusing on material clauses,
+    strict-mode for high-stakes pipelines). The five exit codes never re-number without a
+    major-version bump.
+  </p>
+
+  <p>
+    For MCP-driven agent loops,
+    <a href="https://www.npmjs.com/package/compare-cli-mcp"><code class="chip">compare-cli-mcp</code></a>
+    wraps the CLI as an MCP server with three tools
+    (<code class="chip">compare_files</code>, <code class="chip">compare_with_negotiation</code>,
+    <code class="chip">compare_demo</code>) over stdio. Substantive drift is a successful tool
+    call returning structured content; only genuine errors (I/O, malformed input, no agreed
+    round) become MCP errors. Design contract:
+    <a href="https://github.com/DrBaher/compare-cli/blob/main/docs/mcp.md"><code class="chip">docs/mcp.md</code></a>.
+  </p>
+
+  <h2>Where it fits in the workflow</h2>
+
+  <p>
+    The pre-signature gate. Take the agreed text (from a clean
+    <a href="/tools/draft-cli/">draft-cli</a> render or a converged
+    <a href="/tools/nda-review-cli/">nda-review-cli</a>
+    <code class="chip">negotiation.json</code>), compare against the ready-to-sign artifact
+    (PDF rendered by <a href="/tools/docx2pdf-cli/">docx2pdf-cli</a>, or the
+    <code class="chip">.docx</code> the counterparty mailed back). Gate the
+    <a href="/tools/sign-cli/">sign-cli</a> invocation on exit 0 (or accept 3 and 4 with
+    eyes open).
+    <a href="/workflow/">See the full workflow</a> for the chained commands.
+  </p>
+
+  <h2>Repo</h2>
+  <p><a href="https://github.com/DrBaher/compare-cli" target="_blank" rel="noopener">github.com/DrBaher/compare-cli</a> · MIT licensed · Node.js · two runtime deps (<code class="chip">jszip</code> + <code class="chip">pdfjs-dist</code>) · npm-installable as <code class="chip">compare-cli</code>.</p>
+</BaseLayout>
