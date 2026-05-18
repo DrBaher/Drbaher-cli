@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#fdfcf9"/>
+  <!-- document outline -->
+  <path d="M 130 100 L 320 100 L 380 160 L 380 410 L 130 410 Z"
+        fill="#fdfcf9" stroke="#1f7d5d" stroke-width="16" stroke-linejoin="round"/>
+  <!-- folded corner -->
+  <path d="M 320 100 L 380 160 L 320 160 Z"
+        fill="#1f7d5d" stroke="#1f7d5d" stroke-width="16" stroke-linejoin="round"/>
+  <!-- delta (change / diff) centered in the document body -->
+  <path d="M 255 196 L 336 336 L 174 336 Z"
+        fill="none" stroke="#1f7d5d" stroke-width="22" stroke-linejoin="round" stroke-linecap="round"/>
+  <!-- darker inner accent on the delta to echo the folded-corner depth -->
+  <path d="M 255 196 L 296 266 L 214 266 Z"
+        fill="#0e4a37"/>
+</svg>
