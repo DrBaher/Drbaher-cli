@@ -197,6 +197,17 @@ nda-review-cli doctor --check-llm`}</CodeBlock>
     <a href="/tools/draft-cli/"><code class="chip">draft-cli</code></a> first.
   </p>
 
+  <p>
+    The <code class="chip">negotiation.json</code> state file this CLI emits is consumed by
+    <a href="/tools/compare-cli/"><code class="chip">compare-cli</code></a>'s
+    <code class="chip">--from-negotiation</code> flag — the pre-signature gate reads the
+    converged text (via top-level <code class="chip">status</code>, per-round
+    <code class="chip">agreed</code>, or <code class="chip">clause_status</code> all
+    <code class="chip">"agreed"</code>) and compares against the ready-to-sign artifact.
+    Pair with <code class="chip">--require-signoffs</code> to also enforce that both parties'
+    <code class="chip">negotiate sign-off</code> entries are populated before the gate passes.
+  </p>
+
   <h2>Repo</h2>
   <p><a href="https://github.com/DrBaher/nda-review-cli" target="_blank" rel="noopener">github.com/DrBaher/nda-review-cli</a> · MIT licensed · Stdlib-only Python · 73 tests passing in CI.</p>
 </BaseLayout>

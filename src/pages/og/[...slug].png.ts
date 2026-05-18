@@ -18,23 +18,23 @@ interface Page { title: string; eyebrow: string; description: string; }
 const pages: Record<string, Page> = {
   default: {
     eyebrow: 'contract.cli',
-    title: 'Four CLIs for the contract workflow',
-    description: 'Fill templates · review against your policy · convert to PDF · sign with audit trails. Local-first, MIT.',
+    title: 'Five CLIs for the contract workflow',
+    description: 'Fill templates · review against your policy · convert to PDF · gate drift · sign with audit trails. Local-first, MIT.',
   },
   overview: {
     eyebrow: 'contract.cli',
-    title: 'Four CLIs for the contract workflow',
-    description: 'draft-cli · nda-review-cli · docx2pdf-cli · sign-cli. Local-first, deterministic, no SaaS.',
+    title: 'Five CLIs for the contract workflow',
+    description: 'draft-cli · nda-review-cli · docx2pdf-cli · compare-cli · sign-cli. Local-first, deterministic, no SaaS.',
   },
   workflow: {
     eyebrow: 'The workflow',
     title: 'From blank page to signed agreement',
-    description: 'Draft → review → negotiate → convert → sign. Five commands across four CLIs, all on your machine.',
+    description: 'Draft → review → negotiate → convert → compare → sign. Six commands across five CLIs, all on your machine.',
   },
   install: {
     eyebrow: 'Install',
-    title: 'Four installs, one workflow',
-    description: 'npm i -g @drbaher/draft-cli · pipx install nda-review-cli · npm i -g docx2pdf-cli @drbaher/sign-cli',
+    title: 'Five installs, one workflow',
+    description: 'npm i -g @drbaher/draft-cli · pipx install nda-review-cli · npm i -g docx2pdf-cli compare-cli @drbaher/sign-cli',
   },
   principles: {
     eyebrow: 'Principles',
@@ -48,13 +48,13 @@ const pages: Record<string, Page> = {
   },
   'use-cases': {
     eyebrow: 'Use cases',
-    title: 'Three concrete jobs the CLIs do well',
-    description: 'Vendor onboarding, M&A diligence, employment paperwork. Real workflows, copy-paste commands.',
+    title: 'Four concrete jobs the CLIs do well',
+    description: 'Vendor onboarding, M&A diligence, employment paperwork, pre-signature drift gating. Real workflows, copy-paste commands.',
   },
   changelog: {
     eyebrow: 'Changelog',
     title: 'What’s new across the suite',
-    description: 'Releases, fixes, and roadmap notes for draft-cli, nda-review-cli, docx2pdf-cli, and sign-cli.',
+    description: 'Releases, fixes, and roadmap notes for draft-cli, nda-review-cli, docx2pdf-cli, compare-cli, and sign-cli.',
   },
   mcp: {
     eyebrow: 'MCP server',
@@ -80,6 +80,11 @@ const pages: Record<string, Page> = {
     eyebrow: 'Tool · TypeScript',
     title: 'sign-cli',
     description: 'Multi-provider e-signature with hash-chained audit events and RFC 3161 timestamps.',
+  },
+  'tools/compare-cli': {
+    eyebrow: 'Tool · Node.js',
+    title: 'compare-cli',
+    description: 'Clause-aware drift detection between two contract versions. Pre-signature gate; exit code is the contract.',
   },
 };
 
@@ -202,6 +207,8 @@ export const GET: APIRoute = async ({ params }) => {
                       'nda-review-cli',
                       '·',
                       'docx2pdf-cli',
+                      '·',
+                      'compare-cli',
                       '·',
                       'sign-cli',
                     ],

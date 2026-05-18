@@ -213,10 +213,12 @@ curl http://localhost:8787/v1/openapi.json    # discover the route catalog`}</Co
   <p>
     <code class="chip">sign-cli</code> is the last step in the contract pipeline — after
     <a href="/tools/draft-cli/">draft-cli</a> fills the template,
-    <a href="/tools/nda-review-cli/">nda-review-cli</a> produces the agreed text, and
-    <a href="/tools/docx2pdf-cli/">docx2pdf-cli</a> renders the PDF. Or skip the chain entirely
-    and hand a <code>.docx</code> straight to <code class="chip">sign document</code>. <a
-    href="/workflow/">See the full workflow page</a> for the chained commands.
+    <a href="/tools/nda-review-cli/">nda-review-cli</a> produces the agreed text,
+    <a href="/tools/docx2pdf-cli/">docx2pdf-cli</a> renders the PDF, and
+    <a href="/tools/compare-cli/">compare-cli</a> gates the ready-to-sign PDF against the
+    agreed text (substantive drift = no sign). Or skip the chain entirely and hand a
+    <code>.docx</code> straight to <code class="chip">sign document</code>.
+    <a href="/workflow/">See the full workflow page</a> for the chained commands.
   </p>
 
   <p>
