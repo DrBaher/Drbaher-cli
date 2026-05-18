@@ -1,15 +1,25 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <rect width="512" height="512" rx="96" fill="#fdfcf9"/>
-  <!-- document outline -->
-  <path d="M 130 100 L 320 100 L 380 160 L 380 410 L 130 410 Z"
-        fill="#fdfcf9" stroke="#1f7d5d" stroke-width="16" stroke-linejoin="round"/>
-  <!-- folded corner -->
-  <path d="M 320 100 L 380 160 L 320 160 Z"
-        fill="#1f7d5d" stroke="#1f7d5d" stroke-width="16" stroke-linejoin="round"/>
-  <!-- delta (change / diff) centered in the document body -->
-  <path d="M 255 196 L 336 336 L 174 336 Z"
-        fill="none" stroke="#1f7d5d" stroke-width="22" stroke-linejoin="round" stroke-linecap="round"/>
-  <!-- darker inner accent on the delta to echo the folded-corner depth -->
-  <path d="M 255 196 L 296 266 L 214 266 Z"
-        fill="#0e4a37"/>
+
+  <!-- Left document outline (the agreed text) -->
+  <path d="M 70 110 L 210 110 L 250 150 L 250 400 L 70 400 Z"
+        fill="#fdfcf9" stroke="#1f7d5d" stroke-width="14" stroke-linejoin="round"/>
+  <path d="M 210 110 L 250 150 L 210 150 Z"
+        fill="#1f7d5d" stroke="#1f7d5d" stroke-width="14" stroke-linejoin="round"/>
+
+  <!-- Right document outline (the candidate) -->
+  <path d="M 262 110 L 402 110 L 442 150 L 442 400 L 262 400 Z"
+        fill="#fdfcf9" stroke="#1f7d5d" stroke-width="14" stroke-linejoin="round"/>
+  <path d="M 402 110 L 442 150 L 402 150 Z"
+        fill="#1f7d5d" stroke="#1f7d5d" stroke-width="14" stroke-linejoin="round"/>
+
+  <!-- Left doc: three "lines of text", middle one is the agreed clause -->
+  <line x1="100" y1="200" x2="220" y2="200" stroke="#1f7d5d" stroke-width="12" stroke-linecap="round"/>
+  <line x1="100" y1="252" x2="210" y2="252" stroke="#0e4a37" stroke-width="12" stroke-linecap="round"/>
+  <line x1="100" y1="304" x2="220" y2="304" stroke="#1f7d5d" stroke-width="12" stroke-linecap="round"/>
+
+  <!-- Right doc: same outer lines, but the middle line is SHORTER → drift -->
+  <line x1="292" y1="200" x2="412" y2="200" stroke="#1f7d5d" stroke-width="12" stroke-linecap="round"/>
+  <line x1="292" y1="252" x2="372" y2="252" stroke="#0e4a37" stroke-width="12" stroke-linecap="round"/>
+  <line x1="292" y1="304" x2="412" y2="304" stroke="#1f7d5d" stroke-width="12" stroke-linecap="round"/>
 </svg>
