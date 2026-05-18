@@ -18,7 +18,8 @@ export interface CliMeta {
   excerpt?: string;    // first paragraph after the first H2 in README
   excerptHeading?: string;
   stars?: number;      // GitHub stargazer count
-  weeklyDownloads?: number; // npm last-week downloads (when applicable)
+  weeklyDownloads?: number;            // last-week downloads (from npm or PyPI)
+  weeklyDownloadsSource?: 'npm' | 'pypi';
 }
 
 const FALLBACKS: Record<string, string> = {
@@ -82,6 +83,16 @@ async function npmWeeklyDownloads(name: string): Promise<number | undefined> {
   return typeof j?.downloads === 'number' ? j.downloads : undefined;
 }
 
+// PyPI weekly downloads via pypistats.org. Same shape as npm's: returns the
+// 7-day total or undefined on any error (rate-limit, network, missing field).
+async function pypiWeeklyDownloads(name: string): Promise<number | undefined> {
+  const r = await safeFetch(`https://pypistats.org/api/packages/${name}/recent`);
+  if (!r) return undefined;
+  const j = await r.json();
+  const w = j?.data?.last_week;
+  return typeof w === 'number' ? w : undefined;
+}
+
 async function readmeExcerpt(repo: string): Promise<{ heading?: string; excerpt?: string }> {
   const r = await safeFetch(`https://raw.githubusercontent.com/${repo}/main/README.md`);
   if (!r) return {};
@@ -119,7 +130,7 @@ export async function getCliMeta(): Promise<Record<string, CliMeta>> {
   const out: Record<string, CliMeta> = {};
   await Promise.all(
     targets.map(async ({ key, npm, pypi, repo }) => {
-      const [versionAttempt, stars, weeklyDownloads, excerptObj] = await Promise.all([
+      const [versionAttempt, stars, weeklyDownloadsResult, excerptObj] = await Promise.all([
         (async () => {
           let v: { version: string; source: CliMeta['source'] } | null = null;
           if (npm) v = await npmVersion(npm);
@@ -128,7 +139,20 @@ export async function getCliMeta(): Promise<Record<string, CliMeta>> {
           return v ?? { version: FALLBACKS[key] ?? '0.0.0', source: 'fallback' as const };
         })(),
         repo ? githubStars(repo) : Promise.resolve(undefined),
-        npm  ? npmWeeklyDownloads(npm) : Promise.resolve(undefined),
+        // Prefer npm (most CLIs); fall back to PyPI for pure-Python packages.
+        // Returns the count + which registry it came from so callers can
+        // label the figure correctly.
+        (async (): Promise<{ count?: number; source?: 'npm' | 'pypi' }> => {
+          if (npm) {
+            const c = await npmWeeklyDownloads(npm);
+            return { count: c, source: 'npm' };
+          }
+          if (pypi) {
+            const c = await pypiWeeklyDownloads(pypi);
+            return { count: c, source: 'pypi' };
+          }
+          return {};
+        })(),
         repo ? readmeExcerpt(repo) : Promise.resolve({}),
       ]);
 
@@ -140,7 +164,8 @@ export async function getCliMeta(): Promise<Record<string, CliMeta>> {
         excerpt: excerptObj.excerpt,
         excerptHeading: excerptObj.heading,
         stars,
-        weeklyDownloads,
+        weeklyDownloads: weeklyDownloadsResult.count,
+        weeklyDownloadsSource: weeklyDownloadsResult.source,
       };
     }),
   );
