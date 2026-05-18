@@ -7,11 +7,11 @@ import TryDemo from '../components/TryDemo.astro';
 <BaseLayout
   title="Use cases"
   active="use-cases"
-  description="Concrete vignettes showing how the four CLIs solve real contract-ops problems: vendor onboarding, M&A diligence, employment NDAs."
+  description="Concrete vignettes showing how the five CLIs solve real contract-ops problems: vendor onboarding, M&A diligence, employment NDAs, pre-signature drift gating."
   toc
 >
   <p class="eyebrow">Use cases</p>
-  <h1>Three concrete jobs an agent + human can run together.</h1>
+  <h1>Four concrete jobs an agent + human can run together.</h1>
 
   <p class="text-lg text-ink-700 dark:text-night-100">
     Each vignette below is structured the same way: an agent does the operational work over the
@@ -22,9 +22,10 @@ import TryDemo from '../components/TryDemo.astro';
 
   <Callout label="Pattern">
     Agent: <strong>draft</strong> → <strong>review</strong> → <strong>negotiate</strong> →
-    <strong>convert</strong> → <strong>send</strong>. &nbsp;Human: <strong>approve signature</strong>,
-    <strong>resolve escalations</strong>, <strong>sign-off on final agreed text</strong>. Stop
-    wherever you want; pick up where you stopped.
+    <strong>convert</strong> → <strong>compare</strong> → <strong>send</strong>.
+    &nbsp;Human: <strong>approve signature</strong>, <strong>resolve escalations</strong>,
+    <strong>sign-off on final agreed text</strong>, <strong>review substantive drift</strong>.
+    Stop wherever you want; pick up where you stopped.
   </Callout>
 
   <h2>1. Vendor onboarding NDA at scale</h2>
@@ -121,6 +122,51 @@ sign-cli send --bulk onboarding.csv \\
 
 # Later — verify offline, even years from now
 sign-cli verify bundles/alice-2025-05-10.json`}</CodeBlock>
+
+  <h2>4. Pre-signature drift gating — the "did the PDF still match what we agreed?" check</h2>
+
+  <p>
+    A negotiation finishes. Counsel converges on text, both sides sign off in
+    <code class="chip">nda-review-cli</code>. The agreed text gets rendered to PDF, packed up,
+    routed through a docusign-style flow, and a week later lands back in your inbox as a
+    "ready-to-sign" attachment. Sometime in that round trip — paralegal cleanup, a template
+    auto-fill, an opposing-counsel "minor correction" — the term changed from two years to
+    three. Today: you notice (or don't) at signing time.
+  </p>
+
+  <p>
+    Run <code class="chip">compare-cli</code> as the gate immediately before
+    <code class="chip">sign-cli</code>. It pulls the agreed text from
+    <code class="chip">negotiation.json</code>, classifies every difference in the candidate
+    PDF as cosmetic / typographic / substantive, and exits non-zero if anything material has
+    shifted. <code class="chip">--require-signoffs</code> double-locks the gate to also
+    require both parties' sign-off metadata to be populated.
+  </p>
+
+  <CodeBlock label="pre-signature drift gate">{`# Single CI step or shell guard before sign-cli
+compare --from-negotiation output/negotiation.json output/ready-to-sign.pdf \\
+  --require-signoffs --check \\
+  || {
+    case $? in
+      2) echo "✗ substantive drift — escalate to counsel" ;;
+      3) echo "⚠ cosmetic-only drift — review and waive if intentional" ;;
+      4) echo "⚠ clauses moved, content identical — review" ;;
+      *) echo "✗ I/O or precondition error" ;;
+    esac
+    exit $?
+  }
+
+# Only on exit 0 do we proceed to sign
+sign-cli send --file output/ready-to-sign.pdf \\
+  --signer "alice@acme.com:Alice Founder" \\
+  --signer "bob@beta.com:Bob Counsel"`}</CodeBlock>
+
+  <p>
+    The agent runs this in seconds; the human is only paged when exit-class is
+    <code class="chip">substantive</code>. For richer review,
+    <code class="chip">compare --sarif</code> produces a SARIF v2.1.0 document that lands in
+    the GitHub PR review UI as inline annotations on the contract file.
+  </p>
 
   <h2>What these have in common</h2>
 

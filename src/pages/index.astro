@@ -8,14 +8,15 @@ import { getCliMeta } from '../data/registry';
 
 const meta = await getCliMeta();
 ---
-<BaseLayout title="Overview" active="overview" description="Four composable, local-first CLIs built for an agent-first contract workflow: agents do the operational work, humans approve the gates that matter.">
+<BaseLayout title="Overview" active="overview" description="Five composable, local-first CLIs built for an agent-first contract workflow: agents do the operational work, humans approve the gates that matter.">
   <div class="not-prose hero-band">
     <p class="eyebrow">Built for the agent era</p>
     <h1 class="!mt-2">Agents do the work. You approve what matters.</h1>
     <p class="text-lg text-ink-700 dark:text-night-100 max-w-[62ch]">
-      Four CLIs for the contract workflow — drafting from a template, reviewing what comes back, negotiating, converting to PDF,
-      collecting signatures with a tamper-evident audit trail. Designed so an LLM agent can run 90% of the operational
-      work and a human stays in the loop only for the gates that actually need a human gesture.
+      Five CLIs for the contract workflow — drafting from a template, reviewing what comes back, negotiating, converting to PDF,
+      verifying that the ready-to-sign artifact still matches the agreed text, and collecting signatures with a tamper-evident
+      audit trail. Designed so an LLM agent can run 90% of the operational work and a human stays in the loop only for the
+      gates that actually need a human gesture.
     </p>
     <div class="mt-5 flex flex-wrap items-center gap-2 text-[12.5px]">
       <span class="rounded-md border border-accent-200 bg-accent-50 px-2 py-1 font-mono text-accent-700 dark:border-accent-700/40 dark:bg-accent-900/20 dark:text-accent-300">MCP-native</span>
@@ -59,7 +60,7 @@ const meta = await getCliMeta();
 
   <h2 data-reveal>The tools</h2>
 
-  <div class="not-prose mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4" data-reveal>
+  <div class="not-prose mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5" data-reveal>
     <ToolCard
       title="draft-cli"
       tagline="Fill placeholders in markdown or .docx templates. Typed/computed/positional params, parties registry, multi-doc bundles."
@@ -98,6 +99,18 @@ const meta = await getCliMeta();
       versionSource={meta['docx2pdf-cli'].source}
       stars={meta['docx2pdf-cli'].stars}
       weeklyDownloads={meta['docx2pdf-cli'].weeklyDownloads}
+    />
+    <ToolCard
+      title="compare-cli"
+      tagline="Clause-aware drift detection between two contract versions. Pre-signature gate; exit code is the contract (0/2/3/4)."
+      language="Node.js"
+      install="npm i -g compare-cli"
+      href="/tools/compare-cli/"
+      github="https://github.com/DrBaher/compare-cli"
+      version={meta['compare-cli'].version}
+      versionSource={meta['compare-cli'].source}
+      stars={meta['compare-cli'].stars}
+      weeklyDownloads={meta['compare-cli'].weeklyDownloads}
     />
     <ToolCard
       title="sign-cli"
@@ -159,7 +172,7 @@ const meta = await getCliMeta();
     or grab the hosted listing on <a href="https://smithery.ai/servers/drbaher/sign-cli" target="_blank" rel="noopener">Smithery</a> for one-click install into Claude Desktop, Cursor, and friends.
   </p>
 
-  <h2>Why four small tools instead of one big platform</h2>
+  <h2>Why five small tools instead of one big platform</h2>
 
   <p>
     Most contract operations products are SaaS suites. They want every step in one dashboard, every
@@ -169,7 +182,7 @@ const meta = await getCliMeta();
   </p>
 
   <p>
-    The four CLIs here take the opposite stance. Each does one thing well. None of them require
+    The five CLIs here take the opposite stance. Each does one thing well. None of them require
     an account, a subscription, or a network call you didn't ask for. An agent can drive them over
     stdio or MCP; a human can drive them from a terminal. You can swap any one of them, fork them,
     or audit the source end to end. Together they cover the same workflow a SaaS suite would, with

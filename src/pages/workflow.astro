@@ -4,19 +4,19 @@ import Callout from '../components/Callout.astro';
 import WorkflowDiagram from '../components/WorkflowDiagram.astro';
 import CodeBlock from '../components/CodeBlock.astro';
 ---
-<BaseLayout title="The workflow" active="workflow" description="How draft-cli, nda-review-cli, docx2pdf-cli, and sign-cli chain together into a complete contract pipeline — with copy-paste commands at each step." toc>
+<BaseLayout title="The workflow" active="workflow" description="How draft-cli, nda-review-cli, docx2pdf-cli, compare-cli, and sign-cli chain together into a complete contract pipeline — with copy-paste commands at each step." toc>
   <p class="eyebrow">The workflow</p>
   <h1>From blank page to signed agreement, on your machine.</h1>
 
   <p class="text-lg text-ink-700 dark:text-night-100">
-    Five steps. Each is a single CLI invocation. The output of one step is the input of the next.
+    Six steps. Each is a single CLI invocation. The output of one step is the input of the next.
     Stop at any point — the artifacts you have are useful on their own.
   </p>
 
   <Callout label="TL;DR">
     <code class="chip">draft</code> → <code class="chip">review</code> → <code class="chip">negotiate</code> →
-    <code class="chip">docx2pdf</code> → <code class="chip">sign</code>. Four tools, five commands, no SaaS,
-    no shared database. Files in, files out.
+    <code class="chip">docx2pdf</code> → <code class="chip">compare</code> → <code class="chip">sign</code>.
+    Five tools, six commands, no SaaS, no shared database. Files in, files out.
   </Callout>
 
   <WorkflowDiagram />
@@ -104,7 +104,35 @@ nda-review-cli negotiate finalize --state neg.json \\
 # or for a folder full of contracts:
 docx2pdf --concurrency 4 --out-dir ./pdfs ./drafts/*.docx`}</CodeBlock>
 
-  <h2 data-reveal>5 — Sign</h2>
+  <h2 data-reveal>5 — Compare (the pre-signature gate)</h2>
+  <p data-reveal>
+    Before sending the PDF off to be signed, run <code class="chip">compare-cli</code> with the
+    agreed text on one side and the about-to-be-signed PDF on the other. compare-cli classifies
+    every difference as <strong>cosmetic</strong>, <strong>typographic</strong>, or
+    <strong>substantive</strong>; the exit code is the contract (<code class="chip">0</code> safe
+    to sign, <code class="chip">2</code> substantive drift, <code class="chip">3</code>
+    cosmetic-only, <code class="chip">4</code> clauses moved). If something has silently shifted
+    between the agreed text and the artifact you're about to seal, this is the gate that catches it.
+  </p>
+  <CodeBlock label="step 5 · compare">{`# Gate against the agreed text from negotiation.json
+compare --from-negotiation output/negotiation.json output/agreed.pdf
+
+# Or compare directly against the docx → pdf intermediate
+compare output/agreed.docx output/agreed.pdf --json > drift.json
+
+# CI-style exit-code-only check before sign
+compare --from-negotiation output/negotiation.json output/agreed.pdf --check \\
+  --require-signoffs \\
+  && echo "safe to sign"`}</CodeBlock>
+  <p data-reveal>
+    For unattended pipelines, pass <code class="chip">--require-signoffs</code> so the gate also
+    verifies both parties have completed <code class="chip">negotiate sign-off</code> in
+    <a href="/tools/nda-review-cli/">nda-review-cli</a> — not just that the text matches, but that
+    a human on each side approved it. Substantive drift surfaces as exit 2 with the locked
+    <code class="chip">--json</code> shape; agents route on <code class="chip">exit_class</code>.
+  </p>
+
+  <h2 data-reveal>6 — Sign</h2>
   <p data-reveal>
     Hand the PDF to <code class="chip">sign-cli</code>. Pick a provider — the built-in
     <code class="chip">local</code> provider produces real PAdES-signed PDFs fully offline (no
@@ -113,7 +141,7 @@ docx2pdf --concurrency 4 --out-dir ./pdfs ./drafts/*.docx`}</CodeBlock>
     lands in a hash-chained audit log, and the receipt bundle includes RFC 3161 timestamps so you
     can prove what was signed and when, even years later.
   </p>
-  <CodeBlock label="step 5 · sign">{`sign request create \\
+  <CodeBlock label="step 6 · sign">{`sign request create \\
   --title "Mutual NDA" \\
   --document output/agreed.pdf \\
   --signer "name:Alice Founder,email:alice@acme.com" \\
@@ -149,8 +177,11 @@ sign audit verify --request-id <id>`}</CodeBlock>
 
   <h2>Skipping or substituting steps</h2>
   <p>
-    Each tool stands alone. If you already have a filled Word document, skip step 1. If you sign with a
-    notary or a different e-signature provider, skip step 5 — you'll still have a clean PDF from step 4.
-    The point isn't that you must use all four; it's that they compose cleanly when you do.
+    Each tool stands alone. If you already have a filled Word document, skip step 1. If you sign
+    with a notary or a different e-signature provider, skip step 6 — you'll still have a verified
+    PDF from steps 4 and 5. The compare step is technically optional too, but it's the cheapest
+    insurance you can buy: a few seconds of CPU vs the cost of signing a contract that quietly
+    drifted from what you negotiated. The point isn't that you must use all five tools; it's that
+    they compose cleanly when you do.
   </p>
 </BaseLayout>

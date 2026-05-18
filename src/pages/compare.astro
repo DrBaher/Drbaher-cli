@@ -19,7 +19,8 @@ const rows: Row[] = [
   { label: 'PDF rendering',                       cli: 'Pluggable: LibreOffice, Word, Pandoc, or Gotenberg.',              saas: 'Vendor-controlled rendering pipeline.' },
   { label: 'E-signature provider',                cli: 'Built-in offline PAdES signer (PKCS#7, self-issued cert) OR Dropbox Sign / DocuSign / SignWell.', saas: 'Bundled provider; switching means migrating.' },
   { label: 'Signing without API keys',            cli: 'Yes — fully-offline local provider produces real PAdES PDFs. No signup.',          saas: 'No — vendor signature service is the product.' },
-  { label: 'MCP / agent integration',             cli: '19-tool MCP server in sign-cli with read-only mode and per-signer token guardrails.', saas: 'Generally web-app-only; agents need scraping or custom RPA.' },
+  { label: 'Pre-signature drift detection',       cli: 'compare-cli gates on cosmetic / typographic / substantive classification with exit codes 0/2/3/4. CI-scriptable, SARIF output for code-scanning.', saas: 'Side-by-side viewer in the UI; no machine-readable gate without a custom integration.' },
+  { label: 'MCP / agent integration',             cli: 'sign-cli ships a 19-tool MCP server; compare-cli-mcp adds drift-gate tools (compare_files / compare_with_negotiation / compare_demo). Stable JSON shapes across versions.', saas: 'Generally web-app-only; agents need scraping or custom RPA.' },
   { label: 'Credential isolation',                cli: 'Named profiles bundle provider + dbPath; secrets resolve from shell env at call time.', saas: 'Org-level secret management inside the vendor; not portable.' },
   { label: 'What you pay',                        cli: 'Free. MIT licensed. You pay for the e-sign provider you choose.',  saas: 'Per-seat licenses + signature volume + add-on AI module.' },
   { label: 'Vendor lock-in',                      cli: 'Standard file formats. You can leave any time with all your data.', saas: 'Migration takes weeks; data export often partial.' },
@@ -30,7 +31,7 @@ const rows: Row[] = [
 <BaseLayout
   title="Compare"
   active="compare"
-  description="An honest comparison: draft-cli + nda-review-cli + docx2pdf-cli + sign-cli vs. SaaS contract suites. What you trade and what you get."
+  description="An honest comparison: draft-cli + nda-review-cli + docx2pdf-cli + compare-cli + sign-cli vs. SaaS contract suites. What you trade and what you get."
   toc
 >
   <p class="eyebrow">Compare</p>

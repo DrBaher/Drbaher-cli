@@ -1,5 +1,5 @@
 /**
- * Auto-link references to the four CLIs in markdown content.
+ * Auto-link references to the five CLIs in markdown content.
  * Walks text nodes inside paragraphs and list items, splits where matched,
  * and replaces matches with link nodes pointing to /tools/<cli>/.
  *
@@ -8,7 +8,7 @@
  */
 import { visit, SKIP } from 'unist-util-visit';
 
-const CLIS = ['draft-cli', 'nda-review-cli', 'sign-cli', 'docx2pdf-cli'];
+const CLIS = ['draft-cli', 'nda-review-cli', 'sign-cli', 'docx2pdf-cli', 'compare-cli'];
 const PATTERN = new RegExp(`\\b(${CLIS.join('|')})\\b`, 'g');
 
 const SKIP_PARENT_TYPES = new Set(['link', 'inlineCode', 'code', 'heading']);
