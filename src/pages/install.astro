@@ -18,9 +18,19 @@ import CodeBlock from '../components/CodeBlock.astro';
     Verify with <code class="chip">--version</code> on each.
   </Callout>
 
+  <h2>Install the whole suite</h2>
+  <p>Want all six at once? Two package managers, three commands:</p>
+  <CodeBlock label="install all six">{`# Two Python CLIs (pipx installs one package per command)
+pipx install template-vault-cli
+pipx install nda-review-cli
+
+# Four Node CLIs (one npm command)
+npm i -g @drbaher/draft-cli compare-cli docx2pdf-cli @drbaher/sign-cli`}</CodeBlock>
+  <p>Then verify each with <code class="chip">--version</code>, or jump straight to the <a href="/tour/">5-minute tour</a>.</p>
+
   <h2>Prerequisites</h2>
   <ul>
-    <li><strong>Node.js 18+</strong> for draft-cli, sign-cli, and docx2pdf-cli; <strong>Node.js 20+</strong> for compare-cli (pinned by <code class="chip">pdfjs-dist</code>). Install via <code class="chip">brew install node</code>, <code class="chip">nvm</code>, or your platform's installer.</li>
+    <li><strong>Node.js 18+</strong> for draft-cli and docx2pdf-cli; <strong>Node.js 20+</strong> for compare-cli (pinned by <code class="chip">pdfjs-dist</code>); <strong>Node.js 22+</strong> for sign-cli (uses <code class="chip">node:sqlite</code>). Install via <code class="chip">brew install node</code>, <code class="chip">nvm</code>, or your platform's installer.</li>
     <li><strong>Python 3.9+</strong> with <code class="chip">pipx</code> for template-vault-cli and nda-review-cli. Install pipx via <code class="chip">brew install pipx</code> or your distro package manager, then <code class="chip">pipx ensurepath</code>.</li>
     <li><strong>A PDF backend</strong> (only for docx2pdf-cli) — LibreOffice, Microsoft Word, Pandoc, or a Gotenberg server. The tool auto-detects what's installed.</li>
   </ul>
