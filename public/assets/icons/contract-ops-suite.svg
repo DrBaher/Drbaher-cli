@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#fdfcf9"/>
+  <!-- contract page with a folded corner -->
+  <path d="M 74 108 L 244 108 L 296 160 L 296 404 L 74 404 Z"
+        fill="#fdfcf9" stroke="#1f7d5d" stroke-width="18" stroke-linejoin="round"/>
+  <path d="M 244 108 L 296 160 L 244 160 Z"
+        fill="#1f7d5d" stroke="#1f7d5d" stroke-width="18" stroke-linejoin="round"/>
+  <!-- clause lines; the second is a key-clause accent -->
+  <line x1="106" y1="200" x2="262" y2="200" stroke="#1f7d5d" stroke-width="16" stroke-linecap="round"/>
+  <rect x="98" y="234" width="128" height="26" rx="13" fill="#0e4a37"/>
+  <line x1="106" y1="296" x2="262" y2="296" stroke="#1f7d5d" stroke-width="16" stroke-linecap="round"/>
+  <line x1="106" y1="340" x2="214" y2="340" stroke="#1f7d5d" stroke-width="16" stroke-linecap="round"/>
+  <!-- pipeline relay: dots flow forward off the page into a chevron -->
+  <circle cx="330" cy="256" r="15" fill="#1f7d5d"/>
+  <circle cx="378" cy="256" r="15" fill="#1f7d5d"/>
+  <path d="M 410 230 L 440 256 L 410 282" fill="none" stroke="#0e4a37" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
