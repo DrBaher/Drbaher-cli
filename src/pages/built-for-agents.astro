@@ -390,10 +390,13 @@ sign --version`}</CodeBlock>
   <p>
     Most of the suite shares <code class="chip">0</code> success / <code class="chip">2</code> invalid input /
     <code class="chip">3</code> policy-or-verification / <code class="chip">4</code> not-found — but
-    <strong>the meanings are not uniform</strong>. Two CLIs must be special-cased: <code class="chip">compare-cli</code>
-    reuses <code class="chip">0</code>–<code class="chip">4</code> as <em>drift severities</em>, and
-    <code class="chip">template-vault-cli</code> uses a <code class="chip">0/1/2</code> scheme. Don't assume a shared
-    meaning — branch per CLI, and confirm against each tool's <code class="chip">AGENTS.md</code>.
+    <strong>the meanings are not uniform</strong>. Three CLIs need special-casing: <code class="chip">compare-cli</code>
+    reuses <code class="chip">0</code>–<code class="chip">4</code> as <em>drift severities</em>,
+    <code class="chip">template-vault-cli</code> uses a <code class="chip">0/1/2</code> scheme, and
+    <code class="chip">draft-cli</code> has its own <code class="chip">0</code>–<code class="chip">4</code>
+    (<code class="chip">1</code> = I/O, <code class="chip">4</code> = LLM). Don't assume a shared meaning — branch
+    per CLI, discover the codes from <code class="chip">--catalog json</code>, and confirm against each tool's
+    <code class="chip">AGENTS.md</code>.
   </p>
 
   <div class="not-prose my-6 overflow-x-auto rounded-lg border border-ink-700/10 dark:border-night-300/15">
@@ -413,8 +416,8 @@ sign --version`}</CodeBlock>
         </tr>
         <tr class="border-b border-ink-700/10 dark:border-night-300/15">
           <td class="px-4 py-3 align-top font-mono">draft-cli</td>
-          <td class="px-4 py-3 align-top"><code class="chip">0</code> ok · <code class="chip">1</code> not found · <code class="chip">2</code> invalid input · <code class="chip">3</code> vault · <code class="chip">4</code> schema · <code class="chip">5</code> LLM</td>
-          <td class="px-4 py-3 align-top text-ink-600 dark:text-night-200">extends the common scheme</td>
+          <td class="px-4 py-3 align-top"><code class="chip">0</code> ok · <code class="chip">1</code> i/o error · <code class="chip">2</code> validation · <code class="chip">3</code> template-vault failure · <code class="chip">4</code> llm failure</td>
+          <td class="px-4 py-3 align-top text-amber-700 dark:text-amber-300">own <code class="chip">0</code>–<code class="chip">4</code> (uses <code class="chip">1</code> = I/O)</td>
         </tr>
         <tr class="border-b border-ink-700/10 dark:border-night-300/15">
           <td class="px-4 py-3 align-top font-mono">nda-review-cli</td>
