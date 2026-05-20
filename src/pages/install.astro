@@ -4,9 +4,9 @@ import Callout from '../components/Callout.astro';
 import InstallTabs from '../components/InstallTabs.astro';
 import CodeBlock from '../components/CodeBlock.astro';
 ---
-<BaseLayout title="Install" active="install" description="Install all four CLIs in under two minutes — pipx for nda-review-cli, npm for draft-cli, sign-cli, and docx2pdf-cli." toc>
+<BaseLayout title="Install" active="install" description="Install all six CLIs in under two minutes — pipx for template-vault-cli and nda-review-cli, npm for draft-cli, compare-cli, sign-cli, and docx2pdf-cli." toc>
   <p class="eyebrow">Install</p>
-  <h1>Four installs, one workflow.</h1>
+  <h1>Six installs, one workflow.</h1>
 
   <p class="text-lg text-ink-700 dark:text-night-100">
     Each CLI is a standalone package on its native registry. Install whichever ones you need;
@@ -14,16 +14,41 @@ import CodeBlock from '../components/CodeBlock.astro';
   </p>
 
   <Callout label="TL;DR">
-    <code class="chip">npm i -g @drbaher/draft-cli</code> · <code class="chip">pipx install nda-review-cli</code> · <code class="chip">npm i -g docx2pdf-cli</code> · <code class="chip">npm i -g @drbaher/sign-cli</code>.
+    <code class="chip">pipx install template-vault-cli</code> · <code class="chip">npm i -g @drbaher/draft-cli</code> · <code class="chip">pipx install nda-review-cli</code> · <code class="chip">npm i -g compare-cli</code> · <code class="chip">npm i -g docx2pdf-cli</code> · <code class="chip">npm i -g @drbaher/sign-cli</code>.
     Verify with <code class="chip">--version</code> on each.
   </Callout>
 
   <h2>Prerequisites</h2>
   <ul>
-    <li><strong>Node.js 18+</strong> for draft-cli, sign-cli, and docx2pdf-cli. Install via <code class="chip">brew install node</code>, <code class="chip">nvm</code>, or your platform's installer.</li>
-    <li><strong>Python 3.9+</strong> with <code class="chip">pipx</code> for nda-review-cli. Install pipx via <code class="chip">brew install pipx</code> or your distro package manager, then <code class="chip">pipx ensurepath</code>.</li>
+    <li><strong>Node.js</strong> for draft-cli, sign-cli, and docx2pdf-cli (18+); <strong>Node.js 20+</strong> for compare-cli. Install via <code class="chip">brew install node</code>, <code class="chip">nvm</code>, or your platform's installer.</li>
+    <li><strong>Python 3.9+</strong> with <code class="chip">pipx</code> for template-vault-cli and nda-review-cli. Install pipx via <code class="chip">brew install pipx</code> or your distro package manager, then <code class="chip">pipx ensurepath</code>.</li>
     <li><strong>A PDF backend</strong> (only for docx2pdf-cli) — LibreOffice, Microsoft Word, Pandoc, or a Gotenberg server. The tool auto-detects what's installed.</li>
   </ul>
+
+  <h2>template-vault-cli</h2>
+  <p>
+    The Python CLI for a Git-backed, clause-aware template vault. Stdlib-only at runtime — pipx
+    installs it cleanly into its own environment. Installs as <code class="chip">template-vault</code>
+    on your PATH. The optional <code class="chip">[docx]</code> extra adds <code class="chip">python-docx</code>
+    for <code class="chip">.docx</code> ingestion and export.
+  </p>
+
+  <InstallTabs
+    id="vault-tabs"
+    tabs={[
+      { id: 'pipx',     label: 'pipx',          command: 'pipx install template-vault-cli\ntemplate-vault --version', note: 'Recommended — isolates dependencies and adds the CLI to your $PATH.' },
+      { id: 'pipx-docx', label: 'pipx [docx]',  command: "pipx install 'template-vault-cli[docx]'", note: 'Adds python-docx for .docx ingestion / export.' },
+      { id: 'pip',      label: 'pip',           command: 'pip install template-vault-cli', note: 'Stdlib-only, no isolation. Make sure ~/.local/bin is on your $PATH.' },
+    ]}
+  />
+
+  <CodeBlock label="first run">{`# Zero-config compose-and-swap tour against inline fixtures
+template-vault demo
+
+# Or start a vault of your own and pull a public template in
+mkdir my-vault && cd my-vault
+template-vault init
+template-vault import common-paper-mutual-nda`}</CodeBlock>
 
   <h2>draft-cli</h2>
   <p>
@@ -62,6 +87,30 @@ draft path/to/template.md --list-placeholders`}</CodeBlock>
 
   <CodeBlock label="first-run setup">{`# 16 quick questions write your house policy
 nda-review-cli quickstart`}</CodeBlock>
+
+  <h2>compare-cli</h2>
+  <p>
+    The Node.js CLI for clause-aware drift detection between two contract versions. Single-file, two
+    runtime deps, Node ≥ 20. The package is <code class="chip">compare-cli</code>; the installed command
+    is <code class="chip">compare</code> — the <code class="chip">npx -p … --</code> form below tells npx
+    which package to fetch and which bin to run, since the two names differ.
+  </p>
+
+  <InstallTabs
+    id="compare-tabs"
+    tabs={[
+      { id: 'npm',  label: 'npm',  command: 'npm i -g compare-cli\ncompare --version' },
+      { id: 'pnpm', label: 'pnpm', command: 'pnpm add -g compare-cli' },
+      { id: 'yarn', label: 'yarn', command: 'yarn global add compare-cli' },
+      { id: 'npx',  label: 'npx',  command: 'npx -p compare-cli@latest -- compare --demo', note: 'No install — runs the bundled drift demo once.' },
+    ]}
+  />
+
+  <CodeBlock label="sanity check">{`# Bundled fixtures where the term silently shifted 2y → 3y; exits 2
+compare --demo
+
+# Real comparison — the exit code is the gate (0 safe · 2 drift · 3 cosmetic · 4 moved)
+compare negotiated.docx ready-to-sign.pdf`}</CodeBlock>
 
   <h2>docx2pdf-cli</h2>
   <p>The Node.js CLI for DOCX → PDF conversion with hybrid backends.</p>
@@ -123,14 +172,24 @@ docx2pdf --list-backends`}</CodeBlock>
     </thead>
     <tbody class="text-ink-700 dark:text-night-100">
       <tr class="border-b border-ink-700/10 dark:border-night-300/15">
+        <td class="py-2 pr-4 font-mono">template-vault-cli</td>
+        <td class="py-2 pr-4">The vault is a Git repo — <code class="chip">.vault.json</code> at the vault root, one <code class="chip">meta.json</code> per template · optional shared LLM config at <code class="chip">~/.config/contract-ops/llm.json</code></td>
+        <td class="py-2 pr-4">LLM provider keys (in the shared <code class="chip">llm.json</code>, outside the vault) when <code class="chip">ask</code> is used</td>
+      </tr>
+      <tr class="border-b border-ink-700/10 dark:border-night-300/15">
         <td class="py-2 pr-4 font-mono">draft-cli</td>
         <td class="py-2 pr-4">None by default · optional <code class="chip">&lt;template&gt;.params.json</code> alongside the template · optional <code class="chip">parties.json</code> for shared party records</td>
         <td class="py-2 pr-4">LLM provider keys (env only) when <code class="chip">--from-deal</code> is used</td>
       </tr>
       <tr class="border-b border-ink-700/10 dark:border-night-300/15">
         <td class="py-2 pr-4 font-mono">nda-review-cli</td>
-        <td class="py-2 pr-4"><code class="chip">config/org-policy.json</code>, <code class="chip">profiles/</code>, optional <code class="chip">config/llm.json</code></td>
+        <td class="py-2 pr-4"><code class="chip">config/org-policy.json</code>, <code class="chip">profiles/</code>, optional <code class="chip">config/llm.json</code> (or the shared <code class="chip">~/.config/contract-ops/llm.json</code>)</td>
         <td class="py-2 pr-4">LLM provider keys (gitignored)</td>
+      </tr>
+      <tr class="border-b border-ink-700/10 dark:border-night-300/15">
+        <td class="py-2 pr-4 font-mono">compare-cli</td>
+        <td class="py-2 pr-4">None — stateless and deterministic; reads two files and writes a report</td>
+        <td class="py-2 pr-4">None</td>
       </tr>
       <tr class="border-b border-ink-700/10 dark:border-night-300/15">
         <td class="py-2 pr-4 font-mono">docx2pdf-cli</td>
@@ -146,14 +205,16 @@ docx2pdf --list-backends`}</CodeBlock>
   </table>
 
   <h2>Updating</h2>
-  <CodeBlock>{`pipx upgrade nda-review-cli
-npm update -g @drbaher/draft-cli docx2pdf-cli @drbaher/sign-cli`}</CodeBlock>
+  <CodeBlock>{`pipx upgrade template-vault-cli
+pipx upgrade nda-review-cli
+npm update -g @drbaher/draft-cli compare-cli docx2pdf-cli @drbaher/sign-cli`}</CodeBlock>
 
   <h2>Uninstalling</h2>
   <p>
     Each tool comes off cleanly. There are no daemons, services, or system-wide modifications to
     clean up afterwards.
   </p>
-  <CodeBlock>{`pipx uninstall nda-review-cli
-npm rm -g @drbaher/draft-cli docx2pdf-cli @drbaher/sign-cli`}</CodeBlock>
+  <CodeBlock>{`pipx uninstall template-vault-cli
+pipx uninstall nda-review-cli
+npm rm -g @drbaher/draft-cli compare-cli docx2pdf-cli @drbaher/sign-cli`}</CodeBlock>
 </BaseLayout>

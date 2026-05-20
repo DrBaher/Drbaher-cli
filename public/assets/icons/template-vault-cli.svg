@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#fdfcf9"/>
+  <!-- back version in the stack -->
+  <rect x="186" y="104" width="200" height="252" rx="14"
+        fill="#fdfcf9" stroke="#1f7d5d" stroke-width="13" opacity="0.45"/>
+  <!-- middle version in the stack -->
+  <rect x="158" y="132" width="200" height="252" rx="14"
+        fill="#fdfcf9" stroke="#1f7d5d" stroke-width="13" opacity="0.7"/>
+  <!-- front template card -->
+  <rect x="130" y="160" width="200" height="252" rx="14"
+        fill="#fdfcf9" stroke="#1f7d5d" stroke-width="18"/>
+  <!-- clause lines; the middle one is a swapped clause (provenance) -->
+  <line x1="166" y1="212" x2="294" y2="212" stroke="#1f7d5d" stroke-width="16" stroke-linecap="round"/>
+  <rect x="158" y="264" width="144" height="28" rx="14" fill="#0e4a37"/>
+  <line x1="166" y1="332" x2="294" y2="332" stroke="#1f7d5d" stroke-width="16" stroke-linecap="round"/>
+  <line x1="166" y1="372" x2="252" y2="372" stroke="#1f7d5d" stroke-width="16" stroke-linecap="round"/>
+</svg>

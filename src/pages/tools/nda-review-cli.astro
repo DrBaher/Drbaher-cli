@@ -153,7 +153,7 @@ nda-review-cli doctor --check-llm`}</CodeBlock>
   <p>
     File-based protocol — single JSON document bounces between you and the counterparty by any
     channel (email, Drive, Git). Each round is signed by exactly one party and hash-chained so
-    tampering is detected on load. <a href="/workflow/#3--negotiate">See the workflow page</a>
+    tampering is detected on load. <a href="/workflow/#4--negotiate">See the workflow page</a>
     for the full sequence.
   </p>
 
@@ -190,11 +190,14 @@ nda-review-cli doctor --check-llm`}</CodeBlock>
     <code class="chip">negotiate finalize</code> emits the agreed <code class="chip">.md</code> +
     <code class="chip">.docx</code>. Optionally pass <code class="chip">--to-pdf --sign</code> and
     the CLI shells out to user-configured commands in <code class="chip">config/integrations.json</code>.
-    Wire it to <a href="/tools/docx2pdf-cli/"><code class="chip">docx2pdf-cli</code></a> and
+    Gate the ready-to-sign file against the agreed text with
+    <a href="/tools/compare-cli/"><code class="chip">compare-cli</code></a>, then wire it to
+    <a href="/tools/docx2pdf-cli/"><code class="chip">docx2pdf-cli</code></a> and
     <a href="/tools/sign-cli/"><code class="chip">sign-cli</code></a> for the full pipeline,
-    or any other tool of your choosing. If the inbound document arrived as a template needing
-    placeholder fills (e.g. a counterparty's own draft), pipe it through
-    <a href="/tools/draft-cli/"><code class="chip">draft-cli</code></a> first.
+    or any other tool of your choosing. The templates themselves come from
+    <a href="/tools/template-vault-cli/"><code class="chip">template-vault-cli</code></a>; if the inbound
+    document arrived as a template needing placeholder fills (e.g. a counterparty's own draft), pipe it
+    through <a href="/tools/draft-cli/"><code class="chip">draft-cli</code></a> first.
   </p>
 
   <h2>Repo</h2>

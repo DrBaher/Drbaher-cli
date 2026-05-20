@@ -231,12 +231,15 @@ curl http://localhost:4000/v1/openapi.json    # full OpenAPI 3.1 spec`}</CodeBlo
     mutation, so an agent computing a hash earlier can refuse to sign if the document was swapped in flight.
   </p>
 
-  <h2>The other two CLIs — agent-friendly, not MCP servers</h2>
+  <h2>The other CLIs — agent-friendly over stdio</h2>
 
   <p>
-    sign-cli ships an MCP server because it's the one with persistent state (a signing
-    request is a multi-step object that benefits from typed tools). The other two CLIs in the suite are
-    pure functions: they take input, return output. For those, agents drive them directly over stdio with
+    sign-cli ships the suite's flagship MCP server because it's the one with persistent, multi-step state
+    (a signing request is an object that benefits from typed tools). <a href="/tools/compare-cli/">compare-cli</a>
+    ships a smaller MCP server too — <code class="chip">compare-cli-mcp</code>, three tools over stdio. The rest —
+    <a href="/tools/template-vault-cli/">template-vault-cli</a>, <a href="/tools/draft-cli/">draft-cli</a>,
+    <a href="/tools/nda-review-cli/">nda-review-cli</a>, and <a href="/tools/docx2pdf-cli/">docx2pdf-cli</a> —
+    are pure functions: they take input, return output. For those, agents drive them directly over stdio with
     a stable JSON contract.
   </p>
 
@@ -296,8 +299,10 @@ sign mcp tools         # live MCP tool catalog (inputSchema + outputSchema per t
 sign --version`}</CodeBlock>
 
   <p>
-    The same pattern works across the suite — <code class="chip">draft --list-placeholders --json</code>,
-    <code class="chip">nda-review-cli --catalog json</code>, and
+    The same pattern works across the suite — <code class="chip">template-vault info &lt;ref&gt; --json</code>,
+    <code class="chip">draft --list-placeholders --json</code>,
+    <code class="chip">nda-review-cli --catalog json</code>,
+    <code class="chip">compare … --json</code> (branch on the exit code), and
     <code class="chip">docx2pdf --capabilities</code> are the corresponding discovery commands for the
     other CLIs.
   </p>
@@ -306,7 +311,9 @@ sign --version`}</CodeBlock>
 
   <ul>
     <li><a href="/mcp/">MCP guide</a> — full tool surface and read-only walkthrough.</li>
+    <li><a href="https://github.com/DrBaher/template-vault-cli/blob/main/docs/INTEROP.md">template-vault-cli docs/INTEROP.md</a> — the suite's storage/output contract and shared LLM config.</li>
     <li><a href="https://github.com/DrBaher/draft-cli/blob/main/AGENTS.md">draft-cli AGENTS.md</a> — agent quickstart for the templated-drafting flow.</li>
+    <li><a href="https://github.com/DrBaher/compare-cli/blob/main/AGENTS.md">compare-cli AGENTS.md</a> — agent quickstart for the drift-gate flow (exit-code contract).</li>
     <li><a href="https://github.com/DrBaher/sign-cli/blob/main/AGENTS.md">sign-cli AGENTS.md</a> — agent quickstart (output contract, exit codes, failure → recovery).</li>
     <li><a href="https://github.com/DrBaher/nda-review-cli/blob/main/AGENTS.md">nda-review-cli AGENTS.md</a> — agent quickstart for the drafting/negotiation flow.</li>
     <li><a href="https://github.com/DrBaher/docx2pdf-cli/blob/main/AGENTS.md">docx2pdf-cli AGENTS.md</a> — agent quickstart for the conversion step.</li>

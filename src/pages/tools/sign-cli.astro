@@ -211,9 +211,11 @@ curl http://localhost:8787/v1/openapi.json    # discover the route catalog`}</Co
   <h2>Where it fits in the workflow</h2>
 
   <p>
-    <code class="chip">sign-cli</code> is the last step in the contract pipeline — after
-    <a href="/tools/draft-cli/">draft-cli</a> fills the template,
-    <a href="/tools/nda-review-cli/">nda-review-cli</a> produces the agreed text, and
+    <code class="chip">sign-cli</code> is the last step in the contract pipeline — after a template
+    is pulled from <a href="/tools/template-vault-cli/">template-vault-cli</a>,
+    <a href="/tools/draft-cli/">draft-cli</a> fills it,
+    <a href="/tools/nda-review-cli/">nda-review-cli</a> produces the agreed text,
+    <a href="/tools/compare-cli/">compare-cli</a> gates it for last-minute drift, and
     <a href="/tools/docx2pdf-cli/">docx2pdf-cli</a> renders the PDF. Or skip the chain entirely
     and hand a <code>.docx</code> straight to <code class="chip">sign document</code>. <a
     href="/workflow/">See the full workflow page</a> for the chained commands.

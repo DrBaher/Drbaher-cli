@@ -119,10 +119,11 @@ docx2pdf --check-fonts contract.docx`}</CodeBlock>
   <h2>Where it fits in the workflow</h2>
 
   <p>
-    The conversion step in the four-CLI workflow: take the filled
+    The conversion step in the six-CLI workflow: take the agreed
     <code class="chip">.docx</code> — from <a href="/tools/draft-cli/">draft-cli</a>'s template
     substitution or <a href="/tools/nda-review-cli/">nda-review-cli</a>'s
-    <code class="chip">finalize</code> step — and produce a PDF for
+    <code class="chip">finalize</code> step, optionally gated for drift by
+    <a href="/tools/compare-cli/">compare-cli</a> — and produce a PDF for
     <a href="/tools/sign-cli/">sign-cli</a> to sign. <a href="/workflow/">See the full workflow</a>
     for the chained commands.
   </p>

@@ -1,0 +1,120 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Callout from '../../components/Callout.astro';
+import CodeBlock from '../../components/CodeBlock.astro';
+import FreshHeader from '../../components/FreshHeader.astro';
+import JsonLd from '../../components/JsonLd.astro';
+import { getCliMeta } from '../../data/registry';
+
+const meta = (await getCliMeta())['compare-cli'];
+
+const jsonLd = {
+  '@type': 'SoftwareApplication',
+  name: 'compare-cli',
+  applicationCategory: 'DeveloperApplication',
+  operatingSystem: 'macOS, Linux, Windows',
+  softwareVersion: meta.version,
+  programmingLanguage: 'JavaScript',
+  license: 'https://opensource.org/licenses/MIT',
+  url: 'https://cli.drbaher.com/tools/compare-cli/',
+  codeRepository: 'https://github.com/DrBaher/compare-cli',
+  description: 'Agent-first, clause-aware drift detection between two contract versions. Pre-signature gate with exit codes you can gate CI on: substantive vs cosmetic vs moved-clause drift. Deterministic, single-file Node CLI, no LLM tier.',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+};
+---
+<BaseLayout
+  title="compare-cli"
+  active="tools/compare-cli"
+  description="Agent-first, clause-aware drift detection between two contract versions. A pre-signature gate with exit codes CI can branch on: substantive vs cosmetic vs moved-clause drift. Deterministic single-file Node CLI."
+  toc
+>
+  <JsonLd data={jsonLd} />
+  <p class="eyebrow">Tool · Node.js</p>
+  <h1 class="flex items-center gap-4">
+    <img src="/assets/icons/compare-cli.svg" alt="" class="h-12 w-12" />
+    <span class="font-mono">compare-cli</span>
+  </h1>
+  <FreshHeader name="compare-cli" version={meta.version} source={meta.source} fetchedAt={meta.fetchedAt} stars={meta.stars} weeklyDownloads={meta.weeklyDownloads} github="https://github.com/DrBaher/compare-cli" />
+  <p class="text-lg text-ink-700 dark:text-night-100">
+    Clause-aware drift detection between two contract versions. You negotiated a contract over several
+    rounds; a few days later their paralegal sends a <code class="chip">ready-to-sign.pdf</code>. Is it the
+    text you agreed to, or did something quietly shift? <code class="chip">compare</code> answers with an
+    exit code your CI can gate on. A pre-signature gate for legal teams and agent pipelines —
+    deterministic, single-file Node, two runtime deps, no LLM tier.
+  </p>
+
+  <Callout label="TL;DR">
+    <code class="chip">npm i -g compare-cli</code> (the command is <code class="chip">compare</code>), then
+    <code class="chip">compare negotiated.docx ready-to-sign.pdf</code>. <strong>Exit 0</strong> = safe to sign ·
+    <strong>2</strong> = substantive drift, do not sign · <strong>3</strong> = cosmetic/typographic only ·
+    <strong>4</strong> = clauses moved, content identical.
+  </Callout>
+
+  <h2>What it does</h2>
+
+  <ul>
+    <li><strong>Clause-aware diff, not a byte diff.</strong> It segments both documents into clauses and compares them structurally, so it can tell a substantive change from a cosmetic one — and report the exact clause that moved, changed, was added, or removed.</li>
+    <li><strong>Exit codes you can gate on.</strong> <code class="chip">0</code> every clause matches (safe to sign); <code class="chip">2</code> substantive drift (a clause's text changed, was added, or removed — do not sign without review); <code class="chip">3</code> cosmetic-only (whitespace, curly quotes, em-dashes) or typographic-only (case, <code class="chip">$1,000</code> vs <code class="chip">$1000</code>, Oxford comma); <code class="chip">4</code> clauses moved but content is identical.</li>
+    <li><strong>Cross-format.</strong> Works on <code class="chip">.docx</code>, <code class="chip">.pdf</code>, <code class="chip">.md</code>, and plain text — including cross-format comparisons (negotiated <code class="chip">.docx</code> vs ready-to-sign <code class="chip">.pdf</code>).</li>
+    <li><strong>Deterministic by design.</strong> No LLM tier in v1. Same two inputs always produce the same verdict and the same report, so the gate is reproducible in CI and defensible after the fact.</li>
+    <li><strong>A real report, not just a code.</strong> The exact change is written to a report; <code class="chip">--json</code> emits the structured verdict to stdout for scripts and agents.</li>
+    <li><strong>MCP server included.</strong> <code class="chip">compare-cli-mcp</code> wraps the CLI with three tools (<code class="chip">compare_files</code>, <code class="chip">compare_with_negotiation</code>, <code class="chip">compare_demo</code>) over stdio, JSON-first.</li>
+  </ul>
+
+  <h2>Quickstart</h2>
+
+  <CodeBlock label="install + run">{`# Install (package is compare-cli; the installed command is compare)
+npm i -g compare-cli
+compare --version
+
+# Zero-config: bundled fixtures where the term silently shifted 2y → 3y (exits 2)
+compare --demo
+compare --demo --json
+
+# Compare two real documents — exit code is the gate
+compare negotiated.docx ready-to-sign.pdf
+echo $?    # 0 safe · 2 substantive · 3 cosmetic · 4 moved
+
+# Run without installing
+npx -p compare-cli@latest -- compare --demo`}</CodeBlock>
+
+  <h2>For agents and automation</h2>
+
+  <p>
+    The exit-code contract is the agent affordance: a pipeline branches on the code instead of parsing prose.
+    The full output envelope, exit codes, and failure → recovery loop live in
+    <a href="https://github.com/DrBaher/compare-cli/blob/main/AGENTS.md"><code class="chip">AGENTS.md</code></a>;
+    the structured-output contract is documented in
+    <a href="https://github.com/DrBaher/compare-cli/blob/main/COMPARE_SCHEMA.md"><code class="chip">COMPARE_SCHEMA.md</code></a>.
+    For MCP-aware clients, <code class="chip">compare-cli-mcp</code> exposes the same surface as three stdio tools;
+    the design contract is in <a href="https://github.com/DrBaher/compare-cli/blob/main/docs/mcp.md"><code class="chip">docs/mcp.md</code></a>.
+  </p>
+
+  <CodeBlock label="recommended agent defaults">{`# Gate a signing step on the verdict
+compare negotiated.md ready-to-sign.pdf --json
+case $? in
+  0) echo "safe to sign" ;;
+  2) echo "substantive drift — escalate to human" ;;
+  3|4) echo "cosmetic / reordering only — informational" ;;
+esac`}</CodeBlock>
+
+  <h2>Where it fits in the workflow</h2>
+
+  <p>
+    The drift gate near the end of the six-CLI workflow. After
+    <a href="/tools/nda-review-cli/">nda-review-cli</a> produces the agreed text and before
+    <a href="/tools/sign-cli/">sign-cli</a> collects signatures, <code class="chip">compare</code> checks the
+    ready-to-sign artifact against what was actually agreed — catching the silent shift between "final version"
+    and "the file that went into the signing envelope." It pairs with
+    <a href="/tools/template-vault-cli/">template-vault-cli</a>, with which it shares a portable
+    clause-detection spec. <a href="/workflow/">See the full workflow</a> for the chained commands.
+  </p>
+
+  <p>
+    It's also useful on its own any time you need to prove two document versions say the same thing —
+    cross-format, deterministically. The contract pipeline is one application.
+  </p>
+
+  <h2>Repo</h2>
+  <p><a href="https://github.com/DrBaher/compare-cli" target="_blank" rel="noopener">github.com/DrBaher/compare-cli</a> · MIT licensed · Node.js (≥ 20) · npm-installable.</p>
+</BaseLayout>

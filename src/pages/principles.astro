@@ -2,12 +2,12 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Callout from '../components/Callout.astro';
 ---
-<BaseLayout title="Principles" active="principles" description="The shared design ethos behind draft-cli, nda-review-cli, docx2pdf-cli, and sign-cli — local-first, deterministic, auditable, no vendor lock-in.">
+<BaseLayout title="Principles" active="principles" description="The shared design ethos behind template-vault-cli, draft-cli, nda-review-cli, compare-cli, docx2pdf-cli, and sign-cli — local-first, deterministic, auditable, no vendor lock-in.">
   <p class="eyebrow">Principles</p>
   <h1>What these tools have in common.</h1>
 
   <p class="text-lg text-ink-700">
-    The four CLIs were built independently for different problems, but they share a small set of
+    The six CLIs were built independently for different problems, but they share a small set of
     convictions. If you find yourself disagreeing with one of these, the suite probably isn't the
     right fit for you — and that's fine.
   </p>
@@ -84,9 +84,11 @@ import Callout from '../components/Callout.astro';
 
   <h2>6 — No new runtime dependencies, when avoidable</h2>
   <p>
-    The Python CLI is stdlib-only at runtime — no Flask, no <code class="chip">requests</code>,
-    no SDKs. The Node CLIs keep their dep trees small and audited (draft-cli, for instance, has
-    exactly one: <code class="chip">jszip</code> for <code class="chip">.docx</code> unzip). This
+    The Python CLIs are stdlib-only at runtime — no Flask, no <code class="chip">requests</code>,
+    no SDKs (template-vault-cli adds <code class="chip">python-docx</code> only behind its optional
+    <code class="chip">[docx]</code> extra). The Node CLIs keep their dep trees small and audited
+    (draft-cli, for instance, has exactly one: <code class="chip">jszip</code> for <code class="chip">.docx</code> unzip;
+    compare-cli has two). This
     isn't dogma; it's a forcing function for clarity. Fewer dependencies means a smaller attack
     surface, fewer install surprises, and code that's easier to read end to end.
   </p>
@@ -110,7 +112,7 @@ import Callout from '../components/Callout.astro';
   <h2>Where this comes from</h2>
   <p>
     Most legal-tech products optimize for vendor-side metrics: lock-in, daily active users, premium
-    tiers. The four CLIs here optimize for the user-side metric instead — would I, the person doing
+    tiers. The six CLIs here optimize for the user-side metric instead — would I, the person doing
     actual contract work, trust this output enough to put my name on it? Everything in the design
     follows from that question.
   </p>

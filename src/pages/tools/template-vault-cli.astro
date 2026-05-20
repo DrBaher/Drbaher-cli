@@ -1,0 +1,131 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Callout from '../../components/Callout.astro';
+import CodeBlock from '../../components/CodeBlock.astro';
+import FreshHeader from '../../components/FreshHeader.astro';
+import JsonLd from '../../components/JsonLd.astro';
+import { getCliMeta } from '../../data/registry';
+
+const meta = (await getCliMeta())['template-vault-cli'];
+
+const jsonLd = {
+  '@type': 'SoftwareApplication',
+  name: 'template-vault-cli',
+  applicationCategory: 'DeveloperApplication',
+  operatingSystem: 'macOS, Linux, Windows',
+  softwareVersion: meta.version,
+  programmingLanguage: 'Python',
+  license: 'https://opensource.org/licenses/MIT',
+  url: 'https://cli.drbaher.com/tools/template-vault-cli/',
+  codeRepository: 'https://github.com/DrBaher/template-vault-cli',
+  description: 'Agent-first, Git-backed, clause-aware package manager for legal-document templates. Public sources (Common Paper, YC SAFE, Bonterms) and your own house templates in one searchable, composable, version-tracked vault. Stdlib-only Python.',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+};
+---
+<BaseLayout
+  title="template-vault-cli"
+  active="tools/template-vault-cli"
+  description="Agent-first, Git-backed, clause-aware package manager for legal-document templates. Compose by forking and swapping clauses with recorded provenance; pull upstream improvements into your forks. Stdlib-only Python."
+  toc
+>
+  <JsonLd data={jsonLd} />
+  <p class="eyebrow">Tool · Python</p>
+  <h1 class="flex items-center gap-4">
+    <img src="/assets/icons/template-vault-cli.svg" alt="" class="h-12 w-12" />
+    <span class="font-mono">template-vault-cli</span>
+  </h1>
+  <FreshHeader name="template-vault-cli" version={meta.version} source={meta.source} fetchedAt={meta.fetchedAt} stars={meta.stars} weeklyDownloads={meta.weeklyDownloads} github="https://github.com/DrBaher/template-vault-cli" />
+  <p class="text-lg text-ink-700 dark:text-night-100">
+    A Git-backed, clause-aware package manager for legal-document templates. Public sources
+    (Common Paper, YC SAFE, Bonterms) and your own house templates live in one searchable,
+    composable, version-tracked vault. Clauses are first-class objects with provenance: fork a
+    template, swap a single clause in from another, and later pull upstream parent improvements into
+    your fork — <code class="chip">meta.json</code> records which clause came from where, so the merge
+    is deterministic. The storage layer at the start of the contract pipeline.
+  </p>
+
+  <Callout label="TL;DR">
+    <code class="chip">pipx install template-vault-cli</code>, then <code class="chip">template-vault demo</code>
+    for a zero-config compose-and-swap tour. <code class="chip">template-vault init</code> in a folder makes a
+    vault; <code class="chip">import</code>, <code class="chip">find</code>, <code class="chip">compose</code>,
+    and <code class="chip">swap</code> work from there. It <strong>structures</strong> templates — it doesn't
+    generate clause text.
+  </Callout>
+
+  <h2>What it does</h2>
+
+  <ul>
+    <li><strong>Stores templates as plain files in a Git repo.</strong> Multi-user sync is just <code class="chip">git pull</code> / <code class="chip">git push</code> (wrapped as <code class="chip">sync</code> / <code class="chip">publish</code>). No database, no server.</li>
+    <li><strong>Indexes with a small <code class="chip">meta.json</code> per template.</strong> Category, jurisdiction, tags, summary, version history. <code class="chip">find</code> searches by category, tag, jurisdiction, or keyword.</li>
+    <li><strong>Clause-aware composition.</strong> <code class="chip">compose</code> forks a base template; <code class="chip">swap</code> replaces one clause from another template. Each swap appends to <code class="chip">clause_overrides</code> in <code class="chip">meta.json</code> — e.g. <code class="chip">"Term and Survival" from nda/yc@v1</code> — so the provenance is permanent.</li>
+    <li><strong>Deterministic upgrades.</strong> When a parent template gets a new version, <code class="chip">upgrade</code> pulls the parent's other clause changes into your fork but leaves locally-swapped clauses alone. That's the whole point of recording the override.</li>
+    <li><strong>Public-source import.</strong> <code class="chip">sources</code> lists known upstreams; <code class="chip">import common-paper-mutual-nda</code> fetches the text from the upstream URL at import time (with optional hash pinning). Nothing is bundled.</li>
+    <li><strong>Versioning + integrity.</strong> <code class="chip">history</code> shows the versions / swaps / amends timeline; <code class="chip">diff</code> compares two versions; <code class="chip">verify</code> does a content-level sha256 check across the vault.</li>
+    <li><strong>Opt-in, metadata-only LLM.</strong> <code class="chip">ask</code> sends <em>only</em> template metadata (name, category, jurisdiction, tags, summary, clause titles) to your configured provider by default; <code class="chip">--with-content</code> adds excerpts only after explicit confirmation (or <code class="chip">--yes-send</code> in CI). The CLI structures existing templates; it does not write new clauses.</li>
+  </ul>
+
+  <h2>Quickstart</h2>
+
+  <CodeBlock label="install + run">{`# Install
+pipx install template-vault-cli
+template-vault --version
+
+# Zero-config: compose + swap against inline fixtures, then poke at the vault
+template-vault demo
+
+# Or pull a real public template into a vault of your own
+mkdir my-vault && cd my-vault
+template-vault init
+template-vault import common-paper-mutual-nda
+template-vault list
+
+# Fork + swap one clause, with provenance recorded
+template-vault compose --base nda/house --as nda/house-startup
+template-vault swap nda/house-startup --clause "Term and Survival" --from nda/yc
+template-vault info nda/house-startup        # shows clause_overrides: 1`}</CodeBlock>
+
+  <h2>For agents and automation</h2>
+
+  <p>
+    template-vault is the suite's storage contract. The cross-CLI interop doc
+    (<a href="https://github.com/DrBaher/template-vault-cli/blob/main/docs/INTEROP.md"><code class="chip">docs/INTEROP.md</code></a>)
+    is the citation point for what this repo provides to its siblings. Structured outputs
+    (<code class="chip">info --json</code>, <code class="chip">find --json</code>, <code class="chip">history --json</code>,
+    <code class="chip">stats --json</code>) are validated against JSON Schemas committed under
+    <a href="https://github.com/DrBaher/template-vault-cli/tree/main/docs/spec"><code class="chip">docs/spec/</code></a>,
+    with a semver commitment: a backward-incompatible schema change requires a major version bump.
+    Downstream tools (e.g. <a href="/tools/nda-review-cli/">nda-review-cli</a> pulling clause structure) validate
+    against the schema rather than trusting field shapes by convention.
+  </p>
+
+  <CodeBlock label="recommended agent defaults">{`# Discover what's in the vault, then resolve a template path
+template-vault find "mutual nda california" --json --top-k 5
+template-vault info nda/common-paper-mutual --json
+template-vault get  nda/common-paper-mutual --path-only   # → hand to draft-cli`}</CodeBlock>
+
+  <p>
+    LLM features (<code class="chip">ask</code>) share one on-disk provider config with the other Python CLI in the
+    suite: <code class="chip">~/.config/contract-ops/llm.json</code> is the suite-wide location, so configuring it once
+    lights up LLM features across every tool that adopts the same lookup order. Metadata-only by default; content
+    excerpts require explicit consent. <code class="chip">--why</code> on the write-side commands prints a short
+    structured explanation to <strong>stderr</strong> so it never pollutes structured stdout.
+  </p>
+
+  <h2>Where it fits in the workflow</h2>
+
+  <p>
+    The storage layer at the start of the six-CLI workflow. <code class="chip">template-vault get &lt;ref&gt;</code>
+    resolves a versioned template, which you hand to <a href="/tools/draft-cli/">draft-cli</a> to fill placeholders,
+    then to <a href="/tools/nda-review-cli/">nda-review-cli</a> for review and negotiation. It's where your house
+    templates and forked public sources live with provenance — the source of truth the rest of the pipeline draws
+    from. <a href="/workflow/">See the full workflow</a> for the chained commands.
+  </p>
+
+  <p>
+    It's also useful on its own as a versioned, searchable library for any team that maintains a collection of
+    document templates and wants composition with an audit trail. The contract pipeline is one application.
+  </p>
+
+  <h2>Repo</h2>
+  <p><a href="https://github.com/DrBaher/template-vault-cli" target="_blank" rel="noopener">github.com/DrBaher/template-vault-cli</a> · MIT licensed · Stdlib-only Python (<code class="chip">[docx]</code> extra adds <code class="chip">python-docx</code>) · PyPI-installable.</p>
+</BaseLayout>

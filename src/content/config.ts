@@ -5,7 +5,7 @@ const changelog = defineCollection({
   schema: z.object({
     title: z.string(),
     date: z.coerce.date(),
-    cli: z.enum(['draft-cli', 'nda-review-cli', 'sign-cli', 'docx2pdf-cli', 'site']),
+    cli: z.enum(['template-vault-cli', 'draft-cli', 'nda-review-cli', 'compare-cli', 'sign-cli', 'docx2pdf-cli', 'site']),
     version: z.string().optional(),
     summary: z.string(),
     tags: z.array(z.string()).default([]),

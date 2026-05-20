@@ -9,7 +9,7 @@ export async function GET(context: APIContext) {
   return rss({
     title: 'drbaher CLI suite — changelog',
     description:
-      'Release notes for nda-review-cli, sign-cli, docx2pdf-cli, and the showcase site.',
+      'Release notes for template-vault-cli, draft-cli, nda-review-cli, compare-cli, sign-cli, docx2pdf-cli, and the showcase site.',
     site: context.site!,
     items: entries.map((entry) => ({
       title: entry.data.title,

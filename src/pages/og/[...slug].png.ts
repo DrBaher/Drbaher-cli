@@ -18,23 +18,23 @@ interface Page { title: string; eyebrow: string; description: string; }
 const pages: Record<string, Page> = {
   default: {
     eyebrow: 'contract.cli',
-    title: 'Four CLIs for the contract workflow',
-    description: 'Fill templates · review against your policy · convert to PDF · sign with audit trails. Local-first, MIT.',
+    title: 'Six CLIs for the contract workflow',
+    description: 'Store & version templates · fill them · review against your policy · gate drift · convert to PDF · sign with audit trails. Local-first, MIT.',
   },
   overview: {
     eyebrow: 'contract.cli',
-    title: 'Four CLIs for the contract workflow',
-    description: 'draft-cli · nda-review-cli · docx2pdf-cli · sign-cli. Local-first, deterministic, no SaaS.',
+    title: 'Six CLIs for the contract workflow',
+    description: 'template-vault-cli · draft-cli · nda-review-cli · compare-cli · docx2pdf-cli · sign-cli. Local-first, deterministic, no SaaS.',
   },
   workflow: {
     eyebrow: 'The workflow',
-    title: 'From blank page to signed agreement',
-    description: 'Draft → review → negotiate → convert → sign. Five commands across four CLIs, all on your machine.',
+    title: 'From a versioned template to a signed agreement',
+    description: 'Store → draft → review → negotiate → compare → convert → sign. Seven steps across six CLIs, all on your machine.',
   },
   install: {
     eyebrow: 'Install',
-    title: 'Four installs, one workflow',
-    description: 'npm i -g @drbaher/draft-cli · pipx install nda-review-cli · npm i -g docx2pdf-cli @drbaher/sign-cli',
+    title: 'Six installs, one workflow',
+    description: 'pipx install template-vault-cli nda-review-cli · npm i -g @drbaher/draft-cli compare-cli docx2pdf-cli @drbaher/sign-cli',
   },
   principles: {
     eyebrow: 'Principles',
@@ -54,12 +54,17 @@ const pages: Record<string, Page> = {
   changelog: {
     eyebrow: 'Changelog',
     title: 'What’s new across the suite',
-    description: 'Releases, fixes, and roadmap notes for draft-cli, nda-review-cli, docx2pdf-cli, and sign-cli.',
+    description: 'Releases, fixes, and roadmap notes for template-vault-cli, draft-cli, nda-review-cli, compare-cli, docx2pdf-cli, and sign-cli.',
   },
   mcp: {
     eyebrow: 'MCP server',
     title: 'sign-cli speaks MCP',
     description: 'Drive signing from Claude, Cursor, or any MCP-aware client — same per-signer guardrails.',
+  },
+  'tools/template-vault-cli': {
+    eyebrow: 'Tool · Python',
+    title: 'template-vault-cli',
+    description: 'Git-backed, clause-aware vault for legal-document templates. Fork, swap clauses with provenance, pull upstream upgrades.',
   },
   'tools/draft-cli': {
     eyebrow: 'Tool · Node.js',
@@ -80,6 +85,11 @@ const pages: Record<string, Page> = {
     eyebrow: 'Tool · TypeScript',
     title: 'sign-cli',
     description: 'Multi-provider e-signature with hash-chained audit events and RFC 3161 timestamps.',
+  },
+  'tools/compare-cli': {
+    eyebrow: 'Tool · Node.js',
+    title: 'compare-cli',
+    description: 'Clause-aware drift detection between two contract versions. A pre-signature gate with exit codes CI can branch on.',
   },
 };
 
@@ -191,18 +201,18 @@ export const GET: APIRoute = async ({ params }) => {
                     style: {
                       marginTop: 'auto',
                       display: 'flex',
-                      gap: '20px',
+                      flexWrap: 'wrap',
+                      gap: '16px',
                       fontFamily: 'Mono',
-                      fontSize: '20px',
+                      fontSize: '18px',
                       color: '#1f7d5d',
                     },
                     children: [
+                      'template-vault-cli',
                       'draft-cli',
-                      '·',
                       'nda-review-cli',
-                      '·',
+                      'compare-cli',
                       'docx2pdf-cli',
-                      '·',
                       'sign-cli',
                     ],
                   },

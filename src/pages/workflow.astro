@@ -4,33 +4,54 @@ import Callout from '../components/Callout.astro';
 import WorkflowDiagram from '../components/WorkflowDiagram.astro';
 import CodeBlock from '../components/CodeBlock.astro';
 ---
-<BaseLayout title="The workflow" active="workflow" description="How draft-cli, nda-review-cli, docx2pdf-cli, and sign-cli chain together into a complete contract pipeline — with copy-paste commands at each step." toc>
+<BaseLayout title="The workflow" active="workflow" description="How template-vault-cli, draft-cli, nda-review-cli, compare-cli, docx2pdf-cli, and sign-cli chain together into a complete contract pipeline — with copy-paste commands at each step." toc>
   <p class="eyebrow">The workflow</p>
-  <h1>From blank page to signed agreement, on your machine.</h1>
+  <h1>From a versioned template to a signed agreement, on your machine.</h1>
 
   <p class="text-lg text-ink-700 dark:text-night-100">
-    Five steps. Each is a single CLI invocation. The output of one step is the input of the next.
-    Stop at any point — the artifacts you have are useful on their own.
+    Seven steps across six CLIs. Each is a single CLI invocation. The output of one step is the input
+    of the next. Stop at any point — the artifacts you have are useful on their own.
   </p>
 
   <Callout label="TL;DR">
-    <code class="chip">draft</code> → <code class="chip">review</code> → <code class="chip">negotiate</code> →
-    <code class="chip">docx2pdf</code> → <code class="chip">sign</code>. Four tools, five commands, no SaaS,
-    no shared database. Files in, files out.
+    <code class="chip">template-vault get</code> → <code class="chip">draft</code> → <code class="chip">review</code> →
+    <code class="chip">negotiate</code> → <code class="chip">compare</code> → <code class="chip">docx2pdf</code> →
+    <code class="chip">sign</code>. Six tools, no SaaS, no shared database. Files in, files out.
   </Callout>
 
   <WorkflowDiagram />
 
-  <h2 data-reveal>1 — Draft</h2>
+  <h2 id="1--store" data-reveal>1 — Store &amp; version</h2>
   <p data-reveal>
-    Start with <code class="chip">draft-cli</code>. Point it at your template (markdown or
+    Start in your vault. <a href="/tools/template-vault-cli/">template-vault-cli</a> keeps your house
+    templates and forked public sources (Common Paper, YC SAFE, Bonterms) in one Git-backed, searchable
+    place. Pull a public template in, or compose your own by forking a base and swapping a clause — every
+    swap records its provenance in <code class="chip">meta.json</code>, so a later <code class="chip">upgrade</code>
+    pulls parent improvements in without clobbering your local changes. Resolve a versioned template to a
+    path and hand it to the next step.
+  </p>
+  <CodeBlock label="step 1 · store">{`# One-time: make a vault and import a public source
+template-vault init
+template-vault import common-paper-mutual-nda     # → nda/common-paper-mutual
+
+# Compose a house variant; swap one clause in, with provenance recorded
+template-vault compose --base nda/common-paper-mutual --as nda/house-mutual
+template-vault swap nda/house-mutual --clause "Term and Survival" --from nda/yc
+
+# Resolve the template path to hand to draft-cli
+template-vault get nda/house-mutual --path-only`}</CodeBlock>
+
+  <h2 id="2--draft" data-reveal>2 — Draft</h2>
+  <p data-reveal>
+    Take the template from your vault and fill it with <code class="chip">draft-cli</code>. Point it at the
+    file (markdown or
     <code class="chip">.docx</code> — the Common Paper Mutual NDA, your own house template, a SAFE,
     anything with placeholders) and pass the parameter values. <code class="chip">--list-placeholders</code>
     first if you want to see what the template expects; <code class="chip">--diff</code> previews the
     substitutions before writing. Output is markdown or a styling-preserving <code class="chip">.docx</code>
     round-trip.
   </p>
-  <CodeBlock label="step 1 · draft">{`# Discover what the template needs (run once)
+  <CodeBlock label="step 2 · draft">{`# Discover what the template needs (run once)
 draft templates/mutual-nda.docx --list-placeholders
 
 # Fill it, .docx → .docx with styling preserved
@@ -54,24 +75,24 @@ draft templates/mutual-nda.md --from-deal deal-notes.txt \\
     templates and want the review step pre-wired in the same invocation.
   </p>
 
-  <h2 data-reveal>2 — Review</h2>
+  <h2 id="3--review" data-reveal>3 — Review</h2>
   <p data-reveal>
     Whether the document was drafted by you or arrived from the other side, run it through
     <code class="chip">review</code> to score it against your house policy. Findings come with severity,
     matched rule patterns, and clause-level evidence. Optionally add <code class="chip">--llm</code>
     to layer in a second-pass adjudication from your model of choice.
   </p>
-  <CodeBlock label="step 2 · review">{`nda-review-cli review --file output/nda.md --why \\
+  <CodeBlock label="step 3 · review">{`nda-review-cli review --file output/nda.md --why \\
   --out-md output/review.md`}</CodeBlock>
 
-  <h2 data-reveal>3 — Negotiate</h2>
+  <h2 id="4--negotiate" data-reveal>4 — Negotiate</h2>
   <p data-reveal>
     If the counterparty has the CLI installed too, you can run a structured back-and-forth on a single
     state file that bounces between you (email, Drive, Git — whatever channel you prefer). Each round
     is signed and hash-chained; tampering is detected on load. Stance, clause priorities, and
     non-negotiable redlines all live in your local policy.
   </p>
-  <CodeBlock label="step 3 · negotiate">{`# Party A starts the negotiation
+  <CodeBlock label="step 4 · negotiate">{`# Party A starts the negotiation
 nda-review-cli negotiate init --template common-paper-mutual ... --out neg.json
 
 # Party B counters using their own policy and stance
@@ -92,19 +113,37 @@ nda-review-cli negotiate finalize --state neg.json \\
     Negotiation is opt-in; the workflow doesn't depend on it.
   </p>
 
-  <h2 data-reveal>4 — Convert to PDF</h2>
+  <h2 id="5--compare" data-reveal>5 — Compare for drift</h2>
+  <p data-reveal>
+    Before anything goes into a signing envelope, gate it. <a href="/tools/compare-cli/">compare-cli</a>
+    does a clause-aware diff between the text you agreed to and the artifact you're about to sign —
+    catching the quiet shift between "final version" and "the file the paralegal actually sent back."
+    The verdict is an exit code your script or CI can branch on, so a human only gets pulled in when the
+    drift is substantive.
+  </p>
+  <CodeBlock label="step 5 · compare">{`# Did the ready-to-sign file drift from the agreed text?
+compare output/agreed.md ready-to-sign.pdf --json
+# exit 0 = safe to sign · 2 = substantive drift (review!) · 3 = cosmetic only · 4 = clauses moved`}</CodeBlock>
+  <p data-reveal>
+    Deterministic and cross-format (<code class="chip">.docx</code> / <code class="chip">.pdf</code> /
+    <code class="chip">.md</code> / text), with no LLM tier — the same two inputs always produce the same
+    verdict, which is what makes it defensible as a gate. If the drift is only cosmetic or a reordering,
+    you've confirmed the agreement didn't change and can proceed.
+  </p>
+
+  <h2 id="6--convert" data-reveal>6 — Convert to PDF</h2>
   <p data-reveal>
     Once you have an agreed <code class="chip">.docx</code>, hand it to <code class="chip">docx2pdf-cli</code>.
     Single-file or batch, parallel processing, font validation, and a hybrid backend strategy that picks
     the right converter for what's on your machine. No silent fallbacks — failures are loud, fonts are
     checked, the output is honest.
   </p>
-  <CodeBlock label="step 4 · convert">{`docx2pdf output/agreed.docx output/agreed.pdf
+  <CodeBlock label="step 6 · convert">{`docx2pdf output/agreed.docx output/agreed.pdf
 
 # or for a folder full of contracts:
 docx2pdf --concurrency 4 --out-dir ./pdfs ./drafts/*.docx`}</CodeBlock>
 
-  <h2 data-reveal>5 — Sign</h2>
+  <h2 id="7--sign" data-reveal>7 — Sign</h2>
   <p data-reveal>
     Hand the PDF to <code class="chip">sign-cli</code>. Pick a provider — the built-in
     <code class="chip">local</code> provider produces real PAdES-signed PDFs fully offline (no
@@ -113,14 +152,14 @@ docx2pdf --concurrency 4 --out-dir ./pdfs ./drafts/*.docx`}</CodeBlock>
     lands in a hash-chained audit log, and the receipt bundle includes RFC 3161 timestamps so you
     can prove what was signed and when, even years later.
   </p>
-  <CodeBlock label="step 5 · sign">{`sign request create \\
+  <CodeBlock label="step 7 · sign">{`sign request create \\
   --title "Mutual NDA" \\
   --document output/agreed.pdf \\
   --signer "name:Alice Founder,email:alice@acme.com" \\
   --signer "name:Bob Counsel,email:bob@beta.com" \\
   --provider signwell
 
-# Or skip steps 4 + 5 and seal a DOCX in one shot (offline, PAdES)
+# Or skip the convert + sign steps and seal a DOCX in one shot (offline, PAdES)
 sign document --input output/agreed.docx \\
   --signer-name "Alice Founder" --signer-email "alice@acme.com" \\
   --name-signature true --auto-place first \\
@@ -149,8 +188,9 @@ sign audit verify --request-id <id>`}</CodeBlock>
 
   <h2>Skipping or substituting steps</h2>
   <p>
-    Each tool stands alone. If you already have a filled Word document, skip step 1. If you sign with a
-    notary or a different e-signature provider, skip step 5 — you'll still have a clean PDF from step 4.
-    The point isn't that you must use all four; it's that they compose cleanly when you do.
+    Each tool stands alone. If you already have a filled Word document, skip the vault + draft steps. If
+    you trust the ready-to-sign file, skip the compare gate. If you sign with a notary or a different
+    e-signature provider, skip the signing step — you'll still have a clean PDF from the convert step.
+    The point isn't that you must use all six; it's that they compose cleanly when you do.
   </p>
 </BaseLayout>

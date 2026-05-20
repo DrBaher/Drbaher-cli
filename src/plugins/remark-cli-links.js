@@ -1,5 +1,5 @@
 /**
- * Auto-link references to the four CLIs in markdown content.
+ * Auto-link references to the six CLIs in markdown content.
  * Walks text nodes inside paragraphs and list items, splits where matched,
  * and replaces matches with link nodes pointing to /tools/<cli>/.
  *
@@ -8,7 +8,9 @@
  */
 import { visit, SKIP } from 'unist-util-visit';
 
-const CLIS = ['draft-cli', 'nda-review-cli', 'sign-cli', 'docx2pdf-cli'];
+// Longest names first so e.g. "template-vault-cli" wins over a hypothetical
+// "vault-cli" substring and the regex alternation prefers the full match.
+const CLIS = ['template-vault-cli', 'nda-review-cli', 'docx2pdf-cli', 'compare-cli', 'draft-cli', 'sign-cli'];
 const PATTERN = new RegExp(`\\b(${CLIS.join('|')})\\b`, 'g');
 
 const SKIP_PARENT_TYPES = new Set(['link', 'inlineCode', 'code', 'heading']);
