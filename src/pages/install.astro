@@ -32,7 +32,7 @@ npm i -g @drbaher/draft-cli compare-cli docx2pdf-cli @drbaher/sign-cli`}</CodeBl
   <ul>
     <li><strong>Node.js 18+</strong> for draft-cli and docx2pdf-cli; <strong>Node.js 20+</strong> for compare-cli (pinned by <code class="chip">pdfjs-dist</code>); <strong>Node.js 22+</strong> for sign-cli (uses <code class="chip">node:sqlite</code>). Install via <code class="chip">brew install node</code>, <code class="chip">nvm</code>, or your platform's installer.</li>
     <li><strong>Python 3.9+</strong> with <code class="chip">pipx</code> for template-vault-cli and nda-review-cli. Install pipx via <code class="chip">brew install pipx</code> or your distro package manager, then <code class="chip">pipx ensurepath</code>.</li>
-    <li><strong>A PDF backend</strong> (only for docx2pdf-cli) — LibreOffice, Microsoft Word, Pandoc, or a Gotenberg server. The tool auto-detects what's installed.</li>
+    <li><strong>A PDF backend</strong> (only for docx2pdf-cli) — LibreOffice, Microsoft Word, Apple Pages, or a Gotenberg / ConvertAPI server. The tool auto-detects what's installed.</li>
   </ul>
 
   <h2>template-vault-cli</h2>
@@ -95,7 +95,7 @@ draft path/to/template.md --list-placeholders`}</CodeBlock>
     ]}
   />
 
-  <CodeBlock label="first-run setup">{`# 16 quick questions write your house policy
+  <CodeBlock label="first-run setup">{`# 14 quick questions write your house policy
 nda-review-cli quickstart`}</CodeBlock>
 
   <h2>compare-cli</h2>
@@ -141,7 +141,7 @@ docx2pdf --list-backends`}</CodeBlock>
 
   <p>
     The <code class="chip">--doctor</code> probe walks every backend candidate (LibreOffice, Word,
-    Pandoc, Gotenberg) and reports which ones are usable. Pick one with <code class="chip">--backend</code>
+    Apple Pages, Gotenberg, ConvertAPI) and reports which ones are usable. Pick one with <code class="chip">--backend</code>
     or let the tool auto-select.
   </p>
 

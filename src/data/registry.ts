@@ -24,9 +24,9 @@ export interface CliMeta {
 
 const FALLBACKS: Record<string, string> = {
   'template-vault-cli': '0.4.8',
-  'nda-review-cli': '0.5.0',
-  'docx2pdf-cli': '0.2.1',
-  'sign-cli': '0.6.0',
+  'nda-review-cli': '0.5.1',
+  'docx2pdf-cli': '0.2.2',
+  'sign-cli': '0.6.4',
   'draft-cli': '0.9.0',
   'compare-cli': '0.3.0',
 };

@@ -16,7 +16,7 @@ const rows: Row[] = [
   { label: 'AI usage',                            cli: 'Opt-in per call. Provider of your choice. Disabled by default.',   saas: 'Bundled in higher tiers. Provider chosen by vendor.' },
   { label: 'Templates',                           cli: 'Bring your own .docx; bundled CC-licensed defaults.',              saas: 'Vendor-curated library; hard to fork or modify.' },
   { label: 'Negotiation',                         cli: 'File-based protocol. Hash-chained. Send the file by any channel.', saas: 'In-app redlining + threaded comments behind the SaaS auth.' },
-  { label: 'PDF rendering',                       cli: 'Pluggable: LibreOffice, Word, Pandoc, or Gotenberg.',              saas: 'Vendor-controlled rendering pipeline.' },
+  { label: 'PDF rendering',                       cli: 'Pluggable: LibreOffice, Word, Apple Pages, Gotenberg, or ConvertAPI.', saas: 'Vendor-controlled rendering pipeline.' },
   { label: 'E-signature provider',                cli: 'Built-in offline PAdES signer (PKCS#7, self-issued cert) OR Dropbox Sign / DocuSign / SignWell.', saas: 'Bundled provider; switching means migrating.' },
   { label: 'Signing without API keys',            cli: 'Yes — fully-offline local provider produces real PAdES PDFs. No signup.',          saas: 'No — vendor signature service is the product.' },
   { label: 'Pre-signature drift detection',       cli: 'compare-cli gates on cosmetic / typographic / substantive classification with exit codes 0/2/3/4. CI-scriptable, SARIF output for code-scanning.', saas: 'Side-by-side viewer in the UI; no machine-readable gate without a custom integration.' },
