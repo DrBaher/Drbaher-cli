@@ -48,6 +48,53 @@ const meta = await getCliMeta();
     signatures and escalations. Use them piecemeal or chain them together.
   </Callout>
 
+  <h2 data-reveal>Six tools at a glance</h2>
+
+  <div class="not-prose my-5 overflow-x-auto rounded-lg border border-ink-700/10 dark:border-night-300/15" data-reveal>
+    <table class="w-full border-collapse text-[14px]">
+      <thead>
+        <tr class="border-b border-ink-700/15 bg-cream-100 dark:border-night-300/20 dark:bg-night-600">
+          <th class="px-4 py-2.5 text-left font-semibold text-ink-900 dark:text-night-50">Tool</th>
+          <th class="px-4 py-2.5 text-left font-semibold text-ink-900 dark:text-night-50">Stage</th>
+          <th class="px-4 py-2.5 text-left font-semibold text-ink-900 dark:text-night-50">Reads → writes</th>
+        </tr>
+      </thead>
+      <tbody class="text-ink-800 dark:text-night-100">
+        <tr class="border-b border-ink-700/10 dark:border-night-300/15">
+          <td class="px-4 py-2.5 align-top"><a href="/tools/template-vault-cli/" class="font-mono">template-vault</a> <span class="text-ink-500 dark:text-night-200">· Python</span></td>
+          <td class="px-4 py-2.5 align-top">Store</td>
+          <td class="px-4 py-2.5 align-top">vault → versioned template</td>
+        </tr>
+        <tr class="border-b border-ink-700/10 dark:border-night-300/15">
+          <td class="px-4 py-2.5 align-top"><a href="/tools/draft-cli/" class="font-mono">draft</a> <span class="text-ink-500 dark:text-night-200">· Node</span></td>
+          <td class="px-4 py-2.5 align-top">Draft</td>
+          <td class="px-4 py-2.5 align-top">template + params → filled draft</td>
+        </tr>
+        <tr class="border-b border-ink-700/10 dark:border-night-300/15">
+          <td class="px-4 py-2.5 align-top"><a href="/tools/nda-review-cli/" class="font-mono">nda-review</a> <span class="text-ink-500 dark:text-night-200">· Python</span></td>
+          <td class="px-4 py-2.5 align-top">Review / negotiate</td>
+          <td class="px-4 py-2.5 align-top">draft → verdict + redlines</td>
+        </tr>
+        <tr class="border-b border-ink-700/10 dark:border-night-300/15">
+          <td class="px-4 py-2.5 align-top"><a href="/tools/compare-cli/" class="font-mono">compare</a> <span class="text-ink-500 dark:text-night-200">· Node</span></td>
+          <td class="px-4 py-2.5 align-top">Drift gate</td>
+          <td class="px-4 py-2.5 align-top">two versions → pass / block verdict</td>
+        </tr>
+        <tr class="border-b border-ink-700/10 dark:border-night-300/15">
+          <td class="px-4 py-2.5 align-top"><a href="/tools/docx2pdf-cli/" class="font-mono">docx2pdf</a> <span class="text-ink-500 dark:text-night-200">· Node</span></td>
+          <td class="px-4 py-2.5 align-top">Convert</td>
+          <td class="px-4 py-2.5 align-top">.docx → .pdf</td>
+        </tr>
+        <tr>
+          <td class="px-4 py-2.5 align-top"><a href="/tools/sign-cli/" class="font-mono">sign</a> <span class="text-ink-500 dark:text-night-200">· Node</span></td>
+          <td class="px-4 py-2.5 align-top">Sign</td>
+          <td class="px-4 py-2.5 align-top">.pdf → signed .pdf + receipt</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="text-[13px] text-ink-500 dark:text-night-200" data-reveal>Every tool answers <code class="chip">--catalog json</code> for uniform agent discovery. Exit-code meanings differ per tool — see <a href="/built-for-agents/">built for agents</a>.</p>
+
   <h2 data-reveal>The tools</h2>
 
   <div class="not-prose mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3" data-reveal>
