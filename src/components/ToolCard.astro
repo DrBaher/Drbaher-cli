@@ -14,8 +14,10 @@ export interface Props {
   versionSource?: 'npm' | 'pypi' | 'repo' | 'fallback';
   stars?: number;
   weeklyDownloads?: number;
+  weeklyDownloadsSource?: 'npm' | 'pypi';
 }
-const { title, tagline, language, install, href, github, glyph, icon, version, versionSource, stars, weeklyDownloads } = Astro.props as Props;
+const { title, tagline, language, install, href, github, glyph, icon, version, versionSource, stars, weeklyDownloads, weeklyDownloadsSource } = Astro.props as Props;
+const dlRegistryLabel = weeklyDownloadsSource === 'pypi' ? 'PyPI' : 'npm';
 const versionTitle =
   versionSource === 'npm'  ? 'Live from registry.npmjs.org' :
   versionSource === 'pypi' ? 'Live from pypi.org' :
@@ -52,7 +54,7 @@ const dlLabel = fmtCount(weeklyDownloads);
         </a>
       ) : null}
       {dlLabel ? (
-        <span title={`${weeklyDownloads} npm downloads in the last 7 days`} class="inline-flex flex-none items-center gap-1 rounded-md border border-ink-700/15 bg-cream-50 px-2 py-0.5 text-ink-700 dark:border-night-300/20 dark:bg-night-700 dark:text-night-100">
+        <span title={`${weeklyDownloads} ${dlRegistryLabel} downloads in the last 7 days`} class="inline-flex flex-none items-center gap-1 rounded-md border border-ink-700/15 bg-cream-50 px-2 py-0.5 text-ink-700 dark:border-night-300/20 dark:bg-night-700 dark:text-night-100">
           <svg viewBox="0 0 16 16" class="h-3 w-3 fill-current" aria-hidden="true"><path d="M8 1v8.59l3.3-3.3 1.41 1.42L8 12.41 3.29 7.71l1.42-1.42L8 9.59V1h0zM2 13h12v2H2v-2z"/></svg>
           {dlLabel}/wk
         </span>

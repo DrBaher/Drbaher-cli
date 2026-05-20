@@ -29,15 +29,17 @@ Site: https://cli.drbaher.com/
    - Agent discovery: `nda-review-cli --catalog json` (23 subcommands, including 12 nested `negotiate` subcommands)
    - Agent contract: https://github.com/DrBaher/nda-review-cli/blob/main/AGENTS.md
 
-4. **compare-cli** — Agent-first, clause-aware drift detection between two contract versions. A pre-signature gate: it segments both documents into clauses and reports the exact clause that changed, moved, was added, or removed. Cross-format (`.docx` / `.pdf` / `.md` / text), deterministic, no LLM tier in v1. The verdict is an exit code CI can branch on.
+4. **compare-cli** — Agent-first, clause-aware drift detection between two contract versions. Single-file Node CLI, deterministic by design, no LLM tier in v1. Four-tier clause-detection cascade (H2 / bold-prefix / ALL-CAPS / synthetic). Five-class spectrum (clean / cosmetic / typographic / substantive / moved). `--from-negotiation` reads nda-review-cli's `negotiation.json` with a three-tier resolution (status: converged → per-round agreed → clause_status all "agreed"). `--require-signoffs` double-locks the gate. Output modes: human (with inline word-diff for substantive changes), `--json` (locked across v1.x), `--sarif` (SARIF v2.1.0 for code-scanning). `--check` for exit-code-only CI gates. Track-changes metadata from `.docx` surfaces alongside the diff. Two runtime deps (`jszip` + `pdfjs-dist`).
    - GitHub: https://github.com/DrBaher/compare-cli
-   - npm: https://www.npmjs.com/package/compare-cli (the installed command is `compare`)
+   - npm: https://www.npmjs.com/package/compare-cli (unscoped)
    - Install: `npm i -g compare-cli`
-   - One-shot demo (no install): `npx -p compare-cli@latest -- compare --demo`
+   - Demo: `compare --demo` (exit 2 — fixture is deliberate substantive drift)
    - Exit codes: `0` clauses match (safe to sign), `2` substantive drift (do not sign without review), `3` cosmetic/typographic-only drift, `4` clauses moved but content identical.
-   - Agent discovery: branch on the exit code; `--json` emits the structured verdict. Output contract in COMPARE_SCHEMA.md.
-   - MCP server: `compare-cli-mcp` (stdio, 3 tools: `compare_files`, `compare_with_negotiation`, `compare_demo`)
+   - Agent discovery: `compare --help`, structured `compare --json`
+   - MCP server: separate package `compare-cli-mcp` (npm i -g compare-cli-mcp). Three tools: `compare_files`, `compare_with_negotiation`, `compare_demo`. Stdio transport. `COMPARE_MCP_BASE_DIR` env var for path lockdown.
    - Agent contract: https://github.com/DrBaher/compare-cli/blob/main/AGENTS.md
+   - Schema contract: https://github.com/DrBaher/compare-cli/blob/main/COMPARE_SCHEMA.md (locked; stable across v1.x)
+   - MCP design: https://github.com/DrBaher/compare-cli/blob/main/docs/mcp.md
 
 5. **docx2pdf-cli** — Agent-first DOCX → PDF converter. Six hybrid backends (LibreOffice, Gotenberg, ConvertAPI, Apple Pages, Microsoft Word, textutil-cups). Strict-fidelity guard, machine-readable `--capabilities` + `--doctor` JSON (both schema-validated). NDJSON batch mode.
    - GitHub: https://github.com/DrBaher/docx2pdf-cli

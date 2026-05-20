@@ -20,7 +20,7 @@ import CodeBlock from '../components/CodeBlock.astro';
 
   <h2>Prerequisites</h2>
   <ul>
-    <li><strong>Node.js</strong> for draft-cli, sign-cli, and docx2pdf-cli (18+); <strong>Node.js 20+</strong> for compare-cli. Install via <code class="chip">brew install node</code>, <code class="chip">nvm</code>, or your platform's installer.</li>
+    <li><strong>Node.js 18+</strong> for draft-cli, sign-cli, and docx2pdf-cli; <strong>Node.js 20+</strong> for compare-cli (pinned by <code class="chip">pdfjs-dist</code>). Install via <code class="chip">brew install node</code>, <code class="chip">nvm</code>, or your platform's installer.</li>
     <li><strong>Python 3.9+</strong> with <code class="chip">pipx</code> for template-vault-cli and nda-review-cli. Install pipx via <code class="chip">brew install pipx</code> or your distro package manager, then <code class="chip">pipx ensurepath</code>.</li>
     <li><strong>A PDF backend</strong> (only for docx2pdf-cli) — LibreOffice, Microsoft Word, Pandoc, or a Gotenberg server. The tool auto-detects what's installed.</li>
   </ul>
@@ -188,8 +188,8 @@ docx2pdf --list-backends`}</CodeBlock>
       </tr>
       <tr class="border-b border-ink-700/10 dark:border-night-300/15">
         <td class="py-2 pr-4 font-mono">compare-cli</td>
-        <td class="py-2 pr-4">None — stateless and deterministic; reads two files and writes a report</td>
-        <td class="py-2 pr-4">None</td>
+        <td class="py-2 pr-4">None · stateless and deterministic, all behavior driven by flags · for the MCP server, optional <code class="chip">COMPARE_MCP_BASE_DIR</code> env var to lock down path inputs</td>
+        <td class="py-2 pr-4">None (no LLM tier, no network)</td>
       </tr>
       <tr class="border-b border-ink-700/10 dark:border-night-300/15">
         <td class="py-2 pr-4 font-mono">docx2pdf-cli</td>

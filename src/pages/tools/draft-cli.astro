@@ -34,7 +34,7 @@ const jsonLd = {
     <img src="/assets/icons/draft-cli.svg" alt="" class="h-12 w-12" />
     <span class="font-mono">draft-cli</span>
   </h1>
-  <FreshHeader name="draft-cli" version={meta.version} source={meta.source} fetchedAt={meta.fetchedAt} stars={meta.stars} weeklyDownloads={meta.weeklyDownloads} github="https://github.com/DrBaher/draft-cli" />
+  <FreshHeader name="draft-cli" version={meta.version} source={meta.source} fetchedAt={meta.fetchedAt} stars={meta.stars} weeklyDownloads={meta.weeklyDownloads} weeklyDownloadsSource={meta.weeklyDownloadsSource} github="https://github.com/DrBaher/draft-cli" />
   <p class="text-lg text-ink-700 dark:text-night-100">
     Fill placeholders in a legal-document template with parameter values. Five-tier detection
     (literal brackets, mustache, <code class="chip">.docx</code> highlights, generic-name
@@ -122,7 +122,9 @@ draft template.md --params deal.json --output filled.docx --json`}</CodeBlock>
     (<a href="/tools/template-vault-cli/">template-vault-cli</a>) — or any markdown / <code class="chip">.docx</code>
     you control — and produce a filled draft to hand to
     <a href="/tools/nda-review-cli/">nda-review-cli</a> for policy review or directly to
-    <a href="/tools/docx2pdf-cli/">docx2pdf-cli</a> for PDF rendering.
+    <a href="/tools/docx2pdf-cli/">docx2pdf-cli</a> for PDF rendering. Before signing, the filled
+    draft becomes the BASE that <a href="/tools/compare-cli/">compare-cli</a> gates against in
+    step 5 — making sure the artifact you're about to seal still matches what you drafted.
     <a href="/workflow/">See the full workflow</a> for the chained commands.
   </p>
 

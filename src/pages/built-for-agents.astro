@@ -13,9 +13,11 @@ import CodeBlock from '../components/CodeBlock.astro';
   <h1>Built for Claude, Cursor, Codex — and anything that speaks MCP.</h1>
 
   <p class="text-lg text-ink-700 dark:text-night-100">
-    sign-cli ships a 19-tool MCP stdio server. Wire it into any MCP-aware client and the agent gets typed,
-    schema-validated tools for the entire signing surface — with the per-signer-token guardrail intact so the
-    agent can drive every step except the actual signing gesture.
+    The suite ships two MCP servers. <strong>sign-cli</strong> exposes 19 tools for the entire signing
+    surface (create, send, sign, audit-verify, bundle-export) with the per-signer-token guardrail intact.
+    <strong>compare-cli-mcp</strong> exposes three tools (<code class="chip">compare_files</code>,
+    <code class="chip">compare_with_negotiation</code>, <code class="chip">compare_demo</code>) for the
+    pre-signature drift gate. Wire either or both into any MCP-aware client.
   </p>
 
   <Callout label="One install, every client">
@@ -41,6 +43,49 @@ import CodeBlock from '../components/CodeBlock.astro';
     The Smithery listing exposes the same 19 tools / 4 prompts / 12 resources as the local stdio path. It runs
     against an ephemeral demo database (read-only mode, wiped every 4 hours) so it's safe to explore but not
     suitable for real signing — for that, use the local install with the wire-up snippets below.
+  </p>
+
+  <h2>Adding compare-cli-mcp (the pre-signature drift gate)</h2>
+
+  <p>
+    <code class="chip">compare-cli-mcp</code> is a separate npm package that wraps
+    <a href="/tools/compare-cli/">compare-cli</a> as an MCP server. Three narrow tools, stdio
+    transport, JSON-first responses byte-identical to <code class="chip">compare --json</code>.
+    Substantive drift is a successful tool call (the agent asked what's different and the server
+    answered) — only I/O failures, malformed input, and "no agreed round found" surface as MCP errors.
+  </p>
+
+  <CodeBlock label="install">{`npm i -g compare-cli@^0.3.0 compare-cli-mcp@^0.1.1
+compare-mcp           # spawns the server on stdio (for testing)`}</CodeBlock>
+
+  <p>
+    Wire-up looks the same shape as sign-cli's. Add another entry under
+    <code class="chip">mcpServers</code> in whichever client config you're using (Claude Code,
+    Claude Desktop, Cursor, Codex — the snippets below show <code class="chip">sign-cli</code>;
+    each gets a sibling entry):
+  </p>
+
+  <CodeBlock label="adding compare-cli-mcp">{`{
+  "mcpServers": {
+    "sign-cli": {
+      "command": "npx",
+      "args": ["-y", "@drbaher/sign-cli", "mcp", "serve"]
+    },
+    "compare-cli": {
+      "command": "compare-mcp",
+      "env": {
+        "COMPARE_MCP_BASE_DIR": "/path/to/contract/documents"
+      }
+    }
+  }
+}`}</CodeBlock>
+
+  <p>
+    <code class="chip">COMPARE_MCP_BASE_DIR</code> locks down the server's filesystem reach to one
+    directory (symlinks collapsed, descendants only). Without it, the server reads any file the
+    process can read — fine for an interactive Claude Desktop session, not fine for an unattended
+    agent loop. Documented in detail at
+    <a href="https://github.com/DrBaher/compare-cli/blob/main/docs/mcp.md">docs/mcp.md §3.2</a>.
   </p>
 
   <h2>Claude Code</h2>
