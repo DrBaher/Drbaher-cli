@@ -1,0 +1,20 @@
+---
+import { PLAYGROUND_URL } from '../data/playground';
+interface Props { cli?: string; title?: string; height?: string; }
+const { cli, title, height = '560px' } = Astro.props;
+const src = cli ? `${PLAYGROUND_URL}/?cli=${cli}` : `${PLAYGROUND_URL}/`;
+---
+<div class="not-prose my-6">
+  <iframe
+    src={src}
+    title={title ?? (cli ? `${cli} playground` : 'contract-ops playground')}
+    loading="lazy"
+    sandbox="allow-scripts allow-forms allow-same-origin"
+    class="w-full rounded-lg border border-ink-700/15 bg-white shadow-sm dark:border-night-300/20 dark:bg-night-800"
+    style={`height:${height}`}
+  ></iframe>
+  <p class="mt-1.5 text-[12px] text-ink-500 dark:text-night-200">
+    Runs the real CLI on your input in a sandbox — no setup, nothing stored.
+    <a href={PLAYGROUND_URL} target="_blank" rel="noopener">Open in a new tab ↗</a>
+  </p>
+</div>

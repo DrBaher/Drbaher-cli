@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Callout from '../../components/Callout.astro';
 import CastPlayer from '../../components/CastPlayer.astro';
+import Playground from '../../components/Playground.astro';
 import CodeBlock from '../../components/CodeBlock.astro';
 import FreshHeader from '../../components/FreshHeader.astro';
 import JsonLd from '../../components/JsonLd.astro';
@@ -56,6 +57,10 @@ const jsonLd = {
   </Callout>
 
   <CastPlayer src="/casts/compare-cli-demo.cast" title="compare --demo — drift gate" />
+
+  <h2>Try it live</h2>
+  <p>Paste two versions and hit Run — you get the clause-aware verdict and the exit code that gates a signature.</p>
+  <Playground cli="compare" title="compare playground" />
 
   <h2>What it does</h2>
 

@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Callout from '../../components/Callout.astro';
 import CastPlayer from '../../components/CastPlayer.astro';
+import Playground from '../../components/Playground.astro';
 import CodeBlock from '../../components/CodeBlock.astro';
 import FreshHeader from '../../components/FreshHeader.astro';
 import JsonLd from '../../components/JsonLd.astro';
@@ -53,6 +54,10 @@ const jsonLd = {
   </Callout>
 
   <CastPlayer src="/casts/draft-cli-demo.cast" title="draft --demo — placeholder fill" />
+
+  <h2>Try it live</h2>
+  <p>Edit the template or the params and hit Run — it fills the placeholders for real, in a sandbox.</p>
+  <Playground cli="draft" title="draft playground" />
 
   <h2>What it does</h2>
 

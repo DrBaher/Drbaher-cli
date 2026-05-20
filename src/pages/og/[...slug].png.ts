@@ -36,6 +36,11 @@ const pages: Record<string, Page> = {
     title: 'The whole suite in five minutes',
     description: 'Every CLI ships a zero-config demo. Run all six, then chain them over stdin into one pipeline.',
   },
+  play: {
+    eyebrow: 'Playground',
+    title: 'Run the CLIs in your browser',
+    description: 'draft, compare, docx2pdf and a template-vault explorer — on your own input, in a sandbox. No install.',
+  },
   install: {
     eyebrow: 'Install',
     title: 'Six installs, one workflow',

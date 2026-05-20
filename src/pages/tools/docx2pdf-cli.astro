@@ -3,6 +3,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Callout from '../../components/Callout.astro';
 import CodeBlock from '../../components/CodeBlock.astro';
 import CastPlayer from '../../components/CastPlayer.astro';
+import Playground from '../../components/Playground.astro';
 import FreshHeader from '../../components/FreshHeader.astro';
 import JsonLd from '../../components/JsonLd.astro';
 import { getCliMeta } from '../../data/registry';
@@ -49,6 +50,10 @@ const jsonLd = {
   </Callout>
 
   <CastPlayer src="/casts/docx2pdf-doctor.cast" title="docx2pdf-cli — doctor + batch convert" />
+
+  <h2>Try it live</h2>
+  <p>Upload a <code class="chip">.docx</code> and convert it to a real PDF you can download — running the actual converter in a sandbox.</p>
+  <Playground cli="docx2pdf" title="docx2pdf playground" />
 
   <h2>What it does</h2>
 

@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Callout from '../../components/Callout.astro';
 import CastPlayer from '../../components/CastPlayer.astro';
+import Playground from '../../components/Playground.astro';
 import CodeBlock from '../../components/CodeBlock.astro';
 import FreshHeader from '../../components/FreshHeader.astro';
 import JsonLd from '../../components/JsonLd.astro';
@@ -55,6 +56,10 @@ const jsonLd = {
   </Callout>
 
   <CastPlayer src="/casts/template-vault-cli-demo.cast" title="template-vault demo — compose + swap" />
+
+  <h2>Try it live</h2>
+  <p>Explore a seeded demo vault — search, list, and inspect templates and their clauses (read-only).</p>
+  <Playground cli="template-vault" title="template-vault playground" />
 
   <h2>What it does</h2>
 

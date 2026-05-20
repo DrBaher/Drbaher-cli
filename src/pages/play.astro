@@ -1,0 +1,34 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Callout from '../components/Callout.astro';
+import Playground from '../components/Playground.astro';
+---
+<BaseLayout
+  title="Playground"
+  active="play"
+  description="Run the contract-ops CLIs in your browser — draft, compare, docx2pdf, and a template-vault explorer — on your own input, in a sandbox. No install, nothing stored."
+>
+  <p class="eyebrow">Playground</p>
+  <h1>Run the CLIs in your browser.</h1>
+
+  <p class="text-lg text-ink-700 dark:text-night-100">
+    Four of the suite's tools, running on <strong>your own input</strong> in a sandbox — no install,
+    nothing stored. Switch tabs for <a href="/tools/draft-cli/">draft</a>,
+    <a href="/tools/compare-cli/">compare</a>, <a href="/tools/docx2pdf-cli/">docx2pdf</a>, and the
+    <a href="/tools/template-vault-cli/">template-vault</a> explorer.
+  </p>
+
+  <Callout label="How it works">
+    Each run executes the real CLI server-side with strict limits — short timeout, rate-limited,
+    a stripped environment, and ephemeral storage (your input is never kept). To see the tools
+    chained end to end, take the <a href="/tour/">5-minute tour</a>.
+  </Callout>
+
+  <Playground height="660px" title="contract-ops playground" />
+
+  <p>
+    Two more tools have their own hosted demos: <a href="/tools/nda-review-cli/">nda-review-cli</a>
+    (paste an NDA, get a structured review) and <a href="/tools/sign-cli/">sign-cli</a> (a read-only
+    signing walkthrough).
+  </p>
+</BaseLayout>
