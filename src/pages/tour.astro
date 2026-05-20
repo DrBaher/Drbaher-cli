@@ -58,11 +58,13 @@ template-vault get nda/house-mutual \\
 # gate the ready-to-sign artifact against what you agreed to
 compare filled.md ready-to-sign.docx        # exit 0 = safe · 2 = substantive drift
 
-# render and sign
-cat filled.md | docx2pdf - filled.pdf        # (or hand a .docx straight in)
-sign document --input filled.pdf \\
-  --signer-name "Alice Founder" --signer-email "alice@acme.com" \\
-  --name-signature true --auto-place first --out filled.sealed.pdf`}</CodeBlock>
+# render the agreed .docx to PDF (docx2pdf takes a .docx, not markdown)
+docx2pdf ready-to-sign.docx ready-to-sign.pdf
+
+# sign — DOCX or PDF in, sealed PAdES PDF out, fully offline (one shot)
+sign document ready-to-sign.pdf \\
+  --signer name:Alice,email:alice@acme.com \\
+  --name-signature true --auto-place first --out signed.pdf`}</CodeBlock>
 
   <p data-reveal>
     Review and compare are <em>gates</em>, not transforms — they branch the flow (escalate, redline,
