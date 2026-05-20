@@ -17,12 +17,12 @@ interface Page { title: string; eyebrow: string; description: string; }
 
 const pages: Record<string, Page> = {
   default: {
-    eyebrow: 'contract.cli',
+    eyebrow: 'contract-ops CLI suite',
     title: 'Six CLIs for the contract workflow',
     description: 'Store & version templates · fill them · review against your policy · gate drift · convert to PDF · sign with audit trails. Local-first, MIT.',
   },
   overview: {
-    eyebrow: 'contract.cli',
+    eyebrow: 'contract-ops CLI suite',
     title: 'Six CLIs for the contract workflow',
     description: 'template-vault-cli · draft-cli · nda-review-cli · compare-cli · docx2pdf-cli · sign-cli. Local-first, deterministic, no SaaS.',
   },

@@ -20,7 +20,7 @@
 
   <g transform="translate(80,90)">
     <circle cx="14" cy="14" r="12" fill="#1f7d5d"/>
-    <text x="40" y="22" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="22" font-weight="500" letter-spacing="0.06em" fill="#0c5642">contract.cli</text>
+    <text x="40" y="22" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="22" font-weight="500" letter-spacing="0.06em" fill="#0c5642">contract-ops CLI suite</text>
   </g>
 
   <g transform="translate(80,200)">
