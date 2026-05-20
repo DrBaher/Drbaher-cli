@@ -160,8 +160,8 @@ docx2pdf --concurrency 4 --out-dir ./pdfs ./drafts/*.docx`}</CodeBlock>
   --provider signwell
 
 # Or skip the convert + sign steps and seal a DOCX in one shot (offline, PAdES)
-sign document --input output/agreed.docx \\
-  --signer-name "Alice Founder" --signer-email "alice@acme.com" \\
+sign document output/agreed.docx \\
+  --signer "name:Alice Founder,email:alice@acme.com" \\
   --name-signature true --auto-place first \\
   --out output/agreed.sealed.pdf
 

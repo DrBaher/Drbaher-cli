@@ -114,10 +114,8 @@ sign request create \\
     call — your main <code>./data/sign.db</code> is untouched.
   </p>
 
-  <CodeBlock label="one-shot pipeline">{`sign document \\
-  --input contract.docx \\
-  --signer-name "Alice Founder" \\
-  --signer-email "alice@acme.com" \\
+  <CodeBlock label="one-shot pipeline">{`sign document contract.docx \\
+  --signer "name:Alice Founder,email:alice@acme.com" \\
   --name-signature true \\
   --auto-place first \\
   --out contract.sealed.pdf`}</CodeBlock>
