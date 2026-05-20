@@ -1,0 +1,69 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Callout from '../components/Callout.astro';
+import CodeBlock from '../components/CodeBlock.astro';
+---
+<BaseLayout
+  title="Recipes"
+  active="recipes"
+  description="Task-oriented recipes for the contract-ops CLI suite — reviewing an incoming third-party NDA, gating drift in CI, driving the pipeline from an agent, and batch convert + sign."
+  toc
+>
+  <p class="eyebrow">Recipes</p>
+  <h1>Recipes for real situations.</h1>
+
+  <p class="text-lg text-ink-700 dark:text-night-100">
+    The <a href="/tour/">tour</a> and <a href="/workflow/">workflow</a> walk the happy path
+    start to finish. These are the off-path situations that actually come up — copy-paste
+    sequences you can adapt. Discover any tool's exact flags with <code class="chip">&lt;cli&gt; --catalog json</code>.
+  </p>
+
+  <h2 data-reveal>Review an incoming third-party NDA</h2>
+  <p data-reveal>Someone sends you <em>their</em> paper. Score it against your house policy, then gate the final text before you sign.</p>
+  <CodeBlock label="review their paper">{`# 1. Score it against your house policy, with evidence for each finding
+nda-review-cli review --file their-nda.docx --playbook config/org-policy.json --why
+
+# 2. Negotiate the points you don't accept (see the tool page for the full
+#    negotiate subcommands); nda-review tracks hash-chained negotiation state.
+
+# 3. Before signing, gate the version they sent back against what you agreed
+compare --from-negotiation negotiation.json their-nda-final.docx
+#   exit 0 = matches the agreed text · 2 = it drifted — don't sign`}</CodeBlock>
+
+  <h2 data-reveal>Gate drift in CI</h2>
+  <p data-reveal>Fail the build if a ready-to-sign artifact drifted from the text everyone agreed to — the exit code is the gate, no parsing required.</p>
+  <CodeBlock label="ci gate">{`# Exit-code-only gate (0 safe · 2 substantive · 3 cosmetic · 4 moved)
+compare agreed.md ready-to-sign.docx --check
+
+# …or emit SARIF for GitHub code-scanning / a PR annotation
+compare agreed.md ready-to-sign.docx --sarif > drift.sarif`}</CodeBlock>
+
+  <h2 data-reveal>Drive the pipeline from an agent</h2>
+  <p data-reveal>An LLM agent does the operational work; the human only makes the signing gesture. The per-signer token is the boundary — the agent never sees it.</p>
+  <CodeBlock label="agent loop">{`# 1. Discover each tool's surface at startup — never hardcode flags
+draft --catalog json    compare --catalog json    sign --catalog json
+
+# 2. Agent fills, gates, and converts (branching on exit codes + --json)
+template-vault get nda/house-mutual | draft - --params deal.json | tee filled.md
+compare agreed.md filled.md --json   # agent reads the verdict, decides to proceed
+
+# 3. Agent requests a signature; the human receives a scoped, single-use token
+sign request create --document filled.pdf --signer-email alice@acme.com
+sign sign --token <token-the-human-received>   # the agent never holds this`}</CodeBlock>
+
+  <h2 data-reveal>Batch convert, then sign a folder</h2>
+  <p data-reveal>A directory of agreed documents → PDFs → out for signature, fully offline.</p>
+  <CodeBlock label="batch">{`# Convert every .docx in a folder to PDF
+docx2pdf --out-dir out/ contracts/*.docx
+
+# Send each PDF for signature with the built-in offline signer (no signup)
+for f in out/*.pdf; do
+  sign request create --document "$f" --signer-email "$SIGNER_EMAIL"
+done`}</CodeBlock>
+
+  <Callout label="More">
+    Run any of these in the browser on the <a href="/play/">playground</a> ·
+    full step-by-step in <a href="/workflow/">the workflow</a> ·
+    agent wire-up in <a href="/built-for-agents/">built for agents</a>.
+  </Callout>
+</BaseLayout>

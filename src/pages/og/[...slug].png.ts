@@ -41,6 +41,11 @@ const pages: Record<string, Page> = {
     title: 'Run the CLIs in your browser',
     description: 'draft, compare, docx2pdf and a template-vault explorer — on your own input, in a sandbox. No install.',
   },
+  recipes: {
+    eyebrow: 'Recipes',
+    title: 'Recipes for real situations',
+    description: 'Review an incoming NDA, gate drift in CI, drive the pipeline from an agent, batch convert + sign.',
+  },
   install: {
     eyebrow: 'Install',
     title: 'Six installs, one workflow',
