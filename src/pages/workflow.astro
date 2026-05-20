@@ -161,12 +161,12 @@ docx2pdf --concurrency 4 --out-dir ./pdfs ./drafts/*.docx`}</CodeBlock>
 
 # Or skip the convert + sign steps and seal a DOCX in one shot (offline, PAdES)
 sign document output/agreed.docx \\
-  --signer "name:Alice Founder,email:alice@acme.com" \\
+  --signer "Alice Founder" --signer-email alice@acme.com \\
   --name-signature true --auto-place first \\
   --out output/agreed.sealed.pdf
 
-# Verify a signed PDF later, offline
-sign request verify-signed-pdf output/agreed.signed.pdf
+# Verify a signed PDF later, offline (works on any PAdES-signed PDF)
+sign pdf inspect --pdf output/agreed.signed.pdf
 sign audit verify --request-id <id>`}</CodeBlock>
 
   <h2>What you end up with</h2>

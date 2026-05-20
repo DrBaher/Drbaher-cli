@@ -76,6 +76,11 @@ const pages: Record<string, Page> = {
     title: 'sign-cli speaks MCP',
     description: 'Drive signing from Claude, Cursor, or any MCP-aware client — same per-signer guardrails.',
   },
+  'built-for-agents': {
+    eyebrow: 'Built for agents',
+    title: 'Built for Claude, Cursor, Codex, OpenClaw',
+    description: 'Two MCP servers, a uniform --catalog json discovery contract, and a clean stdio surface for any agent.',
+  },
   'tools/template-vault-cli': {
     eyebrow: 'Tool · Python',
     title: 'template-vault-cli',

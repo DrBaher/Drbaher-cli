@@ -54,10 +54,10 @@ while IFS=, read -r name addr email; do
 
   docx2pdf "out/$name.docx" "out/$name.pdf"
 
-  sign-cli send --file "out/$name.pdf" \\
-    --signer "alice@acme.com:Alice Founder" \\
-    --signer "$email:$name signer" \\
-    --provider sign-well
+  sign request create --document "out/$name.pdf" \\
+    --signer "name:Alice Founder,email:alice@acme.com,order:1" \\
+    --signer "name:$name,email:$email,order:2" \\
+    --provider signwell
 done < vendors.csv`}</CodeBlock>
 
   <p>
@@ -87,8 +87,8 @@ done < vendors.csv`}</CodeBlock>
     --out-md "review/$(basename "$f" .docx).md"
 done
 
-# Aggregate the review summaries
-nda-review-cli summarize --dir review/ --out review/summary.md`}</CodeBlock>
+# Aggregate the per-vendor reviews into one file
+cat review/*.md > review/summary.md`}</CodeBlock>
 
   <p>
     Every review writes a hash-chained record — useful when post-close discovery asks who saw what when.
@@ -103,25 +103,20 @@ nda-review-cli summarize --dir review/ --out review/summary.md`}</CodeBlock>
   </p>
 
   <p>
-    Bundle the three docs into a single signing flow with <code class="chip">sign-cli send --bulk</code>.
+    Bundle the three docs into a single request with <code class="chip">sign request create</code> (repeat <code class="chip">--document</code>).
     The receipt for the whole onboarding lives as one hash-chained file on disk; if the new hire later
     files a dispute, you can hand the verified bundle to opposing counsel without asking three separate
     SaaS vendors for export.
   </p>
 
-  <CodeBlock label="employment onboarding bundle">{`# Single CSV: file, signer email, signer label
-cat > onboarding.csv <<EOF
-nda.pdf,alice@acme.com,Alice (employee)
-ip-assignment.pdf,alice@acme.com,Alice (employee)
-noncompete.pdf,alice@acme.com,Alice (employee)
-EOF
+  <CodeBlock label="employment onboarding bundle">{`# One request, three documents, one signer — a single hash-chained flow
+sign request create \\
+  --document nda.pdf --document ip-assignment.pdf --document noncompete.pdf \\
+  --signer "name:Alice,email:alice@acme.com,order:1" \\
+  --provider signwell
 
-sign-cli send --bulk onboarding.csv \\
-  --provider sign-well \\
-  --receipt-bundle bundles/alice-2025-05-10.json
-
-# Later — verify offline, even years from now
-sign-cli verify bundles/alice-2025-05-10.json`}</CodeBlock>
+# Later — verify the signed PDF offline, even years from now
+sign pdf inspect --pdf nda.signed.pdf`}</CodeBlock>
 
   <h2>4. Pre-signature drift gating — the "did the PDF still match what we agreed?" check</h2>
 
@@ -157,9 +152,9 @@ compare --from-negotiation output/negotiation.json output/ready-to-sign.pdf \\
   }
 
 # Only on exit 0 do we proceed to sign
-sign-cli send --file output/ready-to-sign.pdf \\
-  --signer "alice@acme.com:Alice Founder" \\
-  --signer "bob@beta.com:Bob Counsel"`}</CodeBlock>
+sign request create --document output/ready-to-sign.pdf \\
+  --signer "name:Alice Founder,email:alice@acme.com,order:1" \\
+  --signer "name:Bob Counsel,email:bob@beta.com,order:2"`}</CodeBlock>
 
   <p>
     The agent runs this in seconds; the human is only paged when exit-class is

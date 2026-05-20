@@ -331,13 +331,13 @@ curl http://localhost:4000/v1/openapi.json    # full OpenAPI 3.1 spec`}</CodeBlo
     on load.
   </p>
 
-  <CodeBlock label="agent loop: review a counterparty NDA">{`nda-review-cli --catalog json                     # discover commands + flags
-nda-review-cli draft --template mutual-nda > our.json  # seed our position
-nda-review-cli review counterparty.json --json   # score against house policy
-nda-review-cli negotiate --party-a our.json \\
-                          --party-b counterparty.json \\
-                          --stance-a conservative \\
-                          --json                  # round-by-round JSON output`}</CodeBlock>
+  <CodeBlock label="agent loop: review a counterparty NDA">{`nda-review-cli --catalog json                          # discover commands + flags
+nda-review-cli review --file counterparty.docx \\
+  --playbook policy.json --why                         # score against your house policy
+# negotiate keeps hash-chained state across 12 subcommands; e.g. a two-party sim:
+nda-review-cli negotiate simulate \\
+  --party-a-base ours.txt --party-b-base theirs.txt \\
+  --stance-a conservative --out rounds.json            # round-by-round result`}</CodeBlock>
 
   <p>
     Hash-chained state, deterministic stance + clause priority engine, fatigue-concession rule that
@@ -358,8 +358,8 @@ nda-review-cli negotiate --party-a our.json \\
 docx2pdf --doctor json                 # which backends are usable on this host
 docx2pdf --catalog json                # full CLI command + flag inventory
 docx2pdf in.docx out.pdf --json        # one-shot, structured success/error
-docx2pdf --batch jobs.ndjson \\
-         --concurrency 4 --json        # NDJSON in/out for batch flows`}</CodeBlock>
+docx2pdf --out-dir ./pdfs \\
+         --concurrency 4 --json drafts/*.docx   # batch (--out-dir enables it); --json → NDJSON`}</CodeBlock>
 
   <p>
     Success rows include <code class="chip">outputBytes</code> and <code class="chip">durationMs</code>;

@@ -48,7 +48,7 @@ template-vault get nda/house-mutual | draft - --params deal.json | tee filled.md
 compare agreed.md filled.md --json   # agent reads the verdict, decides to proceed
 
 # 3. Agent requests a signature; the human receives a scoped, single-use token
-sign request create --title "NDA" --document filled.pdf --signer name:Alice,email:alice@acme.com
+sign request create --title "NDA" --document filled.pdf --signer "name:Alice,email:alice@acme.com,order:1"
 sign sign --token <token-the-human-received>   # the agent never holds this`}</CodeBlock>
 
   <h2 data-reveal>Batch convert, then sign a folder</h2>
@@ -58,7 +58,7 @@ docx2pdf --out-dir out/ contracts/*.docx
 
 # Send each PDF for signature with the built-in offline signer (no signup)
 for f in out/*.pdf; do
-  sign request create --document "$f" --signer "email:$SIGNER_EMAIL"
+  sign request create --document "$f" --signer "name:Signer,email:$SIGNER_EMAIL,order:1"
 done`}</CodeBlock>
 
   <Callout label="More">

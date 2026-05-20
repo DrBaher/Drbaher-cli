@@ -115,7 +115,7 @@ sign request create \\
   </p>
 
   <CodeBlock label="one-shot pipeline">{`sign document contract.docx \\
-  --signer "name:Alice Founder,email:alice@acme.com" \\
+  --signer "Alice Founder" --signer-email alice@acme.com \\
   --name-signature true \\
   --auto-place first \\
   --out contract.sealed.pdf`}</CodeBlock>
@@ -141,7 +141,7 @@ sign preview --pdf contract.pdf \\
   </p>
 
   <CodeBlock label="verify offline">{`# Re-parse the PDF, recompute the digest, extract signer certs
-sign request verify-signed-pdf contract.signed.pdf
+sign pdf inspect --pdf contract.signed.pdf
 
 # Verify the hash-chained audit log for a specific request
 sign audit verify --request-id req_abc
