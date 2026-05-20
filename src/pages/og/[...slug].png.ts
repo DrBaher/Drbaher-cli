@@ -31,6 +31,11 @@ const pages: Record<string, Page> = {
     title: 'From a versioned template to a signed agreement',
     description: 'Store → draft → review → negotiate → compare → convert → sign. Seven steps across six CLIs, all on your machine.',
   },
+  tour: {
+    eyebrow: '5-minute tour',
+    title: 'The whole suite in five minutes',
+    description: 'Every CLI ships a zero-config demo. Run all six, then chain them over stdin into one pipeline.',
+  },
   install: {
     eyebrow: 'Install',
     title: 'Six installs, one workflow',

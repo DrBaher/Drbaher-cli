@@ -1,0 +1,77 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Callout from '../components/Callout.astro';
+import CodeBlock from '../components/CodeBlock.astro';
+---
+<BaseLayout
+  title="5-minute tour"
+  active="tour"
+  description="See all six contract-ops CLIs in five minutes: every tool ships a zero-config demo, and they chain over stdin into one end-to-end pipeline."
+  toc
+>
+  <p class="eyebrow">5-minute tour</p>
+  <h1>The whole suite in five minutes.</h1>
+
+  <p class="text-lg text-ink-700 dark:text-night-100">
+    Every CLI ships a zero-config <code class="chip">demo</code> — no setup, no config, no network.
+    Run them top to bottom to see each step of the pipeline, then chain them on your own files.
+  </p>
+
+  <Callout label="TL;DR">
+    Six commands, nothing to configure. Each <code class="chip">demo</code> runs against bundled
+    fixtures and cleans up after itself. <a href="/install/">Install</a> the suite first (or run any
+    one with <code class="chip">npx</code> / <code class="chip">pipx run</code> — no install needed).
+  </Callout>
+
+  <h2 data-reveal>The speed run</h2>
+  <p data-reveal>
+    Paste these one at a time. Each is self-contained and shows that tool's job in a few seconds.
+  </p>
+  <CodeBlock label="six demos, zero config">{`template-vault demo     # 1. store — compose a template + swap a clause, with provenance
+draft --demo            # 2. draft — fill [Party A], [Effective Date], … in a template
+nda-review-cli demo     # 3. review — score a sample NDA against a house policy
+compare --demo          # 4. compare — clause-aware drift gate (exits 2 on the fixture)
+docx2pdf demo           # 5. convert — render a sample DOCX to PDF
+npx @drbaher/sign-cli demo   # 6. sign — offline PAdES sign + verify + receipt`}</CodeBlock>
+
+  <h2 data-reveal>What just happened</h2>
+  <ul data-reveal>
+    <li><a href="/tools/template-vault-cli/">template-vault</a> — forked a base NDA, swapped one clause from another, and recorded the provenance in <code class="chip">meta.json</code>.</li>
+    <li><a href="/tools/draft-cli/">draft</a> — substituted typed placeholders into a template and printed the filled draft.</li>
+    <li><a href="/tools/nda-review-cli/">nda-review-cli</a> — scored the sample NDA and emitted a structured verdict (decision + risk + findings).</li>
+    <li><a href="/tools/compare-cli/">compare</a> — diffed two versions clause-by-clause and flagged the substantive drift (exit <code class="chip">2</code>).</li>
+    <li><a href="/tools/docx2pdf-cli/">docx2pdf</a> — converted a DOCX to PDF with whatever backend is installed.</li>
+    <li><a href="/tools/sign-cli/">sign</a> — created, sent, signed, verified, and bundled a receipt for a PDF — fully offline.</li>
+  </ul>
+
+  <h2 data-reveal>Now chain them on your own files</h2>
+  <p data-reveal>
+    The tools read <code class="chip">-</code> from stdin and write to stdout, so the pre-signature
+    flow composes as a real pipeline. Bring your own template ref, deal params, and policy:
+  </p>
+  <CodeBlock label="end-to-end on real files">{`# resolve a template from the vault → fill it → review it → gate drift → render → sign
+template-vault get nda/house-mutual \\
+  | draft - --params deal.json \\
+  | tee filled.md \\
+  | nda-review-cli review --file - --playbook config/org-policy.json --out-md review.md
+
+# gate the ready-to-sign artifact against what you agreed to
+compare filled.md ready-to-sign.docx        # exit 0 = safe · 2 = substantive drift
+
+# render and sign
+cat filled.md | docx2pdf - filled.pdf        # (or hand a .docx straight in)
+sign document --input filled.pdf \\
+  --signer-name "Alice Founder" --signer-email "alice@acme.com" \\
+  --name-signature true --auto-place first --out filled.sealed.pdf`}</CodeBlock>
+
+  <p data-reveal>
+    Review and compare are <em>gates</em>, not transforms — they branch the flow (escalate, redline,
+    or block) rather than rewrite the document, which is why they read the draft but don't sit
+    mid-pipe. For the full step-by-step with every flag, see <a href="/workflow/">the workflow</a>.
+  </p>
+
+  <Callout label="Next">
+    <a href="/install/">Install</a> the suite · read <a href="/workflow/">the workflow</a> ·
+    wire it into an agent via <a href="/built-for-agents/">built for agents</a>.
+  </Callout>
+</BaseLayout>
