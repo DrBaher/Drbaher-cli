@@ -25,20 +25,25 @@ const meta = await getCliMeta();
       <span class="rounded-md border border-accent-200 bg-accent-50 px-2 py-1 font-mono text-accent-700 dark:border-accent-700/40 dark:bg-accent-900/20 dark:text-accent-300">Local-first · MIT</span>
     </div>
 
-    <div class="mt-7 max-w-[640px] rounded-lg border border-accent-300 bg-white shadow-[0_4px_24px_rgba(15,110,81,0.08)] dark:border-accent-700/40 dark:bg-night-700 dark:shadow-[0_4px_24px_rgba(0,0,0,0.3)]">
+    <a href="/tour/" class="group mt-7 block max-w-[640px] rounded-lg border border-accent-300 bg-white shadow-[0_4px_24px_rgba(15,110,81,0.08)] transition-all hover:-translate-y-0.5 hover:border-accent-400 hover:shadow-[0_8px_28px_rgba(15,110,81,0.12)] dark:border-accent-700/40 dark:bg-night-700 dark:shadow-[0_4px_24px_rgba(0,0,0,0.3)] dark:hover:border-accent-400/40">
       <div class="flex items-center gap-2 border-b border-ink-700/10 px-4 py-2 dark:border-night-300/15">
         <span class="h-2.5 w-2.5 rounded-full bg-[#ff5f57]"></span>
         <span class="h-2.5 w-2.5 rounded-full bg-[#febc2e]"></span>
         <span class="h-2.5 w-2.5 rounded-full bg-[#28c840]"></span>
-        <span class="ml-2 font-mono text-[11px] uppercase tracking-wider text-ink-500 dark:text-night-200">Sign a PDF in 5 seconds — no signup, no SaaS</span>
+        <span class="ml-2 font-mono text-[11px] uppercase tracking-wider text-ink-500 dark:text-night-200">The whole suite in 5 minutes — no setup</span>
       </div>
       <div class="px-4 py-3.5 font-mono text-[14px] leading-relaxed">
-        <span class="text-accent-700 dark:text-accent-300">$</span> <span class="text-ink-900 dark:text-night-50">npx @drbaher/sign-cli demo</span>
+        <div><span class="text-accent-700 dark:text-accent-300">$</span> <span class="text-ink-900 dark:text-night-50">template-vault demo</span></div>
+        <div><span class="text-accent-700 dark:text-accent-300">$</span> <span class="text-ink-900 dark:text-night-50">draft --demo</span></div>
+        <div><span class="text-accent-700 dark:text-accent-300">$</span> <span class="text-ink-900 dark:text-night-50">compare --demo</span></div>
         <div class="mt-2 text-[12px] text-ink-500 dark:text-night-200">
-          Runs the full create → send → sign → verify → receipt-bundle pipeline against the offline local PAdES signer. Then deletes everything.
+          …three more — review, convert, sign. Every demo is zero-config and cleans up after itself.
+        </div>
+        <div class="mt-3 inline-flex items-center gap-1 text-[13px] font-medium text-accent-600 transition-transform group-hover:translate-x-0.5 dark:text-accent-300">
+          Take the 5-minute tour <span aria-hidden="true">→</span>
         </div>
       </div>
-    </div>
+    </a>
   </div>
 
   <Callout label="TL;DR">
