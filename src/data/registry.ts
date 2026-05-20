@@ -31,10 +31,20 @@ const FALLBACKS: Record<string, string> = {
   'compare-cli': '0.3.0',
 };
 
-async function safeFetch(url: string, init: RequestInit = {}): Promise<Response | null> {
+// Last-resort weekly-download counts for the PyPI packages only. npm's API is
+// reliable; pypistats.org rate-limits build IPs (429), which would otherwise
+// drop these badges intermittently. These are recent real figures — refresh
+// occasionally — used only when the live pypistats fetch fails.
+const PYPI_WEEKLY_FALLBACK: Record<string, number> = {
+  'template-vault-cli': 470,
+  'nda-review-cli': 164,
+};
+
+async function safeFetch(url: string, init: RequestInit = {}, timeoutMs = 8000): Promise<Response | null> {
   try {
     const r = await fetch(url, {
       ...init,
+      signal: AbortSignal.timeout(timeoutMs),
       headers: { 'user-agent': 'drbaher-cli-site/0.4', ...(init.headers || {}) },
     });
     if (!r.ok) return null;
@@ -86,12 +96,19 @@ async function npmWeeklyDownloads(name: string): Promise<number | undefined> {
 
 // PyPI weekly downloads via pypistats.org. Same shape as npm's: returns the
 // 7-day total or undefined on any error (rate-limit, network, missing field).
+// pypistats.org rate-limits (429) shared CI/build IPs, so retry once past a
+// transient miss before giving up — otherwise the badge silently disappears.
 async function pypiWeeklyDownloads(name: string): Promise<number | undefined> {
-  const r = await safeFetch(`https://pypistats.org/api/packages/${name}/recent`);
-  if (!r) return undefined;
-  const j = await r.json();
-  const w = j?.data?.last_week;
-  return typeof w === 'number' ? w : undefined;
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const r = await safeFetch(`https://pypistats.org/api/packages/${name}/recent`);
+    if (r) {
+      const j = await r.json();
+      const w = j?.data?.last_week;
+      if (typeof w === 'number') return w;
+    }
+    if (attempt === 0) await new Promise((res) => setTimeout(res, 600));
+  }
+  return undefined;
 }
 
 async function readmeExcerpt(repo: string): Promise<{ heading?: string; excerpt?: string }> {
@@ -151,7 +168,7 @@ export async function getCliMeta(): Promise<Record<string, CliMeta>> {
           }
           if (pypi) {
             const c = await pypiWeeklyDownloads(pypi);
-            return { count: c, source: 'pypi' };
+            return { count: c ?? PYPI_WEEKLY_FALLBACK[key], source: 'pypi' };
           }
           return {};
         })(),
