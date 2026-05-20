@@ -3,5 +3,6 @@
 export const PLAYGROUND_URL =
   import.meta.env.PUBLIC_PLAYGROUND_URL || 'https://contract-ops-playground-production.up.railway.app';
 
-// Tool slugs that have an interactive playground tab (?cli=<id>).
+// Tool slugs that have a tab in the unified playground (?cli=<id>).
+// nda-review and sign aren't here — they have their own dedicated live demos.
 export const PLAYGROUND_CLIS = ['draft', 'compare', 'docx2pdf', 'template-vault'] as const;

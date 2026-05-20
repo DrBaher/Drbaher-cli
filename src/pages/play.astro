@@ -2,33 +2,57 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Callout from '../components/Callout.astro';
 import Playground from '../components/Playground.astro';
+import TryDemo from '../components/TryDemo.astro';
 ---
 <BaseLayout
   title="Playground"
   active="play"
-  description="Run the contract-ops CLIs in your browser — draft, compare, docx2pdf, and a template-vault explorer — on your own input, in a sandbox. No install, nothing stored."
+  description="Run all six contract-ops CLIs in your browser — draft, compare, docx2pdf and template-vault in one sandbox, plus nda-review and sign with their own live demos. No install, nothing stored."
 >
   <p class="eyebrow">Playground</p>
   <h1>Run the CLIs in your browser.</h1>
 
   <p class="text-lg text-ink-700 dark:text-night-100">
-    Four of the suite's tools, running on <strong>your own input</strong> in a sandbox — no install,
-    nothing stored. Switch tabs for <a href="/tools/draft-cli/">draft</a>,
-    <a href="/tools/compare-cli/">compare</a>, <a href="/tools/docx2pdf-cli/">docx2pdf</a>, and the
-    <a href="/tools/template-vault-cli/">template-vault</a> explorer.
+    Try any of the six tools on <strong>your own input</strong> — no install, nothing stored. Four
+    share one sandbox below; <a href="/tools/nda-review-cli/">nda-review</a> and
+    <a href="/tools/sign-cli/">sign</a> have their own richer live demos under it.
   </p>
 
   <Callout label="How it works">
     Each run executes the real CLI server-side with strict limits — short timeout, rate-limited,
-    a stripped environment, and ephemeral storage (your input is never kept). To see the tools
-    chained end to end, take the <a href="/tour/">5-minute tour</a>.
+    a stripped environment, ephemeral storage (your input is never kept). To see the tools chained
+    end to end, take the <a href="/tour/">5-minute tour</a>.
   </Callout>
 
+  <h2 data-reveal>draft · compare · docx2pdf · template-vault</h2>
+  <p data-reveal>One sandbox, four tabs: fill a template, gate clause drift, convert a <code class="chip">.docx</code>, or explore a seeded template vault.</p>
   <Playground height="660px" title="contract-ops playground" />
 
-  <p>
-    Two more tools have their own hosted demos: <a href="/tools/nda-review-cli/">nda-review-cli</a>
-    (paste an NDA, get a structured review) and <a href="/tools/sign-cli/">sign-cli</a> (a read-only
-    signing walkthrough).
-  </p>
+  <h2 data-reveal>nda-review</h2>
+  <p data-reveal>Paste an NDA for a structured review, or run the full draft → review → negotiate simulator. Resets every 30 minutes.</p>
+  <div class="not-prose my-4 overflow-hidden rounded-lg border border-ink-700/15 bg-night-900 shadow-[0_4px_24px_rgba(0,0,0,0.06)] dark:border-night-300/15">
+    <div class="flex items-center gap-2 border-b border-white/10 px-3 py-2">
+      <span class="h-2.5 w-2.5 rounded-full bg-[#ff5f57]"></span>
+      <span class="h-2.5 w-2.5 rounded-full bg-[#febc2e]"></span>
+      <span class="h-2.5 w-2.5 rounded-full bg-[#28c840]"></span>
+      <span class="ml-2 font-mono text-[11px] uppercase tracking-wider text-cream-50/50">nda-review-cli — live sandbox</span>
+      <a href="https://nda-review-cli-production.up.railway.app/" target="_blank" rel="noopener" class="ml-auto font-mono text-[11px] text-cream-50/60 hover:text-cream-50">open in new tab ↗</a>
+    </div>
+    <iframe
+      src="https://nda-review-cli-production.up.railway.app/"
+      title="nda-review-cli live demo"
+      loading="lazy"
+      sandbox="allow-scripts allow-same-origin allow-forms"
+      referrerpolicy="no-referrer"
+      class="h-[640px] w-full bg-white"
+    ></iframe>
+  </div>
+
+  <h2 data-reveal>sign</h2>
+  <p data-reveal>A read-only walkthrough of the offline send → sign → verify → receipt flow.</p>
+  <TryDemo
+    href="https://sign-cli-demo-production.up.railway.app/web-demo/"
+    title="See sign-cli sending a real PDF"
+    blurb="Read-only browser demo of the full send → sign → verify → receipt flow. Sandboxes reset every few hours."
+  />
 </BaseLayout>
