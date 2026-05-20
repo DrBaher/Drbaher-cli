@@ -1,4 +1,6 @@
 ---
+import SuiteMark from './SuiteMark.astro';
+
 export interface Props {
   active?: string;
 }
@@ -47,7 +49,7 @@ const sections = [
 <!-- Mobile top bar -->
 <div class="flex items-center justify-between border-b border-ink-700/10 bg-cream-50 px-5 py-3 lg:hidden dark:border-night-300/15 dark:bg-night-700">
   <a href="/" class="flex items-center gap-2 font-serif font-semibold text-ink-900 dark:text-night-50">
-    <img src="/assets/icons/contract-ops-suite.svg" alt="" width="40" height="40" class="h-10 w-10 shrink-0" />
+    <SuiteMark class="h-10 w-10 shrink-0" />
     <span class="flex flex-col leading-[1.1]">
       <span class="text-lg">contract-ops</span>
       <span class="text-sm font-medium text-ink-500 dark:text-night-200">CLI suite</span>
@@ -77,7 +79,7 @@ const sections = [
 >
   <div class="flex items-center justify-between p-5">
     <a href="/" class="flex items-center gap-2.5 font-serif font-semibold text-ink-900 dark:text-night-50">
-      <img src="/assets/icons/contract-ops-suite.svg" alt="" width="40" height="40" class="h-10 w-10 shrink-0" />
+      <SuiteMark class="h-10 w-10 shrink-0" />
       <span class="flex flex-col leading-[1.1]">
         <span class="text-lg">contract-ops</span>
         <span class="text-sm font-medium text-ink-500 dark:text-night-200">CLI suite</span>
