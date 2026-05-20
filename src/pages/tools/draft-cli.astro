@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Callout from '../../components/Callout.astro';
+import CastPlayer from '../../components/CastPlayer.astro';
 import CodeBlock from '../../components/CodeBlock.astro';
 import FreshHeader from '../../components/FreshHeader.astro';
 import JsonLd from '../../components/JsonLd.astro';
@@ -26,6 +27,7 @@ const jsonLd = {
   title="draft-cli"
   active="tools/draft-cli"
   description="Agent-first placeholder-filler for legal-document templates. Markdown + .docx round-trip, typed/computed/positional params, parties.json registry, multi-doc bundles, optional LLM inference from prose deal notes."
+  withCasts
   toc
 >
   <JsonLd data={jsonLd} />
@@ -49,6 +51,8 @@ const jsonLd = {
     <code class="chip">.docx</code> in and out for a styling-preserving round-trip. Run
     <code class="chip">--list-placeholders</code> first to see what the template needs.
   </Callout>
+
+  <CastPlayer src="/casts/draft-cli-demo.cast" title="draft --demo — placeholder fill" />
 
   <h2>What it does</h2>
 

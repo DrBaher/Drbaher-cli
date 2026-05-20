@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Callout from '../../components/Callout.astro';
+import CastPlayer from '../../components/CastPlayer.astro';
 import CodeBlock from '../../components/CodeBlock.astro';
 import FreshHeader from '../../components/FreshHeader.astro';
 import JsonLd from '../../components/JsonLd.astro';
@@ -26,6 +27,7 @@ const jsonLd = {
   title="template-vault-cli"
   active="tools/template-vault-cli"
   description="Agent-first, Git-backed, clause-aware package manager for legal-document templates. Compose by forking and swapping clauses with recorded provenance; pull upstream improvements into your forks. Stdlib-only Python."
+  withCasts
   toc
 >
   <JsonLd data={jsonLd} />
@@ -51,6 +53,8 @@ const jsonLd = {
     and <code class="chip">swap</code> work from there. It <strong>structures</strong> templates — it doesn't
     generate clause text.
   </Callout>
+
+  <CastPlayer src="/casts/template-vault-cli-demo.cast" title="template-vault demo — compose + swap" />
 
   <h2>What it does</h2>
 

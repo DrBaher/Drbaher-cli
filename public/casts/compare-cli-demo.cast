@@ -1,0 +1,4 @@
+{"version":2,"width":88,"height":20,"timestamp":1779276938,"command":"bash /tmp/rec-compare.sh","env":{"SHELL":"/bin/zsh"}}
+[0.003747, "o", "\u001b[32m$\u001b[0m compare --demo\r\n\r\n"]
+[0.464325, "o", "\u001b[1mcompare: <demo:base>  →  <demo:candidate>\u001b[0m\r\n\u001b[2m  base:      text (none), 4 clauses\u001b[0m\r\n\u001b[2m  candidate: text (none), 4 clauses\u001b[0m\r\n\r\nsummary: \u001b[31m1 substantive\u001b[0m\r\n\r\n\u001b[31m[substantive]\u001b[0m 2. Term \u001b[2m(clause 2)\u001b[0m\r\n       The term of this agreement is \u001b[31mtwo\u001b[0m\u001b[32mthree\u001b[0m \u001b[31m(2)\u001b[0m\u001b[32m(3)\u001b[0m years from the Effective Date.\r\n\r\n\u001b[31mverdict: substantive drift — DO NOT sign without review (exit 2)\u001b[0m\r\n"]
+[0.465145, "x", "2"]

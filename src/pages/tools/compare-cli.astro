@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Callout from '../../components/Callout.astro';
+import CastPlayer from '../../components/CastPlayer.astro';
 import CodeBlock from '../../components/CodeBlock.astro';
 import FreshHeader from '../../components/FreshHeader.astro';
 import JsonLd from '../../components/JsonLd.astro';
@@ -26,6 +27,7 @@ const jsonLd = {
   title="compare-cli"
   active="tools/compare-cli"
   description="Clause-aware drift detection between two contract versions. Pre-signature gate for legal teams and agent pipelines. Single-file Node CLI, deterministic by design, no LLM tier."
+  withCasts
   toc
 >
   <JsonLd data={jsonLd} />
@@ -52,6 +54,8 @@ const jsonLd = {
     cross-format. Pair with <code class="chip">--from-negotiation negotiation.json</code> to
     pull the agreed text from <a href="/tools/nda-review-cli/">nda-review-cli</a>'s state file.
   </Callout>
+
+  <CastPlayer src="/casts/compare-cli-demo.cast" title="compare --demo — drift gate" />
 
   <h2>What it does</h2>
 

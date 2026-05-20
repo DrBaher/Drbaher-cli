@@ -1,0 +1,6 @@
+{"version":2,"width":88,"height":20,"timestamp":1779276939,"command":"bash /tmp/rec-draft.sh","env":{"SHELL":"/bin/zsh"}}
+[0.004248, "o", "\u001b[32m$\u001b[0m draft --demo\r\n\r\n"]
+[0.476003, "o", "\u001b[36mdemo: substituting [Party A], [Party B], [Effective Date]\r\n\u001b[0m"]
+[0.476059, "o", "# Mutual Non-Disclosure Agreement (demo)\r\n\r\nThis Agreement is entered into on 2026-06-01 between Acme Corporation\r\nand Vendor Inc. (collectively, the \"Parties\").\r\n\r\n1. Confidentiality. Acme Corporation and Vendor Inc. agree to keep confidential\r\n   any information disclosed under this Agreement.\r\n\r\n2. Term. This Agreement remains in effect for two years from the\r\n   2026-06-01.\r\n\u001b[2m\r\nthis is what a real run looks like. try:\r\n\u001b[0m"]
+[0.476061, "o", "  draft your-template.md --party-a \"Acme\" --party-b \"Vendor\" --effective-date 2026-06-01\r\n"]
+[0.477497, "x", "0"]
