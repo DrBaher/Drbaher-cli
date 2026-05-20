@@ -66,10 +66,10 @@ This means an LLM agent can do all the operational work (sending documents, trac
 
 ## Cross-suite agent contract
 
-All six CLIs share the same contract:
+All six CLIs share the same output shape; exit-code meanings vary by CLI (see below):
 
 - **Output**: success JSON to stdout, exit `0`. Errors as `{ ok: false, error: { code, message, hint?, details? } }` to stderr, non-zero exit.
-- **Exit codes**: `0` success, `2` invalid input, `3` policy/chain/verification failed, `4` not found. (draft-cli's matrix has additional codes for vault failures and LLM errors; see its CHANGELOG. compare-cli reuses `0/2/3/4` with drift-specific semantics — match / substantive / cosmetic / moved.)
+- **Exit codes (NOT uniform — don't assume a shared meaning)**: most of the suite uses `0` success / `2` invalid input / `3` policy/chain/verification failed / `4` not found (nda-review-cli, sign-cli, docx2pdf-cli). Two differ and must be special-cased: **template-vault-cli** = `0` success / `1` failure / `2` bad usage; **compare-cli** reuses `0`–`4` as drift classes — `0` clean, `2` substantive drift, `3` cosmetic/typographic, `4` clauses moved, `1` I/O error. **draft-cli** extends the common scheme up to `5` (template-not-found / schema / LLM failures). Always check the individual CLI's AGENTS.md / exit-codes doc.
 - **Discovery**: each CLI exposes a machine-readable manifest at startup. template-vault-cli: `template-vault info <ref> --json` + `find <query> --json` (validated against schemas under `docs/spec/`). draft-cli: `draft --list-placeholders --json` (per-template schema). nda-review-cli + sign-cli: `<bin> --catalog json` (subcommand + flag inventory). compare-cli: branch on the exit code, `--json` for the structured verdict. docx2pdf-cli additionally exposes `--capabilities` (feature contract) and `--doctor` (host readiness), both schema-validated under `schemas/`. sign-cli additionally exposes `sign mcp tools` (live MCP tool catalog).
 - **Never hardcode tool counts, flag lists, or sub-command names** — call the discovery commands at startup.
 

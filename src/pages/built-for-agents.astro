@@ -352,6 +352,61 @@ sign --version`}</CodeBlock>
     other CLIs.
   </p>
 
+  <h2>Exit codes across the suite</h2>
+
+  <p>
+    Most of the suite shares <code class="chip">0</code> success / <code class="chip">2</code> invalid input /
+    <code class="chip">3</code> policy-or-verification / <code class="chip">4</code> not-found — but
+    <strong>the meanings are not uniform</strong>. Two CLIs must be special-cased: <code class="chip">compare-cli</code>
+    reuses <code class="chip">0</code>–<code class="chip">4</code> as <em>drift severities</em>, and
+    <code class="chip">template-vault-cli</code> uses a <code class="chip">0/1/2</code> scheme. Don't assume a shared
+    meaning — branch per CLI, and confirm against each tool's <code class="chip">AGENTS.md</code>.
+  </p>
+
+  <div class="not-prose my-6 overflow-x-auto rounded-lg border border-ink-700/10 dark:border-night-300/15">
+    <table class="w-full border-collapse text-[14px]">
+      <thead>
+        <tr class="border-b border-ink-700/15 bg-cream-100 dark:border-night-300/20 dark:bg-night-600">
+          <th class="px-4 py-3 text-left font-semibold text-ink-900 dark:text-night-50">CLI</th>
+          <th class="px-4 py-3 text-left font-semibold text-ink-900 dark:text-night-50">Exit codes</th>
+          <th class="px-4 py-3 text-left font-semibold text-ink-900 dark:text-night-50">Note</th>
+        </tr>
+      </thead>
+      <tbody class="text-ink-800 dark:text-night-100">
+        <tr class="border-b border-ink-700/10 dark:border-night-300/15">
+          <td class="px-4 py-3 align-top font-mono">template-vault-cli</td>
+          <td class="px-4 py-3 align-top"><code class="chip">0</code> ok · <code class="chip">1</code> failure (verify / doctor / drift) · <code class="chip">2</code> bad usage</td>
+          <td class="px-4 py-3 align-top text-amber-700 dark:text-amber-300">differs — <code class="chip">0/1/2</code></td>
+        </tr>
+        <tr class="border-b border-ink-700/10 dark:border-night-300/15">
+          <td class="px-4 py-3 align-top font-mono">draft-cli</td>
+          <td class="px-4 py-3 align-top"><code class="chip">0</code> ok · <code class="chip">1</code> not found · <code class="chip">2</code> invalid input · <code class="chip">3</code> vault · <code class="chip">4</code> schema · <code class="chip">5</code> LLM</td>
+          <td class="px-4 py-3 align-top text-ink-600 dark:text-night-200">extends the common scheme</td>
+        </tr>
+        <tr class="border-b border-ink-700/10 dark:border-night-300/15">
+          <td class="px-4 py-3 align-top font-mono">nda-review-cli</td>
+          <td class="px-4 py-3 align-top"><code class="chip">0</code> ok · <code class="chip">2</code> invalid input · <code class="chip">3</code> policy / chain / consent · <code class="chip">4</code> not found</td>
+          <td class="px-4 py-3 align-top text-ink-600 dark:text-night-200">common <code class="chip">0/2/3/4</code></td>
+        </tr>
+        <tr class="border-b border-ink-700/10 dark:border-night-300/15">
+          <td class="px-4 py-3 align-top font-mono">compare-cli</td>
+          <td class="px-4 py-3 align-top"><code class="chip">0</code> clean · <code class="chip">1</code> I/O error · <code class="chip">2</code> substantive drift · <code class="chip">3</code> cosmetic / typographic · <code class="chip">4</code> clauses moved</td>
+          <td class="px-4 py-3 align-top text-amber-700 dark:text-amber-300"><code class="chip">2/3/4</code> are drift severities, not errors</td>
+        </tr>
+        <tr class="border-b border-ink-700/10 dark:border-night-300/15">
+          <td class="px-4 py-3 align-top font-mono">docx2pdf-cli</td>
+          <td class="px-4 py-3 align-top"><code class="chip">0</code> ok · <code class="chip">2</code> bad flag / input · <code class="chip">3</code> NO_BACKEND · <code class="chip">4</code> conversion failed</td>
+          <td class="px-4 py-3 align-top text-ink-600 dark:text-night-200">common <code class="chip">0/2/3/4</code></td>
+        </tr>
+        <tr>
+          <td class="px-4 py-3 align-top font-mono">sign-cli</td>
+          <td class="px-4 py-3 align-top"><code class="chip">0</code> ok · <code class="chip">2</code> invalid input · <code class="chip">3</code> policy / chain (forbidden, tampered) · <code class="chip">4</code> not found</td>
+          <td class="px-4 py-3 align-top text-ink-600 dark:text-night-200">common <code class="chip">0/2/3/4</code></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
   <h2>See also</h2>
 
   <ul>
