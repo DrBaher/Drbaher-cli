@@ -10,14 +10,16 @@ import CodeBlock from '../components/CodeBlock.astro';
   toc
 >
   <p class="eyebrow">Agent integrations</p>
-  <h1>Built for Claude, Cursor, Codex — and anything that speaks MCP.</h1>
+  <h1>Built for Claude, Cursor, Codex, OpenClaw — and any agent that speaks MCP or runs a shell.</h1>
 
   <p class="text-lg text-ink-700 dark:text-night-100">
     The suite ships two MCP servers. <strong>sign-cli</strong> exposes 19 tools for the entire signing
     surface (create, send, sign, audit-verify, bundle-export) with the per-signer-token guardrail intact.
     <strong>compare-cli-mcp</strong> exposes three tools (<code class="chip">compare_files</code>,
     <code class="chip">compare_with_negotiation</code>, <code class="chip">compare_demo</code>) for the
-    pre-signature drift gate. Wire either or both into any MCP-aware client.
+    pre-signature drift gate. Wire either or both into any MCP-aware client — or, for a shell-running
+    agent like <a href="https://openclaw.ai/" target="_blank" rel="noopener">OpenClaw</a>, skip MCP
+    entirely and run the CLIs directly (see below).
   </p>
 
   <Callout label="One install, every client">
@@ -197,6 +199,37 @@ agent = Agent(
     <code class="chip">langchain-mcp-adapters</code> package or wrap the CLI directly. The langchain
     wrapper starter is shipped in <a href="https://github.com/DrBaher/sign-cli/tree/main/integrations"><code class="chip">integrations/</code></a>
     in the sign-cli repo.
+  </p>
+
+  <h2>OpenClaw (a shell-running agent — no MCP needed)</h2>
+
+  <p>
+    <a href="https://openclaw.ai/" target="_blank" rel="noopener">OpenClaw</a> — "the AI that actually
+    does things" — is a local agent framework with full shell access. It drives tools by running them
+    as <strong>commands</strong>, not over MCP, which is a clean fit for this suite: every CLI is a plain
+    command with a machine-readable contract, so OpenClaw drives <strong>all six</strong> directly with no
+    server to wire up. This is how the suite has been exercised end to end.
+  </p>
+
+  <p>The pattern any shell-running agent should follow:</p>
+
+  <CodeBlock>{`# 1. Discover — never hardcode flags or subcommands. Every CLI answers --catalog json:
+template-vault --catalog json   draft --catalog json   nda-review-cli --catalog json
+compare --catalog json          docx2pdf --catalog json   sign --catalog json
+
+# 2. Run with --json and branch on the exit code (see the matrix below)
+draft template.md --params deal.json --json
+compare negotiated.md ready-to-sign.pdf --json   # 0 safe · 2 substantive · 3 cosmetic · 4 moved
+
+# 3. Pipe the pre-execution chain end to end (every tool reads '-' from stdin)
+template-vault get nda/house-mutual | draft - --params deal.json \\
+  | nda-review-cli review --file - --playbook config/org-policy.json`}</CodeBlock>
+
+  <p>
+    Install OpenClaw with <code class="chip">npm i -g openclaw</code> (then <code class="chip">openclaw onboard</code>)
+    and the suite from the <a href="/install/">install page</a>; from there OpenClaw runs the CLIs like any
+    other shell tool. MCP-aware clients can additionally use sign-cli's and compare-cli's MCP servers
+    (above) — OpenClaw doesn't need them.
   </p>
 
   <h2>HTTP / non-MCP clients</h2>
@@ -411,6 +444,7 @@ sign --version`}</CodeBlock>
 
   <ul>
     <li><a href="/mcp/">MCP guide</a> — full tool surface and read-only walkthrough.</li>
+    <li><a href="https://openclaw.ai/" target="_blank" rel="noopener">OpenClaw</a> — the shell-running agent the suite has been tested with; runs the CLIs directly, no MCP.</li>
     <li><a href="https://github.com/DrBaher/template-vault-cli/blob/main/docs/INTEROP.md">template-vault-cli docs/INTEROP.md</a> — the suite's storage/output contract and shared LLM config.</li>
     <li><a href="https://github.com/DrBaher/draft-cli/blob/main/AGENTS.md">draft-cli AGENTS.md</a> — agent quickstart for the templated-drafting flow.</li>
     <li><a href="https://github.com/DrBaher/compare-cli/blob/main/AGENTS.md">compare-cli AGENTS.md</a> — agent quickstart for the drift-gate flow (exit-code contract).</li>
