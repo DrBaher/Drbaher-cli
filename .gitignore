@@ -29,3 +29,7 @@ pnpm-debug.log*
 # Vercel
 .vercel
 /launch/
+
+# stray sign-cli demo databases (created by `sign` runs while recording casts)
+data/
+**/sign.db
