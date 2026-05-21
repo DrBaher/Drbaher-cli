@@ -15,7 +15,7 @@ export async function GET(context: APIContext) {
       title: entry.data.title,
       pubDate: entry.data.date,
       description: entry.data.summary,
-      link: `/changelog/#${entry.slug}`,
+      link: `/changelog/#${entry.id}`,
       categories: [entry.data.cli, ...entry.data.tags],
     })),
     customData: '<language>en-us</language>',

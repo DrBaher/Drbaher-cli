@@ -1,5 +1,4 @@
 import { defineConfig } from 'astro/config';
-import tailwind from '@astrojs/tailwind';
 import sitemap from '@astrojs/sitemap';
 import rehypeSlug from 'rehype-slug';
 import rehypeAutolinkHeadings from 'rehype-autolink-headings';
@@ -9,7 +8,6 @@ import remarkCliLinks from './src/plugins/remark-cli-links.js';
 export default defineConfig({
   site: 'https://cli.drbaher.com',
   integrations: [
-    tailwind(),
     sitemap({
       filter: (page) => !page.includes('/og/'),
     }),
