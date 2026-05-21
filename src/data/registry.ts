@@ -172,7 +172,7 @@ export async function getCliMeta(): Promise<Record<string, CliMeta>> {
           }
           return {};
         })(),
-        repo ? readmeExcerpt(repo) : Promise.resolve({}),
+        repo ? readmeExcerpt(repo) : Promise.resolve<{ heading?: string; excerpt?: string }>({}),
       ]);
 
       out[key] = {

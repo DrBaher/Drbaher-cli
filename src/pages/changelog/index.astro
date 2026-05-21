@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getCollection } from 'astro:content';
+import { getCollection, render } from 'astro:content';
 
 const entries = (await getCollection('changelog')).sort(
   (a, b) => b.data.date.getTime() - a.data.date.getTime(),
@@ -31,7 +31,7 @@ function fmt(d: Date) {
 
   <ol class="not-prose mt-8 space-y-8">
     {entries.map(async (entry) => {
-      const { Content } = await entry.render();
+      const { Content } = await render(entry);
       const colorCls = cliColor[entry.data.cli] ?? cliColor.site;
       return (
         <li class="border-l-2 border-ink-700/15 pl-6 dark:border-night-300/20">
