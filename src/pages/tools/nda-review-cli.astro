@@ -4,6 +4,7 @@ import Callout from '../../components/Callout.astro';
 import CodeBlock from '../../components/CodeBlock.astro';
 import CastPlayer from '../../components/CastPlayer.astro';
 import TryDemo from '../../components/TryDemo.astro';
+import Playground from '../../components/Playground.astro';
 import FreshHeader from '../../components/FreshHeader.astro';
 import JsonLd from '../../components/JsonLd.astro';
 import { getCliMeta } from '../../data/registry';
@@ -52,26 +53,9 @@ const jsonLd = {
 
   <CastPlayer src="/casts/nda-review-quickstart.cast" title="nda-review-cli — quickstart + review" />
 
-  <h2>Try it without installing</h2>
-  <p>The full draft / review / simulator demo runs in a sandbox below — no install, no signup. Reset every 30 minutes.</p>
-
-  <div class="not-prose my-4 overflow-hidden rounded-lg border border-ink-700/15 bg-night-900 shadow-[0_4px_24px_rgba(0,0,0,0.06)] dark:border-night-300/15">
-    <div class="flex items-center gap-2 border-b border-white/10 px-3 py-2">
-      <span class="h-2.5 w-2.5 rounded-full bg-[#ff5f57]"></span>
-      <span class="h-2.5 w-2.5 rounded-full bg-[#febc2e]"></span>
-      <span class="h-2.5 w-2.5 rounded-full bg-[#28c840]"></span>
-      <span class="ml-2 font-mono text-[11px] uppercase tracking-wider text-cream-50/50">nda-review-cli — live sandbox</span>
-      <a href="https://nda-review-cli-production.up.railway.app/" target="_blank" rel="noopener" class="ml-auto font-mono text-[11px] text-cream-50/60 hover:text-cream-50">open in new tab ↗</a>
-    </div>
-    <iframe
-      src="https://nda-review-cli-production.up.railway.app/"
-      title="nda-review-cli live demo"
-      loading="lazy"
-      sandbox="allow-scripts allow-same-origin allow-forms"
-      referrerpolicy="no-referrer"
-      class="h-[640px] w-full bg-white"
-    ></iframe>
-  </div>
+  <h2>Try it live</h2>
+  <p>Paste an NDA and score it against a house policy book — real findings, no install, no signup. The review tab runs the actual CLI in a sandbox; load the example that <em>fails</em> the policy to see it flag every clause.</p>
+  <Playground cli="nda-review" title="nda-review playground" />
 
   <h2>What it does</h2>
 

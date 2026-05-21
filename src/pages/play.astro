@@ -7,15 +7,15 @@ import TryDemo from '../components/TryDemo.astro';
 <BaseLayout
   title="Playground"
   active="play"
-  description="Run all six contract-ops CLIs in your browser — draft, compare, docx2pdf and template-vault in one sandbox, plus nda-review and sign with their own live demos. No install, nothing stored."
+  description="Run all six contract-ops CLIs in your browser — one sandbox, real templates and a house policy book, no install, nothing stored."
 >
   <p class="eyebrow">Playground</p>
   <h1>Run the CLIs in your browser.</h1>
 
   <p class="text-lg text-ink-700 dark:text-night-100">
-    Try any of the six tools on <strong>your own input</strong> — no install, nothing stored. Four
-    share one sandbox below; <a href="/tools/nda-review-cli/">nda-review</a> and
-    <a href="/tools/sign-cli/">sign</a> have their own richer live demos under it.
+    Try any of the six tools on <strong>your own input</strong> — no install, nothing stored. All six
+    run in the sandbox below on a realistic corpus; <a href="/tools/sign-cli/">sign</a> also has a
+    richer guided web-demo under it.
   </p>
 
   <Callout label="How it works">
@@ -24,31 +24,11 @@ import TryDemo from '../components/TryDemo.astro';
     end to end, take the <a href="/tour/">5-minute tour</a>.
   </Callout>
 
-  <h2 data-reveal>draft · compare · docx2pdf · template-vault</h2>
-  <p data-reveal>One sandbox, four tabs: fill a template, gate clause drift, convert a <code class="chip">.docx</code>, or explore a seeded template vault.</p>
+  <h2 data-reveal>All six CLIs, one sandbox</h2>
+  <p data-reveal>Six tabs plus a guided full-pipeline: fill real templates, gate clause drift, convert a <code class="chip">.docx</code>, explore a seeded multi-category vault, review an NDA against a house policy book, and sign offline.</p>
   <Playground height="660px" title="contract-ops playground" />
 
-  <h2 data-reveal>nda-review</h2>
-  <p data-reveal>Paste an NDA for a structured review, or run the full draft → review → negotiate simulator. Resets every 30 minutes.</p>
-  <div class="not-prose my-4 overflow-hidden rounded-lg border border-ink-700/15 bg-night-900 shadow-[0_4px_24px_rgba(0,0,0,0.06)] dark:border-night-300/15">
-    <div class="flex items-center gap-2 border-b border-white/10 px-3 py-2">
-      <span class="h-2.5 w-2.5 rounded-full bg-[#ff5f57]"></span>
-      <span class="h-2.5 w-2.5 rounded-full bg-[#febc2e]"></span>
-      <span class="h-2.5 w-2.5 rounded-full bg-[#28c840]"></span>
-      <span class="ml-2 font-mono text-[11px] uppercase tracking-wider text-cream-50/50">nda-review-cli — live sandbox</span>
-      <a href="https://nda-review-cli-production.up.railway.app/" target="_blank" rel="noopener" class="ml-auto font-mono text-[11px] text-cream-50/60 hover:text-cream-50">open in new tab ↗</a>
-    </div>
-    <iframe
-      src="https://nda-review-cli-production.up.railway.app/"
-      title="nda-review-cli live demo"
-      loading="lazy"
-      sandbox="allow-scripts allow-same-origin allow-forms"
-      referrerpolicy="no-referrer"
-      class="h-[640px] w-full bg-white"
-    ></iframe>
-  </div>
-
-  <h2 data-reveal>sign</h2>
+  <h2 data-reveal>sign — guided web-demo</h2>
   <p data-reveal>A read-only walkthrough of the offline send → sign → verify → receipt flow.</p>
   <TryDemo
     href="https://sign-cli-demo-production.up.railway.app/web-demo/"
