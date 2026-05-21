@@ -190,6 +190,12 @@
   .hero-band {
     @apply -mx-5 mb-8 rounded-none bg-gradient-to-br from-mint-50 via-cream-50 to-cream-100 px-5 py-8 sm:mx-0 sm:rounded-xl sm:px-8 sm:py-10;
   }
+  /* The hero is .not-prose, so its <h1> misses prose's size. Match the 2.5rem
+     prose <h1> used on every other page so headings are consistent suite-wide. */
+  .hero-band h1 {
+    font-size: 2.5rem;
+    line-height: 1.15;
+  }
   .dark .hero-band {
     @apply bg-gradient-to-br from-night-600 via-night-700 to-night-800;
   }
