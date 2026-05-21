@@ -3,7 +3,6 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Callout from '../../components/Callout.astro';
 import CodeBlock from '../../components/CodeBlock.astro';
 import CastPlayer from '../../components/CastPlayer.astro';
-import TryDemo from '../../components/TryDemo.astro';
 import Playground from '../../components/Playground.astro';
 import FreshHeader from '../../components/FreshHeader.astro';
 import JsonLd from '../../components/JsonLd.astro';
@@ -36,7 +35,7 @@ const jsonLd = {
   <p class="eyebrow">Tool · Python</p>
   <h1 class="flex items-center gap-4">
     <img src="/assets/icons/nda-review-cli.svg" alt="" class="h-12 w-12" />
-    <span class="font-mono">nda-review-cli</span>
+    <span class="font-serif">nda-review-cli</span>
   </h1>
   <FreshHeader name="nda-review-cli" version={meta.version} source={meta.source} fetchedAt={meta.fetchedAt} stars={meta.stars} weeklyDownloads={meta.weeklyDownloads} weeklyDownloadsSource={meta.weeklyDownloadsSource} github="https://github.com/DrBaher/nda-review-cli" />
   <p class="text-lg text-ink-700 dark:text-night-100">
