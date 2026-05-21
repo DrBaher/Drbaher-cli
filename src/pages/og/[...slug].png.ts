@@ -26,6 +26,11 @@ const pages: Record<string, Page> = {
     title: 'Six CLIs for the contract workflow',
     description: 'template-vault-cli · draft-cli · nda-review-cli · compare-cli · docx2pdf-cli · sign-cli. Local-first, deterministic, no SaaS.',
   },
+  'build-a-cli': {
+    eyebrow: 'Contributing',
+    title: 'Build a CLI for the suite',
+    description: 'The playbook for adding a new CLI to contract-ops — the --catalog discovery contract, AGENTS/README conventions, packaging, pipeline interop, and the integration checklist.',
+  },
   workflow: {
     eyebrow: 'The workflow',
     title: 'From a versioned template to a signed agreement',
