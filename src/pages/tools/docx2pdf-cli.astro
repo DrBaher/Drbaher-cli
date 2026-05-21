@@ -66,7 +66,7 @@ const jsonLd = {
     <li><strong>Network retries.</strong> <code class="chip">--retries N</code> on the network backends (<code class="chip">gotenberg</code>, <code class="chip">convertapi</code>) retries transient failures with a non-busy backoff.</li>
     <li><strong>Font validation.</strong> <code class="chip">--check-fonts</code> verifies the document's referenced fonts are present before converting, so you don't get silent substitutions in the rendered PDF.</li>
     <li><strong>Backend transparency.</strong> <code class="chip">--why</code> prints the full selection decision tree — no opaque "auto" mode that silently picks a low-fidelity fallback.</li>
-    <li><strong>Honest failure.</strong> Structured error envelopes carry an optional <code>kind</code> (e.g. <code>NO_BACKEND</code>) so library callers branch on error type, not message text. Non-zero exits; nothing gets quietly mangled.</li>
+    <li><strong>Honest failure.</strong> Distinct exit codes per class (<code>2</code> usage · <code>3</code> no backend · <code>4</code> conversion failed); the <code class="chip">--json</code> failure object is flat (<code>error</code> is a string). Branch on the exit code — nothing gets quietly mangled.</li>
   </ul>
 
   <h2>Quickstart</h2>

@@ -26,7 +26,7 @@
 [0.9600000000000003, "o", "r"]
 [1.0000000000000002, "o", "t"]
 [1.1000000000000003, "o", "\r\n"]
-[1.5000000000000004, "o", "\u001b[1mnda-review-cli quickstart — 16 questions, ~3 minutes\u001b[0m\r\n"]
+[1.5000000000000004, "o", "\u001b[1mnda-review-cli quickstart — 14 questions, ~3 minutes\u001b[0m\r\n"]
 [1.8000000000000005, "o", "\u001b[2mWrites config/org-policy.json. Skip any answer with Enter.\u001b[0m\r\n"]
 [2.3000000000000007, "o", "\u001b[36m[1/16]\u001b[0m Your organization name?\r\n"]
 [2.6000000000000005, "o", "      → "]
