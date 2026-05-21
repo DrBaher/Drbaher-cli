@@ -3,7 +3,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Callout from '../../components/Callout.astro';
 import CodeBlock from '../../components/CodeBlock.astro';
 import CastPlayer from '../../components/CastPlayer.astro';
-import TryDemo from '../../components/TryDemo.astro';
+import Playground from '../../components/Playground.astro';
 import FreshHeader from '../../components/FreshHeader.astro';
 import JsonLd from '../../components/JsonLd.astro';
 import { getCliMeta } from '../../data/registry';
@@ -55,11 +55,9 @@ const jsonLd = {
 
   <CastPlayer src="/casts/sign-cli-demo.cast" title="sign-cli — offline demo flow" />
 
-  <TryDemo
-    href="https://sign-cli-demo-production.up.railway.app/web-demo/"
-    title="See sign-cli sending a real PDF"
-    blurb="Read-only browser demo of the full send → sign → verify → receipt flow. Sandboxes reset every few hours."
-  />
+  <h2>Try it live</h2>
+  <p>Run the offline lifecycle, browse the tokenized signer inbox, inspect a request, or verify the tamper-evident audit chain — in a sandbox, no install.</p>
+  <Playground cli="sign" title="sign playground" />
 
   <h2>What it does</h2>
 

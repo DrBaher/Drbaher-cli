@@ -2,7 +2,6 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Callout from '../components/Callout.astro';
 import Playground from '../components/Playground.astro';
-import TryDemo from '../components/TryDemo.astro';
 ---
 <BaseLayout
   title="Playground"
@@ -14,8 +13,7 @@ import TryDemo from '../components/TryDemo.astro';
 
   <p class="text-lg text-ink-700 dark:text-night-100">
     Try any of the six tools on <strong>your own input</strong> — no install, nothing stored. All six
-    run in the sandbox below on a realistic corpus; <a href="/tools/sign-cli/">sign</a> also has a
-    richer guided web-demo under it.
+    run in the sandbox below on a realistic corpus, from filling templates to verifying signatures.
   </p>
 
   <Callout label="How it works">
@@ -27,12 +25,4 @@ import TryDemo from '../components/TryDemo.astro';
   <h2 data-reveal>All six CLIs, one sandbox</h2>
   <p data-reveal>Six tabs plus a guided full-pipeline: fill real templates, gate clause drift, convert a <code class="chip">.docx</code>, explore a seeded multi-category vault, review an NDA against a house policy book, and sign offline.</p>
   <Playground height="660px" title="contract-ops playground" />
-
-  <h2 data-reveal>sign — guided web-demo</h2>
-  <p data-reveal>A read-only walkthrough of the offline send → sign → verify → receipt flow.</p>
-  <TryDemo
-    href="https://sign-cli-demo-production.up.railway.app/web-demo/"
-    title="See sign-cli sending a real PDF"
-    blurb="Read-only browser demo of the full send → sign → verify → receipt flow. Sandboxes reset every few hours."
-  />
 </BaseLayout>
