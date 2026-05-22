@@ -26,7 +26,7 @@ const jsonLd = {
 <BaseLayout
   title="contract-vault-cli"
   active="tools/contract-vault-cli"
-  description="Post-signature management layer of the contract-ops suite: register signed contracts, then surface renewals, notice deadlines, and obligations (ics/json/csv). Git-backed, stdlib-only Python."
+  description="A git-backed register for signed contracts: register executed deals, then surface renewals, notice deadlines, recurring obligations, and reminders as a searchable portfolio and an .ics calendar. Local-first, stdlib-only Python."
   toc
 >
   <JsonLd data={jsonLd} />
@@ -37,16 +37,20 @@ const jsonLd = {
   </h1>
   <FreshHeader name="contract-vault-cli" version={meta.version} source={meta.source} fetchedAt={meta.fetchedAt} stars={meta.stars} weeklyDownloads={meta.weeklyDownloads} github="https://github.com/DrBaher/contract-vault-cli" />
   <p class="text-lg text-ink-700 dark:text-night-100">
-    The suite's <strong>post-signature ("manage-out") layer</strong>. The pipeline ends at
-    <a href="/tools/sign-cli/">sign-cli</a> with an executed agreement — and that's exactly when the
-    real obligations begin. <code class="chip">contract-vault</code> registers each signed contract in a
-    git-backed vault and then surfaces what you'd otherwise miss: auto-renewal <strong>notice
-    deadlines</strong>, expirations, payment dates, and obligations — as a queryable portfolio and an
-    <code class="chip">.ics</code> calendar feed. It's the natural sibling of
-    <a href="/tools/template-vault-cli/">template-vault</a>: template-vault stores the <em>blanks</em>
-    (clauses, variables); contract-vault stores the <em>signed instances</em>. Every field keeps the
-    suite's <code class="chip">confidence</code> / <code class="chip">source</code> envelope, so you
-    always know what came from extraction vs. a human's <code class="chip">accept</code>.
+    A git-backed register for your <strong>signed</strong> contracts — so a renewal, notice deadline,
+    or obligation never slips. <code class="chip">contract-vault</code> registers each executed deal in a
+    plain git repo, then surfaces what you'd otherwise miss: auto-renewal <strong>notice deadlines</strong>,
+    expirations, payment dates, and <strong>recurring obligations</strong> — as a queryable portfolio, an
+    <code class="chip">.ics</code> calendar, and a <strong>reminder digest</strong> for cron or an agent.
+    Every field keeps a <code class="chip">confidence</code> and a <code class="chip">source</code>, and a
+    human <code class="chip">accept</code> promotes a checked field to <code class="chip">manual</code>.
+    Local-first, single-file, stdlib-only.
+  </p>
+  <p class="text-ink-700 dark:text-night-100">
+    It works standalone — and also composes with the contract-ops suite as the <strong>post-signature
+    ("manage-out") end</strong>: it ingests <a href="/tools/extract-cli/">extract-cli</a> output and is the
+    sibling of <a href="/tools/template-vault-cli/">template-vault</a> (template-vault stores the blank
+    templates; contract-vault stores the signed instances).
   </p>
 
   <Callout label="TL;DR">
@@ -65,7 +69,9 @@ const jsonLd = {
 
   <ul>
     <li><strong>Registers signed contracts</strong> from <a href="/tools/extract-cli/">extract-cli</a> output — <code class="chip">extract doc.pdf | contract-vault ingest -</code>, or <code class="chip">ingest</code> shells out to <code class="chip">extract</code> directly. Each deal is a committed record in a plain git repo (no DB, no daemon).</li>
-    <li><strong>Surfaces deadlines as a calendar.</strong> <code class="chip">due</code> / <code class="chip">obligations</code> project upcoming auto-renewal notices, expirations, and payment dates within a window (<code class="chip">--within 90d</code>) and emit a valid RFC 5545 <code class="chip">.ics</code> feed you can subscribe to.</li>
+    <li><strong>Surfaces deadlines as a calendar.</strong> <code class="chip">due</code> / <code class="chip">obligations</code> project upcoming auto-renewal notices, expirations, and payment dates within a window (<code class="chip">--within 90d</code>) and emit a valid RFC 5545 <code class="chip">.ics</code> feed. They're <strong>status-aware</strong> — only <em>open</em> obligations by default, so completing one drops it from the calendar.</li>
+    <li><strong>Obligation lifecycle.</strong> <code class="chip">obligation &lt;deal&gt; &lt;id&gt;</code> marks an obligation <code class="chip">done</code>/<code class="chip">waived</code>, assigns an <code class="chip">--owner</code>, or makes it <strong>recur</strong> (<code class="chip">weekly</code> / <code class="chip">monthly</code> / <code class="chip">quarterly</code> / <code class="chip">semiannual</code>). Lifecycle survives a re-ingest/recompute (carried forward by id).</li>
+    <li><strong>Reminders for cron &amp; agents.</strong> <code class="chip">remind</code> is a digest of obligations whose reminder window is open right now; <code class="chip">config reminders</code> sets corpus-wide default lead-times once (e.g. <code class="chip">30,7</code> days). A bundled scheduling guide shows how to run it from cron.</li>
     <li><strong>Renewal-exposure gate.</strong> <code class="chip">risk</code> / <code class="chip">at-risk</code> flags <em>missed</em> notice deadlines (CRITICAL when the contract auto-renews) and imminent ones; <code class="chip">--strict</code> exits non-zero for CI.</li>
     <li><strong>Portfolio queries.</strong> <code class="chip">find</code> by counterparty, governing law, currency, value threshold, expiry, or auto-renew; <code class="chip">stats</code> for a portfolio dashboard; <code class="chip">export</code> to <code class="chip">csv</code> / <code class="chip">md</code> / <code class="chip">json</code> for finance and legal.</li>
     <li><strong>Human-in-the-loop review.</strong> <code class="chip">review</code> lists unidentified / LLM-derived / low-confidence fields; <code class="chip">accept</code> promotes a checked field to <code class="chip">source: manual</code> (single or bulk <code class="chip">--from</code>), and <code class="chip">history</code> shows the git trail of every ingest + accept.</li>
@@ -84,7 +90,11 @@ contract-vault demo
 mkdir my-vault && cd my-vault
 contract-vault init
 extract ~/contracts/acme-msa.pdf | contract-vault ingest -
-contract-vault due --within 90d --format ics > deadlines.ics`}</CodeBlock>
+contract-vault due --within 90d --format ics > deadlines.ics
+
+# Assign an owner + reminder lead-times to an obligation, then run the reminder digest
+contract-vault obligation acme-corporation/master-services-agreement 1 --owner "Finance" --reminders 30,7
+contract-vault remind --json        # what's due to nudge right now — wire into cron`}</CodeBlock>
 
   <h2>For agents and automation</h2>
 
@@ -101,7 +111,8 @@ contract-vault due --within 90d --format ics > deadlines.ics`}</CodeBlock>
 
   <CodeBlock label="recommended agent defaults">{`contract-vault --catalog json                                  # discover commands/flags
 contract-vault find --auto-renew --value-gt 50000 --json       # portfolio query
-contract-vault risk --within 30d --strict --json               # CI renewal-exposure gate`}</CodeBlock>
+contract-vault risk --within 30d --strict --json               # CI renewal-exposure gate
+contract-vault remind --json                                   # reminder digest (run from cron)`}</CodeBlock>
 
   <p>
     Stored records conform to committed JSON Schemas under
