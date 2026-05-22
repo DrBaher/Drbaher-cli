@@ -1,56 +1,64 @@
 ---
-// Animated SVG workflow diagram. Eight steps — one per CLI — with traveling
-// dots that flow across the arrows in sequence (handoff metaphor). Pure SVG
-// SMIL — no JS, works in static export, respects prefers-reduced-motion via CSS.
-// Geometry is derived from `steps` so the layout stays correct as the suite grows.
+// Animated workflow diagram for the eight-CLI suite.
+//   • Tablet / desktop: two "floors" (4×2, serpentine) — pure SVG SMIL relay.
+//   • Phone (< sm): a vertical stack of full-width step cards — stays legible
+//     on narrow screens where eight boxes across would be unreadable.
+// Both views are generated from one `steps` array. Respects prefers-reduced-motion.
 const steps = [
-  { cli: 'extract-cli',        verb: 'ingest',  out: 'structured JSON', role: 'any contract' },
-  { cli: 'template-vault-cli', verb: 'store',   out: 'versioned template', role: 'your vault' },
-  { cli: 'draft-cli',          verb: 'draft',   out: '.md / .docx',     role: 'your template' },
-  { cli: 'nda-review-cli',     verb: 'review',  out: 'agreed text',     role: 'your policy' },
-  { cli: 'compare-cli',        verb: 'compare', out: 'drift verdict',   role: 'pre-sign gate' },
-  { cli: 'docx2pdf-cli',       verb: 'convert', out: '.pdf',            role: 'hybrid backend' },
-  { cli: 'sign-cli',           verb: 'sign',    out: 'signed.pdf + audit', role: 'hash-chained' },
-  { cli: 'contract-vault-cli', verb: 'manage',  out: 'renewals + deadlines', role: 'signed register' },
+  { cli: 'extract-cli',        verb: 'ingest' },
+  { cli: 'template-vault-cli', verb: 'store' },
+  { cli: 'draft-cli',          verb: 'draft' },
+  { cli: 'nda-review-cli',     verb: 'review' },
+  { cli: 'compare-cli',        verb: 'compare' },
+  { cli: 'docx2pdf-cli',       verb: 'convert' },
+  { cli: 'sign-cli',           verb: 'sign' },
+  { cli: 'contract-vault-cli', verb: 'manage' },
 ];
 
-const X0 = 12;          // left edge of the first box
-const BW = 116;         // box width
-const BH = 64;          // box height
-const GAP = 14;         // gap between boxes
-const PITCH = BW + GAP; // 130
-const BY = 60;          // box top
-const W = X0 * 2 + steps.length * BW + (steps.length - 1) * GAP; // 920 for 7
+const BW = 116, BH = 56, GAP = 16, PITCH = BW + GAP;   // 132
+const X0 = 12, COLS = 4;
+const W = X0 * 2 + COLS * BW + (COLS - 1) * GAP;        // 536 — keep max-w literal in sync
+const ROW_Y = [44, 150];                                // box tops for the two floors
+const FRAME_H = ROW_Y[1] + BH + 18;                     // 224
+const colX = (c: number) => X0 + c * PITCH;
 
-const boxes = steps.map((s, i) => {
-  const x = X0 + i * PITCH;
-  return { ...s, x, cx: x + BW / 2 };
+interface Box { cli: string; verb: string; x: number; y: number; cx: number; cy: number; }
+const boxes: Box[] = steps.map((s, i) => {
+  const floor = i < 4 ? 0 : 1;
+  const col = floor === 0 ? i : 7 - i;   // bottom floor runs right→left (a clean U-turn)
+  const x = colX(col), y = ROW_Y[floor];
+  return { ...s, x, y, cx: x + BW / 2, cy: y + BH / 2 };
 });
-// One arrow per transition (between consecutive boxes), reused as the dot's motion path.
-const arrows = boxes.slice(0, -1).map((b, i) => ({
-  id: `flow${i}`,
-  x1: b.x + BW + 2,
-  x2: b.x + PITCH - 2,
-  begin: i * 2,
-}));
-const DUR = (arrows.length + 1) * 2; // staggered relay over the full cycle
-const encW = W - 12;
-const lineX2 = X0 + (steps.length - 1) * PITCH + BW;
+
+interface Arrow { id: string; d: string; begin: number; }
+const arrows: Arrow[] = [];
+for (let i = 0; i < steps.length - 1; i++) {
+  const a = boxes[i], b = boxes[i + 1];
+  let d: string;
+  if (a.y === b.y) {
+    d = b.x > a.x
+      ? `M${a.x + BW + 2} ${a.cy} L${b.x - 2} ${b.cy}`     // top floor: left → right
+      : `M${a.x - 2} ${a.cy} L${b.x + BW + 2} ${b.cy}`;     // bottom floor: right → left
+  } else {
+    d = `M${a.cx} ${a.y + BH + 2} L${b.cx} ${b.y - 2}`;     // floor connector: down
+  }
+  arrows.push({ id: `flow${i}`, d, begin: i * 2 });
+}
+const DUR = steps.length * 2;  // staggered relay over the full cycle
 ---
-<div class="not-prose my-8 overflow-x-auto rounded-lg border border-ink-700/10 bg-white p-5 dark:border-night-300/15 dark:bg-night-600">
-  <!-- max-w must be a literal for Tailwind's scanner; keep in sync with W (8 steps → 1050). -->
-  <svg viewBox={`0 0 ${W} 220`} class="mx-auto block h-auto w-full max-w-[1050px]" role="img" aria-label="Contract workflow: ingest any contract, store a template, draft, review, compare for drift, convert to PDF, sign, then manage renewals and deadlines">
+<div class="not-prose my-8 rounded-lg border border-ink-700/10 bg-white p-5 dark:border-night-300/15 dark:bg-night-600">
+  <!-- Tablet / desktop: two floors. max-w is literal for Tailwind's scanner; keep in sync with W. -->
+  <svg viewBox={`0 0 ${W} ${FRAME_H + 6}`} class="mx-auto hidden h-auto w-full max-w-[536px] sm:block" role="img"
+       aria-label="Contract workflow in two rows: ingest, store, draft, review; then compare, convert, sign, manage — all on your machine">
     <defs>
       <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
         <path d="M 0 0 L 10 5 L 0 10 z" class="fill-ink-500 dark:fill-night-200"/>
       </marker>
       <linearGradient id="boxGrad" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#fdfcf9"/>
-        <stop offset="100%" stop-color="#faf8f3"/>
+        <stop offset="0%" stop-color="#fdfcf9"/><stop offset="100%" stop-color="#faf8f3"/>
       </linearGradient>
       <linearGradient id="boxGradDark" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#1c1916"/>
-        <stop offset="100%" stop-color="#15120f"/>
+        <stop offset="0%" stop-color="#1c1916"/><stop offset="100%" stop-color="#15120f"/>
       </linearGradient>
       <radialGradient id="dotGrad">
         <stop offset="0%" stop-color="#3d9a78" stop-opacity="1"/>
@@ -59,49 +67,50 @@ const lineX2 = X0 + (steps.length - 1) * PITCH + BW;
       </radialGradient>
     </defs>
 
-    <!-- "your machine" enclosing box -->
-    <rect x="6" y="6" width={encW} height="208" rx="10" fill="none" class="stroke-accent-200 dark:stroke-accent-700/40" stroke-width="1" stroke-dasharray="4 4"/>
-    <text x="20" y="24" font-family="Inter, sans-serif" font-size="11" font-weight="600" letter-spacing="0.14em" class="fill-accent-700 dark:fill-accent-300">YOUR MACHINE · NO SAAS · NO TELEMETRY</text>
+    <rect x="6" y="6" width={W - 12} height={FRAME_H} rx="10" fill="none" class="stroke-accent-200 dark:stroke-accent-700/40" stroke-width="1" stroke-dasharray="4 4"/>
+    <text x="20" y="26" font-family="Inter, sans-serif" font-size="11" font-weight="600" letter-spacing="0.14em" class="fill-accent-700 dark:fill-accent-300">YOUR MACHINE · NO SAAS · NO TELEMETRY</text>
 
-    <!-- Step boxes — same look in light, swapped fill in dark via class -->
+    {arrows.map((a) => (
+      <path id={a.id} d={a.d} class="stroke-ink-500 dark:stroke-night-200" stroke-width="1.4" fill="none" marker-end="url(#arrow)"/>
+    ))}
+
     {boxes.map((b) => (
       <g class="step-box">
-        <rect x={b.x} y={BY} width={BW} height={BH} rx="6" fill="url(#boxGrad)" class="dark:[fill:url(#boxGradDark)] stroke-accent-200 dark:stroke-accent-700/40"/>
-        <text x={b.cx} y="84" font-family="JetBrains Mono, monospace" font-size="10" text-anchor="middle" font-weight="600" class="fill-accent-700 dark:fill-accent-300">{b.cli}</text>
-        <text x={b.cx} y="105" font-family="Inter, sans-serif" font-size="13" text-anchor="middle" font-weight="600" class="fill-ink-900 dark:fill-night-50">{b.verb}</text>
+        <rect x={b.x} y={b.y} width={BW} height={BH} rx="6" fill="url(#boxGrad)" class="dark:[fill:url(#boxGradDark)] stroke-accent-200 dark:stroke-accent-700/40"/>
+        <text x={b.cx} y={b.y + 22} font-family="JetBrains Mono, monospace" font-size="9.5" text-anchor="middle" font-weight="600" class="fill-accent-700 dark:fill-accent-300">{b.cli}</text>
+        <text x={b.cx} y={b.y + 42} font-family="Inter, sans-serif" font-size="13" text-anchor="middle" font-weight="600" class="fill-ink-900 dark:fill-night-50">{b.verb}</text>
       </g>
     ))}
 
-    <!-- Arrow paths (also used as motion paths for the traveling dots) -->
-    {arrows.map((a) => (
-      <path id={a.id} d={`M${a.x1} 92 L${a.x2} 92`} class="stroke-ink-500 dark:stroke-night-200" stroke-width="1.4" fill="none" marker-end="url(#arrow)"/>
-    ))}
-
-    <!-- Traveling dots — one per arrow, staggered begin times so it reads as a relay -->
     {arrows.map((a) => (
       <circle r="4.5" fill="url(#dotGrad)" class="flow-dot">
-        <animateMotion dur={`${DUR}s`} repeatCount="indefinite" begin={`${a.begin}s`} rotate="auto">
-          <mpath href={`#${a.id}`}/>
-        </animateMotion>
+        <animateMotion dur={`${DUR}s`} repeatCount="indefinite" begin={`${a.begin}s`} rotate="auto"><mpath href={`#${a.id}`}/></animateMotion>
         <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.05;0.95;1" dur={`${DUR}s`} repeatCount="indefinite" begin={`${a.begin}s`}/>
       </circle>
     ))}
-
-    <!-- Output labels under each box -->
-    {boxes.map((b) => (
-      <text x={b.cx} y="148" font-family="Inter, sans-serif" font-size="11" text-anchor="middle" class="fill-ink-600 dark:fill-night-200">{b.out}</text>
-    ))}
-
-    <!-- Bottom strip with role labels -->
-    <line x1={X0} y1="170" x2={lineX2} y2="170" class="stroke-accent-100 dark:stroke-accent-700/30" stroke-width="1"/>
-    {boxes.map((b) => (
-      <text x={b.cx} y="190" font-family="Inter, sans-serif" font-size="11" text-anchor="middle" class="fill-ink-600 dark:fill-night-200">{b.role}</text>
-    ))}
   </svg>
+
+  <!-- Phone: vertical stack of full-width step cards -->
+  <div class="flex flex-col sm:hidden">
+    {steps.map((s, i) => (
+      <>
+        <div class="flex items-center justify-between rounded-md border border-accent-200 bg-cream-50 px-3.5 py-2.5 dark:border-accent-700/40 dark:bg-night-700">
+          <span class="flex items-center gap-2.5">
+            <span class="font-mono text-[11px] font-semibold text-ink-400 dark:text-night-300">{i + 1}</span>
+            <span class="text-[15px] font-semibold text-ink-900 dark:text-night-50">{s.verb}</span>
+          </span>
+          <span class="font-mono text-[11px] text-accent-700 dark:text-accent-300">{s.cli}</span>
+        </div>
+        {i < steps.length - 1 && (
+          <div class="py-1 text-center text-[13px] leading-none text-accent-500 dark:text-accent-400" aria-hidden="true">↓</div>
+        )}
+      </>
+    ))}
+  </div>
 </div>
 
 <style>
-  /* Pause animation for users who prefer reduced motion. */
+  /* Pause the traveling dots for users who prefer reduced motion. */
   @media (prefers-reduced-motion: reduce) {
     .flow-dot { display: none; }
   }
