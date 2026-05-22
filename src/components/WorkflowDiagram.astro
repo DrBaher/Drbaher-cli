@@ -1,57 +1,53 @@
 ---
-// Animated workflow diagram for the contract-ops suite (the linear pipeline;
-// contract-lint is a parallel pre-signature gate, surfaced on the workflow page).
-//   • Tablet / desktop: two "floors" (4×2, serpentine) — pure SVG SMIL relay.
-//   • Phone (< sm): a vertical stack of full-width step cards.
-//   • Each step is clickable / tappable / keyboard-activatable: it reveals a
-//     short description of that CLI in the panel below (with a link to its docs).
-// Both views are generated from one `steps` array. Respects prefers-reduced-motion.
-const steps = [
-  { cli: 'extract-cli',        verb: 'ingest',  href: '/tools/extract-cli/',        blurb: "Ingest any contract (.md/.txt/.html/.docx/.pdf) into structured JSON — parties, clauses, dates, governing law — with a confidence and source on every field." },
-  { cli: 'template-vault-cli', verb: 'store',   href: '/tools/template-vault-cli/', blurb: "A git-backed, clause-aware vault for your blank templates — fork, swap clauses with recorded provenance, and pull upstream upgrades." },
-  { cli: 'draft-cli',          verb: 'draft',   href: '/tools/draft-cli/',          blurb: "Fill placeholders in a markdown or .docx template — typed/computed/positional params, a parties registry, multi-document bundles." },
-  { cli: 'nda-review-cli',     verb: 'review',  href: '/tools/nda-review-cli/',      blurb: "Draft, review, and negotiate NDAs against your house playbook. Deterministic by default; opt-in LLM adjudication." },
-  { cli: 'compare-cli',        verb: 'compare', href: '/tools/compare-cli/',         blurb: "Clause-aware drift detection between two contract versions — a pre-signature gate with exit codes CI can branch on." },
-  { cli: 'docx2pdf-cli',       verb: 'convert', href: '/tools/docx2pdf-cli/',        blurb: "Honest DOCX → PDF conversion with hybrid backends, parallel batches, and font validation." },
-  { cli: 'sign-cli',           verb: 'sign',    href: '/tools/sign-cli/',            blurb: "Fully-offline PAdES e-signature with hash-chained audit events and RFC 3161 timestamps; per-signer tokens gate the human." },
-  { cli: 'contract-vault-cli', verb: 'manage',  href: '/tools/contract-vault-cli/',  blurb: "Register signed contracts, then surface renewals, notice deadlines, recurring obligations, and reminders as a portfolio + an .ics calendar." },
+// Animated workflow diagram for the contract-ops suite (nine CLIs).
+//   • Tablet / desktop: a serpentine flow that BRANCHES at the pre-signature gate —
+//     nda-review fans out to the two parallel gates (contract-lint + compare) and
+//     merges back into docx2pdf → sign → contract-vault. Pure SVG SMIL relay.
+//   • Phone (< sm): a vertical stack; the two gates render as a side-by-side pair.
+//   • Each step is clickable / tappable / keyboard-activatable: it reveals a short
+//     description of that CLI in the panel below. Respects prefers-reduced-motion.
+const BW = 116, BH = 52;
+const C = [14, 148, 282, 416];          // column x-positions (pitch 134)
+const W = C[3] + BW + 14;               // 546 — keep max-w literal in sync
+const Y = [44, 132, 220];               // band tops: top row · gates · bottom row
+const FRAME_H = Y[2] + BH + 12;         // 284
+const cy = (y: number) => y + BH / 2;
+const cx = (x: number) => x + BW / 2;
+
+interface Box { cli: string; verb: string; href: string; blurb: string; x: number; y: number; }
+const boxes: Box[] = [
+  { cli: 'extract-cli',        verb: 'ingest',  href: '/tools/extract-cli/',        x: C[0], y: Y[0], blurb: "Ingest any contract (.md/.txt/.html/.docx/.pdf) into structured JSON — parties, clauses, dates, governing law — with a confidence and source on every field." },
+  { cli: 'template-vault-cli', verb: 'store',   href: '/tools/template-vault-cli/', x: C[1], y: Y[0], blurb: "A git-backed, clause-aware vault for your blank templates — fork, swap clauses with recorded provenance, and pull upstream upgrades." },
+  { cli: 'draft-cli',          verb: 'draft',   href: '/tools/draft-cli/',          x: C[2], y: Y[0], blurb: "Fill placeholders in a markdown or .docx template — typed/computed/positional params, a parties registry, multi-document bundles." },
+  { cli: 'nda-review-cli',     verb: 'review',  href: '/tools/nda-review-cli/',      x: C[3], y: Y[0], blurb: "Draft, review, and negotiate NDAs against your house playbook. Deterministic by default; opt-in LLM adjudication." },
+  { cli: 'contract-lint-cli',  verb: 'lint',    href: '/tools/contract-lint-cli/',   x: C[2], y: Y[1], blurb: "Lint one contract for internal-consistency defects — leftover placeholders, broken cross-references, defined-term and numbering issues. Gates defects WITHIN one document." },
+  { cli: 'compare-cli',        verb: 'compare', href: '/tools/compare-cli/',         x: C[3], y: Y[1], blurb: "Clause-aware drift detection between two contract versions. Gates drift BETWEEN versions, with exit codes CI can branch on." },
+  { cli: 'docx2pdf-cli',       verb: 'convert', href: '/tools/docx2pdf-cli/',        x: C[2], y: Y[2], blurb: "Honest DOCX → PDF conversion with hybrid backends, parallel batches, and font validation." },
+  { cli: 'sign-cli',           verb: 'sign',    href: '/tools/sign-cli/',            x: C[1], y: Y[2], blurb: "Fully-offline PAdES e-signature with hash-chained audit events and RFC 3161 timestamps; per-signer tokens gate the human." },
+  { cli: 'contract-vault-cli', verb: 'manage',  href: '/tools/contract-vault-cli/',  x: C[0], y: Y[2], blurb: "Register signed contracts, then surface renewals, notice deadlines, recurring obligations, and reminders as a portfolio + an .ics calendar." },
 ];
+const B = Object.fromEntries(boxes.map((b) => [b.cli, b])) as Record<string, Box>;
 
-const BW = 116, BH = 56, GAP = 16, PITCH = BW + GAP;   // 132
-const X0 = 12, COLS = 4;
-const W = X0 * 2 + COLS * BW + (COLS - 1) * GAP;        // 536 — keep max-w literal in sync
-const ROW_Y = [44, 150];
-const FRAME_H = ROW_Y[1] + BH + 18;                     // 224
-const colX = (c: number) => X0 + c * PITCH;
-
-interface Box { cli: string; verb: string; href: string; blurb: string; x: number; y: number; cx: number; cy: number; }
-const boxes: Box[] = steps.map((s, i) => {
-  const floor = i < 4 ? 0 : 1;
-  const col = floor === 0 ? i : 7 - i;   // bottom floor runs right→left (a clean U-turn)
-  const x = colX(col), y = ROW_Y[floor];
-  return { ...s, x, y, cx: x + BW / 2, cy: y + BH / 2 };
-});
-
+// Explicit arrows incl. the branch (nda-review → {lint, compare}) and merge ({lint, compare} → docx2pdf).
+const ndaR = B['nda-review-cli'], lint = B['contract-lint-cli'], comp = B['compare-cli'], conv = B['docx2pdf-cli'];
 interface Arrow { id: string; d: string; begin: number; }
-const arrows: Arrow[] = [];
-for (let i = 0; i < steps.length - 1; i++) {
-  const a = boxes[i], b = boxes[i + 1];
-  let d: string;
-  if (a.y === b.y) {
-    d = b.x > a.x
-      ? `M${a.x + BW + 2} ${a.cy} L${b.x - 2} ${b.cy}`     // top floor: left → right
-      : `M${a.x - 2} ${a.cy} L${b.x + BW + 2} ${b.cy}`;     // bottom floor: right → left
-  } else {
-    d = `M${a.cx} ${a.y + BH + 2} L${b.cx} ${b.y - 2}`;     // floor connector: down
-  }
-  arrows.push({ id: `flow${i}`, d, begin: i * 2 });
-}
-const DUR = steps.length * 2;
+const arrows: Arrow[] = [
+  { id: 'f0', d: `M${C[0] + BW + 2} ${cy(Y[0])} L${C[1] - 2} ${cy(Y[0])}`, begin: 0 }, // extract → store
+  { id: 'f1', d: `M${C[1] + BW + 2} ${cy(Y[0])} L${C[2] - 2} ${cy(Y[0])}`, begin: 1 }, // store → draft
+  { id: 'f2', d: `M${C[2] + BW + 2} ${cy(Y[0])} L${C[3] - 2} ${cy(Y[0])}`, begin: 2 }, // draft → review
+  { id: 'f3', d: `M${cx(ndaR.x)} ${ndaR.y + BH + 2} L${cx(comp.x)} ${comp.y - 2}`, begin: 3 },          // review → compare (down)
+  { id: 'f4', d: `M${cx(ndaR.x) - 8} ${ndaR.y + BH + 2} L${cx(lint.x) + 4} ${lint.y - 2}`, begin: 3 },  // review → lint (branch, down-left)
+  { id: 'f5', d: `M${cx(comp.x)} ${comp.y + BH + 2} L${cx(conv.x) + 4} ${conv.y - 2}`, begin: 4 },       // compare → convert (merge, down-left)
+  { id: 'f6', d: `M${cx(lint.x)} ${lint.y + BH + 2} L${cx(conv.x)} ${conv.y - 2}`, begin: 4 },           // lint → convert (down)
+  { id: 'f7', d: `M${C[2] - 2} ${cy(Y[2])} L${C[1] + BW + 2} ${cy(Y[2])}`, begin: 5 }, // convert → sign (left)
+  { id: 'f8', d: `M${C[1] - 2} ${cy(Y[2])} L${C[0] + BW + 2} ${cy(Y[2])}`, begin: 6 }, // sign → manage (left)
+];
+const DUR = 16;
 ---
 <div class="not-prose my-8 rounded-lg border border-ink-700/10 bg-white p-5 dark:border-night-300/15 dark:bg-night-600">
-  <!-- Tablet / desktop: two floors. max-w is literal for Tailwind's scanner; keep in sync with W. -->
-  <svg viewBox={`0 0 ${W} ${FRAME_H + 6}`} class="mx-auto hidden h-auto w-full max-w-[536px] sm:block" role="img"
-       aria-label="Contract workflow in two rows: ingest, store, draft, review; then compare, convert, sign, manage — all on your machine. Activate a step for a description.">
+  <!-- Tablet / desktop. max-w is literal for Tailwind's scanner; keep in sync with W. -->
+  <svg viewBox={`0 0 ${W} ${FRAME_H + 6}`} class="mx-auto hidden h-auto w-full max-w-[546px] sm:block" role="img"
+       aria-label="Contract workflow: ingest, store, draft, review; then the flow branches to two parallel pre-signature gates — contract-lint and compare — and merges back into convert, sign, manage. All on your machine. Activate a step for a description.">
     <defs>
       <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
         <path d="M 0 0 L 10 5 L 0 10 z" class="fill-ink-500 dark:fill-night-200"/>
@@ -71,6 +67,7 @@ const DUR = steps.length * 2;
 
     <rect x="6" y="6" width={W - 12} height={FRAME_H} rx="10" fill="none" class="stroke-accent-200 dark:stroke-accent-700/40" stroke-width="1" stroke-dasharray="4 4"/>
     <text x="20" y="26" font-family="Inter, sans-serif" font-size="11" font-weight="600" letter-spacing="0.14em" class="fill-accent-700 dark:fill-accent-300">YOUR MACHINE · NO SAAS · NO TELEMETRY</text>
+    <text x={cx(lint.x) + (cx(comp.x) - cx(lint.x)) / 2} y={Y[1] - 8} font-family="Inter, sans-serif" font-size="9.5" font-style="italic" text-anchor="middle" class="fill-ink-400 dark:fill-night-300">parallel gates — both must pass</text>
 
     {arrows.map((a) => (
       <path id={a.id} d={a.d} class="stroke-ink-500 dark:stroke-night-200" stroke-width="1.4" fill="none" marker-end="url(#arrow)"/>
@@ -79,8 +76,8 @@ const DUR = steps.length * 2;
     {boxes.map((b) => (
       <g class="step-box" role="button" tabindex="0" data-cli={b.cli} data-href={b.href} data-blurb={b.blurb} aria-label={`${b.cli}: ${b.blurb}`}>
         <rect x={b.x} y={b.y} width={BW} height={BH} rx="6" fill="url(#boxGrad)" class="dark:[fill:url(#boxGradDark)] stroke-accent-200 dark:stroke-accent-700/40"/>
-        <text x={b.cx} y={b.y + 22} font-family="JetBrains Mono, monospace" font-size="9.5" text-anchor="middle" font-weight="600" class="fill-accent-700 dark:fill-accent-300">{b.cli}</text>
-        <text x={b.cx} y={b.y + 42} font-family="Inter, sans-serif" font-size="13" text-anchor="middle" font-weight="600" class="fill-ink-900 dark:fill-night-50">{b.verb}</text>
+        <text x={cx(b.x)} y={b.y + 21} font-family="JetBrains Mono, monospace" font-size="9.5" text-anchor="middle" font-weight="600" class="fill-accent-700 dark:fill-accent-300">{b.cli}</text>
+        <text x={cx(b.x)} y={b.y + 40} font-family="Inter, sans-serif" font-size="13" text-anchor="middle" font-weight="600" class="fill-ink-900 dark:fill-night-50">{b.verb}</text>
       </g>
     ))}
 
@@ -92,21 +89,36 @@ const DUR = steps.length * 2;
     ))}
   </svg>
 
-  <!-- Phone: vertical stack of full-width step cards -->
+  <!-- Phone: vertical stack; the two gates render as a parallel pair. -->
   <div class="flex flex-col sm:hidden">
-    {steps.map((s, i) => (
+    {[0, 1, 2, 3].map((i) => (
       <>
         <button type="button" class="wf-card flex w-full items-center justify-between rounded-md border border-accent-200 bg-cream-50 px-3.5 py-2.5 text-left dark:border-accent-700/40 dark:bg-night-700"
-                data-cli={s.cli} data-href={s.href} data-blurb={s.blurb} aria-label={`${s.cli}: ${s.blurb}`}>
-          <span class="flex items-center gap-2.5">
-            <span class="font-mono text-[11px] font-semibold text-ink-400 dark:text-night-300">{i + 1}</span>
-            <span class="text-[15px] font-semibold text-ink-900 dark:text-night-50">{s.verb}</span>
-          </span>
-          <span class="font-mono text-[11px] text-accent-700 dark:text-accent-300">{s.cli}</span>
+                data-cli={boxes[i].cli} data-href={boxes[i].href} data-blurb={boxes[i].blurb} aria-label={`${boxes[i].cli}: ${boxes[i].blurb}`}>
+          <span class="flex items-center gap-2.5"><span class="font-mono text-[11px] font-semibold text-ink-400 dark:text-night-300">{i + 1}</span><span class="text-[15px] font-semibold text-ink-900 dark:text-night-50">{boxes[i].verb}</span></span>
+          <span class="font-mono text-[11px] text-accent-700 dark:text-accent-300">{boxes[i].cli}</span>
         </button>
-        {i < steps.length - 1 && (
-          <div class="py-1 text-center text-[13px] leading-none text-accent-500 dark:text-accent-400" aria-hidden="true">↓</div>
-        )}
+        <div class="py-1 text-center text-[13px] leading-none text-accent-500 dark:text-accent-400" aria-hidden="true">↓</div>
+      </>
+    ))}
+    <div class="text-center text-[11px] italic text-ink-400 dark:text-night-300">parallel gates — both must pass</div>
+    <div class="mt-1 grid grid-cols-2 gap-2">
+      {[4, 5].map((i) => (
+        <button type="button" class="wf-card flex flex-col rounded-md border border-accent-200 bg-cream-50 px-3 py-2.5 text-left dark:border-accent-700/40 dark:bg-night-700"
+                data-cli={boxes[i].cli} data-href={boxes[i].href} data-blurb={boxes[i].blurb} aria-label={`${boxes[i].cli}: ${boxes[i].blurb}`}>
+          <span class="text-[15px] font-semibold text-ink-900 dark:text-night-50">{boxes[i].verb}</span>
+          <span class="font-mono text-[10px] text-accent-700 dark:text-accent-300">{boxes[i].cli}</span>
+        </button>
+      ))}
+    </div>
+    {[6, 7, 8].map((i) => (
+      <>
+        <div class="py-1 text-center text-[13px] leading-none text-accent-500 dark:text-accent-400" aria-hidden="true">↓</div>
+        <button type="button" class="wf-card flex w-full items-center justify-between rounded-md border border-accent-200 bg-cream-50 px-3.5 py-2.5 text-left dark:border-accent-700/40 dark:bg-night-700"
+                data-cli={boxes[i].cli} data-href={boxes[i].href} data-blurb={boxes[i].blurb} aria-label={`${boxes[i].cli}: ${boxes[i].blurb}`}>
+          <span class="flex items-center gap-2.5"><span class="font-mono text-[11px] font-semibold text-ink-400 dark:text-night-300">{i}</span><span class="text-[15px] font-semibold text-ink-900 dark:text-night-50">{boxes[i].verb}</span></span>
+          <span class="font-mono text-[11px] text-accent-700 dark:text-accent-300">{boxes[i].cli}</span>
+        </button>
       </>
     ))}
   </div>
@@ -121,7 +133,6 @@ const DUR = steps.length * 2;
 </div>
 
 <style>
-  /* Interactivity affordances. */
   .step-box { cursor: pointer; }
   .step-box > rect { transition: stroke 0.15s ease, stroke-width 0.15s ease; }
   .step-box:hover > rect,
@@ -131,7 +142,6 @@ const DUR = steps.length * 2;
   .wf-card { cursor: pointer; transition: border-color 0.15s ease; }
   .wf-card[data-selected] { border-color: #1f7d5d; }
 
-  /* Pause the traveling dots for users who prefer reduced motion. */
   @media (prefers-reduced-motion: reduce) {
     .flow-dot { display: none; }
   }
