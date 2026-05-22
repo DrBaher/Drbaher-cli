@@ -207,7 +207,7 @@ agent = Agent(
     <a href="https://openclaw.ai/" target="_blank" rel="noopener">OpenClaw</a> — "the AI that actually
     does things" — is a local agent framework with full shell access. It drives tools by running them
     as <strong>commands</strong>, not over MCP, which is a clean fit for this suite: every CLI is a plain
-    command with a machine-readable contract, so OpenClaw drives <strong>all seven</strong> directly with no
+    command with a machine-readable contract, so OpenClaw drives <strong>all eight</strong> directly with no
     server to wire up. This is how the suite has been exercised end to end.
   </p>
 
@@ -215,7 +215,8 @@ agent = Agent(
 
   <CodeBlock>{`# 1. Discover — never hardcode flags or subcommands. Every CLI answers --catalog json:
 extract --catalog json          template-vault --catalog json   draft --catalog json
-nda-review-cli --catalog json   compare --catalog json          docx2pdf --catalog json   sign --catalog json
+nda-review-cli --catalog json   compare --catalog json          docx2pdf --catalog json
+sign --catalog json             contract-vault --catalog json
 
 # 2. Run with --json and branch on the exit code (see the matrix below)
 draft template.md --params deal.json --json
@@ -316,8 +317,8 @@ curl http://localhost:4000/v1/openapi.json    # full OpenAPI 3.1 spec`}</CodeBlo
     (a signing request is an object that benefits from typed tools). <a href="/tools/compare-cli/">compare-cli</a>
     ships a smaller MCP server too — <code class="chip">compare-cli-mcp</code>, three tools over stdio. The rest —
     <a href="/tools/extract-cli/">extract-cli</a>, <a href="/tools/template-vault-cli/">template-vault-cli</a>,
-    <a href="/tools/draft-cli/">draft-cli</a>, <a href="/tools/nda-review-cli/">nda-review-cli</a>, and
-    <a href="/tools/docx2pdf-cli/">docx2pdf-cli</a> —
+    <a href="/tools/draft-cli/">draft-cli</a>, <a href="/tools/nda-review-cli/">nda-review-cli</a>,
+    <a href="/tools/docx2pdf-cli/">docx2pdf-cli</a>, and <a href="/tools/contract-vault-cli/">contract-vault-cli</a> —
     are pure functions: they take input, return output. For those, agents drive them directly over stdio with
     a stable JSON contract.
   </p>

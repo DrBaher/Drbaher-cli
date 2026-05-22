@@ -1,0 +1,130 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Callout from '../../components/Callout.astro';
+import Playground from '../../components/Playground.astro';
+import CodeBlock from '../../components/CodeBlock.astro';
+import FreshHeader from '../../components/FreshHeader.astro';
+import JsonLd from '../../components/JsonLd.astro';
+import { getCliMeta } from '../../data/registry';
+
+const meta = (await getCliMeta())['contract-vault-cli'];
+
+const jsonLd = {
+  '@type': 'SoftwareApplication',
+  name: 'contract-vault-cli',
+  applicationCategory: 'DeveloperApplication',
+  operatingSystem: 'macOS, Linux, Windows',
+  softwareVersion: meta.version,
+  programmingLanguage: 'Python',
+  license: 'https://opensource.org/licenses/MIT',
+  url: 'https://cli.drbaher.com/tools/contract-vault-cli/',
+  codeRepository: 'https://github.com/DrBaher/contract-vault-cli',
+  description: 'Post-signature management layer of the contract-ops CLI suite: register signed contracts in a git-backed vault, then search the portfolio and surface renewals, notice deadlines, and obligations as a calendar. Stdlib-only Python.',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+};
+---
+<BaseLayout
+  title="contract-vault-cli"
+  active="tools/contract-vault-cli"
+  description="Post-signature management layer of the contract-ops suite: register signed contracts, then surface renewals, notice deadlines, and obligations (ics/json/csv). Git-backed, stdlib-only Python."
+  toc
+>
+  <JsonLd data={jsonLd} />
+  <p class="eyebrow">Tool · Python</p>
+  <h1 class="flex items-center gap-4">
+    <img src="/assets/icons/contract-vault-cli.svg" alt="" class="h-12 w-12" />
+    <span class="font-serif">contract-vault-cli</span>
+  </h1>
+  <FreshHeader name="contract-vault-cli" version={meta.version} source={meta.source} fetchedAt={meta.fetchedAt} stars={meta.stars} weeklyDownloads={meta.weeklyDownloads} github="https://github.com/DrBaher/contract-vault-cli" />
+  <p class="text-lg text-ink-700 dark:text-night-100">
+    The suite's <strong>post-signature ("manage-out") layer</strong>. The pipeline ends at
+    <a href="/tools/sign-cli/">sign-cli</a> with an executed agreement — and that's exactly when the
+    real obligations begin. <code class="chip">contract-vault</code> registers each signed contract in a
+    git-backed vault and then surfaces what you'd otherwise miss: auto-renewal <strong>notice
+    deadlines</strong>, expirations, payment dates, and obligations — as a queryable portfolio and an
+    <code class="chip">.ics</code> calendar feed. It's the natural sibling of
+    <a href="/tools/template-vault-cli/">template-vault</a>: template-vault stores the <em>blanks</em>
+    (clauses, variables); contract-vault stores the <em>signed instances</em>. Every field keeps the
+    suite's <code class="chip">confidence</code> / <code class="chip">source</code> envelope, so you
+    always know what came from extraction vs. a human's <code class="chip">accept</code>.
+  </p>
+
+  <Callout label="TL;DR">
+    <code class="chip">pipx install contract-vault</code>, then <code class="chip">contract-vault demo</code>
+    for a zero-config register-and-calendar tour on bundled fixtures. Register your own with
+    <code class="chip">extract contract.pdf | contract-vault ingest -</code>, then
+    <code class="chip">contract-vault due --within 90d --format ics</code>. Stdlib-only, git-backed, no
+    network on the default path.
+  </Callout>
+
+  <h2>Try it live</h2>
+  <p>Explore a seeded demo register (read-only) — list deals, query the portfolio, and project the upcoming renewals/deadlines, in a sandbox.</p>
+  <Playground cli="contract-vault" title="contract-vault explorer" />
+
+  <h2>What it does</h2>
+
+  <ul>
+    <li><strong>Registers signed contracts</strong> from <a href="/tools/extract-cli/">extract-cli</a> output — <code class="chip">extract doc.pdf | contract-vault ingest -</code>, or <code class="chip">ingest</code> shells out to <code class="chip">extract</code> directly. Each deal is a committed record in a plain git repo (no DB, no daemon).</li>
+    <li><strong>Surfaces deadlines as a calendar.</strong> <code class="chip">due</code> / <code class="chip">obligations</code> project upcoming auto-renewal notices, expirations, and payment dates within a window (<code class="chip">--within 90d</code>) and emit a valid RFC 5545 <code class="chip">.ics</code> feed you can subscribe to.</li>
+    <li><strong>Renewal-exposure gate.</strong> <code class="chip">risk</code> / <code class="chip">at-risk</code> flags <em>missed</em> notice deadlines (CRITICAL when the contract auto-renews) and imminent ones; <code class="chip">--strict</code> exits non-zero for CI.</li>
+    <li><strong>Portfolio queries.</strong> <code class="chip">find</code> by counterparty, governing law, currency, value threshold, expiry, or auto-renew; <code class="chip">stats</code> for a portfolio dashboard; <code class="chip">export</code> to <code class="chip">csv</code> / <code class="chip">md</code> / <code class="chip">json</code> for finance and legal.</li>
+    <li><strong>Human-in-the-loop review.</strong> <code class="chip">review</code> lists unidentified / LLM-derived / low-confidence fields; <code class="chip">accept</code> promotes a checked field to <code class="chip">source: manual</code> (single or bulk <code class="chip">--from</code>), and <code class="chip">history</code> shows the git trail of every ingest + accept.</li>
+  </ul>
+
+  <h2>Quickstart</h2>
+
+  <CodeBlock label="install + run">{`# Install (stdlib-only; the [docx] extra pulls in extract-cli for end-to-end ingest)
+pipx install contract-vault
+contract-vault --version
+
+# Zero-config: register two sample contracts and project their renewals calendar
+contract-vault demo
+
+# Register your own signed contract, then export the next quarter's deadlines
+mkdir my-vault && cd my-vault
+contract-vault init
+extract ~/contracts/acme-msa.pdf | contract-vault ingest -
+contract-vault due --within 90d --format ics > deadlines.ics`}</CodeBlock>
+
+  <h2>For agents and automation</h2>
+
+  <p>
+    contract-vault answers the suite's discovery contract: <code class="chip">contract-vault --catalog json</code>
+    returns <code class="chip">{'{'}name, bin, version, description, commands[], exitCodes{'}'}</code> so an
+    agent learns every command and flag at startup. Read commands take <code class="chip">--json</code>;
+    <code class="chip">due</code>/<code class="chip">export</code> take a richer <code class="chip">--format</code>.
+    Exit codes are CI-friendly: <code class="chip">0</code> ok, <code class="chip">1</code> failure or findings
+    (a <code class="chip">verify</code> mismatch, or a <code class="chip">--strict</code> review/risk gate),
+    <code class="chip">2</code> bad usage. The full agent contract is in
+    <a href="https://github.com/DrBaher/contract-vault-cli/blob/main/AGENTS.md"><code class="chip">AGENTS.md</code></a>.
+  </p>
+
+  <CodeBlock label="recommended agent defaults">{`contract-vault --catalog json                                  # discover commands/flags
+contract-vault find --auto-renew --value-gt 50000 --json       # portfolio query
+contract-vault risk --within 30d --strict --json               # CI renewal-exposure gate`}</CodeBlock>
+
+  <p>
+    Stored records conform to committed JSON Schemas under
+    <a href="https://github.com/DrBaher/contract-vault-cli/tree/main/docs/spec"><code class="chip">docs/spec/</code></a>
+    (<code class="chip">contract-record.schema.json</code> + the obligations projection), with the suite's
+    semver commitment. Extraction is <strong>delegated</strong> to
+    <a href="/tools/extract-cli/">extract-cli</a> (and its shared
+    <code class="chip">~/.config/contract-ops/llm.json</code>) — contract-vault never reimplements it and
+    never calls out on a default path. See
+    <a href="https://github.com/DrBaher/contract-vault-cli/blob/main/docs/INTEROP.md"><code class="chip">docs/INTEROP.md</code></a>.
+  </p>
+
+  <h2>Where it fits in the workflow</h2>
+
+  <p>
+    The final stage of the eight-CLI workflow — the <em>manage-out</em> end.
+    <a href="/tools/sign-cli/">sign-cli</a> produces the executed PDF; contract-vault registers it and
+    keeps watch over its lifecycle. Feed it the same <a href="/tools/extract-cli/">extract-cli</a> output
+    that drives intake, and the deal you signed becomes a tracked obligation with a calendar. It also
+    stands alone as a git-backed contract register for any team that just needs to never miss a renewal.
+    <a href="/workflow/">See the full workflow</a>.
+  </p>
+
+  <h2>Repo</h2>
+  <p><a href="https://github.com/DrBaher/contract-vault-cli" target="_blank" rel="noopener">github.com/DrBaher/contract-vault-cli</a> · MIT licensed · Stdlib-only Python (the <code class="chip">[docx]</code>/<code class="chip">[pdf]</code> extras pull in extract-cli) · PyPI <code class="chip">contract-vault</code>.</p>
+</BaseLayout>

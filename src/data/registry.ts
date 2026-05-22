@@ -28,6 +28,7 @@ const FALLBACKS: Record<string, string> = {
   'nda-review-cli': '0.5.1',
   'docx2pdf-cli': '0.2.2',
   'sign-cli': '0.6.4',
+  'contract-vault-cli': '0.1.8',
   'draft-cli': '0.9.0',
   'compare-cli': '0.3.0',
 };
@@ -145,6 +146,7 @@ export async function getCliMeta(): Promise<Record<string, CliMeta>> {
     { key: 'nda-review-cli', pypi: 'nda-review-cli', repo: 'DrBaher/nda-review-cli' },
     { key: 'docx2pdf-cli',   npm: 'docx2pdf-cli',   repo: 'DrBaher/docx2pdf-cli' },
     { key: 'sign-cli',       npm: '@drbaher/sign-cli', repo: 'DrBaher/sign-cli' },
+    { key: 'contract-vault-cli', pypi: 'contract-vault', repo: 'DrBaher/contract-vault-cli' },
     { key: 'compare-cli',    npm: 'compare-cli',    repo: 'DrBaher/compare-cli' },
   ];
 
