@@ -28,7 +28,7 @@ const FALLBACKS: Record<string, string> = {
   'nda-review-cli': '0.5.1',
   'docx2pdf-cli': '0.2.2',
   'sign-cli': '0.6.4',
-  'contract-vault-cli': '0.1.8',
+  'contract-vault-cli': '0.4.2',
   'draft-cli': '0.9.0',
   'compare-cli': '0.3.0',
 };

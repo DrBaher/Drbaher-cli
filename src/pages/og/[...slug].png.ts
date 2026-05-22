@@ -124,7 +124,7 @@ const pages: Record<string, Page> = {
   'tools/contract-vault-cli': {
     eyebrow: 'Tool · Python',
     title: 'contract-vault-cli',
-    description: 'Post-signature layer: register signed contracts, then surface renewals, notice deadlines, and obligations (ics/json/csv). Git-backed.',
+    description: 'Git-backed register for signed contracts: surface renewals, notice deadlines, recurring obligations, and reminders as a portfolio + an .ics calendar. Local-first.',
   },
 };
 
