@@ -18,13 +18,13 @@ interface Page { title: string; eyebrow: string; description: string; }
 const pages: Record<string, Page> = {
   default: {
     eyebrow: 'contract-ops CLI suite',
-    title: 'Eight CLIs for the contract workflow',
-    description: 'Extract any contract · store & version templates · fill them · review against your policy · gate drift · convert to PDF · sign with audit trails · track renewals & deadlines. Local-first, MIT.',
+    title: 'Nine CLIs for the contract workflow',
+    description: 'Extract any contract · store & version templates · fill them · review against your policy · lint for defects · gate drift · convert to PDF · sign with audit trails · track renewals & deadlines. Local-first, MIT.',
   },
   overview: {
     eyebrow: 'contract-ops CLI suite',
-    title: 'Eight CLIs for the contract workflow',
-    description: 'extract-cli · template-vault-cli · draft-cli · nda-review-cli · compare-cli · docx2pdf-cli · sign-cli · contract-vault-cli. Local-first, deterministic, no SaaS.',
+    title: 'Nine CLIs for the contract workflow',
+    description: 'extract-cli · template-vault-cli · draft-cli · nda-review-cli · contract-lint-cli · compare-cli · docx2pdf-cli · sign-cli · contract-vault-cli. Local-first, deterministic, no SaaS.',
   },
   'build-a-cli': {
     eyebrow: 'Contributing',
@@ -34,12 +34,12 @@ const pages: Record<string, Page> = {
   workflow: {
     eyebrow: 'The workflow',
     title: 'From a versioned template to a signed agreement',
-    description: 'Extract → store → draft → review → negotiate → compare → convert → sign → manage. Nine steps across eight CLIs, all on your machine.',
+    description: 'Extract → store → draft → review → negotiate → compare → convert → sign → manage. Nine steps across nine CLIs, all on your machine.',
   },
   tour: {
     eyebrow: '5-minute tour',
     title: 'The whole suite in five minutes',
-    description: 'Every CLI ships a zero-config demo. Run all eight, then chain them over stdin into one pipeline.',
+    description: 'Every CLI ships a zero-config demo. Run all nine, then chain them over stdin into one pipeline.',
   },
   play: {
     eyebrow: 'Playground',
@@ -53,7 +53,7 @@ const pages: Record<string, Page> = {
   },
   install: {
     eyebrow: 'Install',
-    title: 'Eight installs, one workflow',
+    title: 'Nine installs, one workflow',
     description: 'pipx install extract-cli template-vault-cli nda-review-cli contract-vault · npm i -g @drbaher/draft-cli compare-cli docx2pdf-cli @drbaher/sign-cli',
   },
   principles: {
@@ -125,6 +125,11 @@ const pages: Record<string, Page> = {
     eyebrow: 'Tool · Python',
     title: 'contract-vault-cli',
     description: 'Git-backed register for signed contracts: surface renewals, notice deadlines, recurring obligations, and reminders as a portfolio + an .ics calendar. Local-first.',
+  },
+  'tools/contract-lint-cli': {
+    eyebrow: 'Tool · Python',
+    title: 'contract-lint-cli',
+    description: 'Deterministic linter for a contract’s internal consistency — placeholders, broken cross-references, defined-term and numbering defects — with CI-gateable exit codes.',
   },
 };
 
@@ -251,6 +256,7 @@ export const GET: APIRoute = async ({ params }) => {
                       'docx2pdf-cli',
                       'sign-cli',
                       'contract-vault-cli',
+                      'contract-lint-cli',
                     ],
                   },
                 },
