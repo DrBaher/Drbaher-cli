@@ -12,7 +12,7 @@ tags: ["site"]
 What changed on the site:
 
 - **New tool page** at [`/tools/extract-cli/`](/tools/extract-cli/), mirroring the sibling skeleton (TL;DR, try-it-live playground embed, what-it-does, quickstart, agent affordances, where-it-fits, repo link).
-- **Registry entry** in `src/data/registry.ts` — PyPI `extract-cli`, repo `DrBaher/extract-cli` — version / stars / weekly-downloads fetched at build time alongside the other six. Fallback `0.1.7`.
+- **Registry entry** in `src/data/registry.ts` — PyPI `extract-cli`, repo `DrBaher/extract-cli` — version / stars / weekly-downloads fetched at build time alongside the other six. Fallback `0.1.8`.
 - **Homepage** — hero, TL;DR, the "seven tools at a glance" table, the ToolCard grid (`lg:grid-cols-3`, now seven cards), and "why seven small tools" all rebalanced from six to seven, with extract-cli first.
 - **Workflow diagram** rebuilt as a data-driven seven-box SVG: `ingest → store → draft → review → compare → convert → sign`.
 - **Workflow walkthrough** gains a "0 — Ingest any contract" front-door step (extract feeds review/compare; the closed loop still starts at step 1 if you're authoring from your own template).
@@ -21,4 +21,4 @@ What changed on the site:
 - **Sibling pages, OG images, sidebar, footer, search, `built-for-agents`, `llms.txt`, content config, the cli-link plugin, and the `package.json` description** all move to the seven-CLI narrative.
 - **Icon** — a document-under-a-magnifier motif (with JSON braces in the lens) in the suite palette.
 
-On the repo side, extract-cli also shipped **v0.1.7**: the `extract --catalog json` discovery contract, an `AGENTS.md`, an `llms.txt`, and the suite-standard packaging keywords — so it answers the same agent contract as the other six.
+On the repo side, extract-cli also shipped the `extract --catalog json` discovery contract, an `AGENTS.md`, an `llms.txt`, and the suite-standard packaging keywords (v0.1.7) — so it answers the same agent contract as the other six — alongside a round of clause-detection breadth from a real-corpus survey (v0.1.8).
