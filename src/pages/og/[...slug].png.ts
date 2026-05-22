@@ -18,13 +18,13 @@ interface Page { title: string; eyebrow: string; description: string; }
 const pages: Record<string, Page> = {
   default: {
     eyebrow: 'contract-ops CLI suite',
-    title: 'Six CLIs for the contract workflow',
-    description: 'Store & version templates · fill them · review against your policy · gate drift · convert to PDF · sign with audit trails. Local-first, MIT.',
+    title: 'Seven CLIs for the contract workflow',
+    description: 'Extract any contract · store & version templates · fill them · review against your policy · gate drift · convert to PDF · sign with audit trails. Local-first, MIT.',
   },
   overview: {
     eyebrow: 'contract-ops CLI suite',
-    title: 'Six CLIs for the contract workflow',
-    description: 'template-vault-cli · draft-cli · nda-review-cli · compare-cli · docx2pdf-cli · sign-cli. Local-first, deterministic, no SaaS.',
+    title: 'Seven CLIs for the contract workflow',
+    description: 'extract-cli · template-vault-cli · draft-cli · nda-review-cli · compare-cli · docx2pdf-cli · sign-cli. Local-first, deterministic, no SaaS.',
   },
   'build-a-cli': {
     eyebrow: 'Contributing',
@@ -34,17 +34,17 @@ const pages: Record<string, Page> = {
   workflow: {
     eyebrow: 'The workflow',
     title: 'From a versioned template to a signed agreement',
-    description: 'Store → draft → review → negotiate → compare → convert → sign. Seven steps across six CLIs, all on your machine.',
+    description: 'Extract → store → draft → review → negotiate → compare → convert → sign. Eight steps across seven CLIs, all on your machine.',
   },
   tour: {
     eyebrow: '5-minute tour',
     title: 'The whole suite in five minutes',
-    description: 'Every CLI ships a zero-config demo. Run all six, then chain them over stdin into one pipeline.',
+    description: 'Every CLI ships a zero-config demo. Run all seven, then chain them over stdin into one pipeline.',
   },
   play: {
     eyebrow: 'Playground',
     title: 'Run the CLIs in your browser',
-    description: 'draft, compare, docx2pdf and a template-vault explorer — on your own input, in a sandbox. No install.',
+    description: 'extract, draft, compare, docx2pdf and a template-vault explorer — on your own input, in a sandbox. No install.',
   },
   recipes: {
     eyebrow: 'Recipes',
@@ -53,8 +53,8 @@ const pages: Record<string, Page> = {
   },
   install: {
     eyebrow: 'Install',
-    title: 'Six installs, one workflow',
-    description: 'pipx install template-vault-cli nda-review-cli · npm i -g @drbaher/draft-cli compare-cli docx2pdf-cli @drbaher/sign-cli',
+    title: 'Seven installs, one workflow',
+    description: 'pipx install extract-cli template-vault-cli nda-review-cli · npm i -g @drbaher/draft-cli compare-cli docx2pdf-cli @drbaher/sign-cli',
   },
   principles: {
     eyebrow: 'Principles',
@@ -74,7 +74,7 @@ const pages: Record<string, Page> = {
   changelog: {
     eyebrow: 'Changelog',
     title: 'What’s new across the suite',
-    description: 'Releases, fixes, and roadmap notes for template-vault-cli, draft-cli, nda-review-cli, compare-cli, docx2pdf-cli, and sign-cli.',
+    description: 'Releases, fixes, and roadmap notes for extract-cli, template-vault-cli, draft-cli, nda-review-cli, compare-cli, docx2pdf-cli, and sign-cli.',
   },
   mcp: {
     eyebrow: 'MCP server',
@@ -85,6 +85,11 @@ const pages: Record<string, Page> = {
     eyebrow: 'Built for agents',
     title: 'Built for Claude, Cursor, Codex, OpenClaw',
     description: 'Two MCP servers, a uniform --catalog json discovery contract, and a clean stdio surface for any agent.',
+  },
+  'tools/extract-cli': {
+    eyebrow: 'Tool · Python',
+    title: 'extract-cli',
+    description: 'Open-loop front door: ingest any contract (.md/.txt/.html/.docx/.pdf) into structured JSON — parties, clauses, dates, governing law — for the suite.',
   },
   'tools/template-vault-cli': {
     eyebrow: 'Tool · Python',
@@ -233,6 +238,7 @@ export const GET: APIRoute = async ({ params }) => {
                       color: '#1f7d5d',
                     },
                     children: [
+                      'extract-cli',
                       'template-vault-cli',
                       'draft-cli',
                       'nda-review-cli',

@@ -8,13 +8,14 @@ import { getCliMeta } from '../data/registry';
 
 const meta = await getCliMeta();
 ---
-<BaseLayout title="Overview" active="overview" description="Six composable, local-first CLIs built for an agent-first contract workflow: agents do the operational work, humans approve the gates that matter.">
+<BaseLayout title="Overview" active="overview" description="Seven composable, local-first CLIs built for an agent-first contract workflow: agents do the operational work, humans approve the gates that matter.">
   <div class="not-prose hero-band">
     <p class="eyebrow">Built for the agent era</p>
     <h1 class="!mt-2">Agents do the work. You approve what matters.</h1>
     <p class="text-lg text-ink-700 dark:text-night-100 max-w-[62ch]">
-      Six CLIs for the contract workflow — storing and versioning your templates, drafting from them, reviewing what comes back,
-      negotiating, gating last-minute drift, converting to PDF, and collecting signatures with a tamper-evident audit trail.
+      Seven CLIs for the contract workflow — ingesting any contract into structured JSON, storing and versioning your templates,
+      drafting from them, reviewing what comes back, negotiating, gating last-minute drift, converting to PDF, and collecting
+      signatures with a tamper-evident audit trail.
       Designed so an LLM agent can run most of the operational work and a human stays in the loop only for the gates that actually
       need a human gesture.
     </p>
@@ -43,12 +44,12 @@ const meta = await getCliMeta();
   </div>
 
   <Callout label="TL;DR">
-    Six open-source CLIs, six repositories, one agent-friendly workflow. Local-first by default —
+    Seven open-source CLIs, seven repositories, one agent-friendly workflow. Local-first by default —
     no SaaS account, no telemetry, no vendor lock-in. The agent drives via MCP / stdio; the human approves
     signatures and escalations. Use them piecemeal or chain them together.
   </Callout>
 
-  <h2 data-reveal>Six tools at a glance</h2>
+  <h2 data-reveal>Seven tools at a glance</h2>
 
   <div class="not-prose my-5 overflow-x-auto rounded-lg border border-ink-700/10 dark:border-night-300/15" data-reveal>
     <table class="w-full border-collapse text-[14px]">
@@ -60,6 +61,11 @@ const meta = await getCliMeta();
         </tr>
       </thead>
       <tbody class="text-ink-800 dark:text-night-100">
+        <tr class="border-b border-ink-700/10 dark:border-night-300/15">
+          <td class="px-4 py-2.5 align-top"><a href="/tools/extract-cli/" class="font-mono">extract</a> <span class="text-ink-500 dark:text-night-200">· Python</span></td>
+          <td class="px-4 py-2.5 align-top">Ingest</td>
+          <td class="px-4 py-2.5 align-top">any contract → structured JSON</td>
+        </tr>
         <tr class="border-b border-ink-700/10 dark:border-night-300/15">
           <td class="px-4 py-2.5 align-top"><a href="/tools/template-vault-cli/" class="font-mono">template-vault</a> <span class="text-ink-500 dark:text-night-200">· Python</span></td>
           <td class="px-4 py-2.5 align-top">Store</td>
@@ -98,6 +104,20 @@ const meta = await getCliMeta();
   <h2 data-reveal>The tools</h2>
 
   <div class="not-prose mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3" data-reveal>
+    <ToolCard
+      title="extract-cli"
+      tagline="Open-loop front door: ingest any contract (.md/.txt/.html/.docx/.pdf) into structured JSON — parties, clauses, dates, governing law — with a confidence and source on every field."
+      language="Python"
+      install="pipx install extract-cli"
+      href="/tools/extract-cli/"
+      github="https://github.com/DrBaher/extract-cli"
+      icon="/assets/icons/extract-cli.svg"
+      version={meta['extract-cli'].version}
+      versionSource={meta['extract-cli'].source}
+      stars={meta['extract-cli'].stars}
+      weeklyDownloads={meta['extract-cli'].weeklyDownloads}
+      weeklyDownloadsSource={meta['extract-cli'].weeklyDownloadsSource}
+    />
     <ToolCard
       title="template-vault-cli"
       tagline="Git-backed, clause-aware vault for legal-document templates. Fork, swap clauses with recorded provenance, pull upstream upgrades."
@@ -229,7 +249,7 @@ const meta = await getCliMeta();
     or grab the hosted listing on <a href="https://smithery.ai/servers/drbaher/sign-cli" target="_blank" rel="noopener">Smithery</a> for one-click install into Claude Desktop, Cursor, and friends.
   </p>
 
-  <h2>Why six small tools instead of one big platform</h2>
+  <h2>Why seven small tools instead of one big platform</h2>
 
   <p>
     Most contract operations products are SaaS suites. They want every step in one dashboard, every
@@ -239,7 +259,7 @@ const meta = await getCliMeta();
   </p>
 
   <p>
-    The six CLIs here take the opposite stance. Each does one thing well. None of them require
+    The seven CLIs here take the opposite stance. Each does one thing well. None of them require
     an account, a subscription, or a network call you didn't ask for. An agent can drive them over
     stdio or MCP; a human can drive them from a terminal. You can swap any one of them, fork them,
     or audit the source end to end. Together they cover the same workflow a SaaS suite would, with
@@ -249,9 +269,10 @@ const meta = await getCliMeta();
   <h2>Where to go from here</h2>
 
   <ul>
-    <li><a href="/tour/">5-minute tour</a> — run all six zero-config demos, then chain them end to end. The fastest way in.</li>
-    <li><a href="/workflow/">The workflow</a> — step-by-step walkthrough of how the six tools chain together, with copy-paste commands.</li>
-    <li><a href="/install/">Install</a> — one page covering all six install paths.</li>
+    <li><a href="/tour/">5-minute tour</a> — run all seven zero-config demos, then chain them end to end. The fastest way in.</li>
+    <li><a href="/workflow/">The workflow</a> — step-by-step walkthrough of how the seven tools chain together, with copy-paste commands.</li>
+    <li><a href="/install/">Install</a> — one page covering all seven install paths.</li>
+    <li><a href="/tools/extract-cli/">extract-cli</a> — the open-loop front door: turn any contract (yours or a counterparty's) into structured JSON.</li>
     <li><a href="/tools/template-vault-cli/">template-vault-cli</a> — Git-backed, clause-aware vault for your templates, with composition and provenance.</li>
     <li><a href="/tools/draft-cli/">draft-cli</a> — fill placeholders in markdown or .docx templates, typed/computed/positional params, multi-doc bundles.</li>
     <li><a href="/tools/nda-review-cli/">nda-review-cli</a> — drafting, reviewing, and negotiating NDAs against your house policy.</li>

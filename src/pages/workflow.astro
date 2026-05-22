@@ -4,22 +4,40 @@ import Callout from '../components/Callout.astro';
 import WorkflowDiagram from '../components/WorkflowDiagram.astro';
 import CodeBlock from '../components/CodeBlock.astro';
 ---
-<BaseLayout title="The workflow" active="workflow" description="How template-vault-cli, draft-cli, nda-review-cli, compare-cli, docx2pdf-cli, and sign-cli chain together into a complete contract pipeline — with copy-paste commands at each step." toc>
+<BaseLayout title="The workflow" active="workflow" description="How extract-cli, template-vault-cli, draft-cli, nda-review-cli, compare-cli, docx2pdf-cli, and sign-cli chain together into a complete contract pipeline — with copy-paste commands at each step." toc>
   <p class="eyebrow">The workflow</p>
   <h1>From a versioned template to a signed agreement, on your machine.</h1>
 
   <p class="text-lg text-ink-700 dark:text-night-100">
-    Seven steps across six CLIs. Each is a single CLI invocation. The output of one step is the input
-    of the next. Stop at any point — the artifacts you have are useful on their own.
+    Eight steps across seven CLIs. Each is a single CLI invocation. The output of one step is the input
+    of the next. Stop at any point — the artifacts you have are useful on their own. Two entry points:
+    ingest foreign paper with <code class="chip">extract</code> (step 0), or start from your own versioned
+    template (step 1).
   </p>
 
   <Callout label="TL;DR">
-    <code class="chip">template-vault get</code> → <code class="chip">draft</code> → <code class="chip">review</code> →
-    <code class="chip">negotiate</code> → <code class="chip">compare</code> → <code class="chip">docx2pdf</code> →
-    <code class="chip">sign</code>. Six tools, no SaaS, no shared database. Files in, files out.
+    <code class="chip">extract</code> → <code class="chip">template-vault get</code> → <code class="chip">draft</code> →
+    <code class="chip">review</code> → <code class="chip">negotiate</code> → <code class="chip">compare</code> →
+    <code class="chip">docx2pdf</code> → <code class="chip">sign</code>. Seven tools, no SaaS, no shared database. Files in, files out.
   </Callout>
 
   <WorkflowDiagram />
+
+  <h2 id="0--ingest" data-reveal>0 — Ingest any contract (the open-loop front door)</h2>
+  <p data-reveal>
+    The rest of this pipeline is a closed loop that handles documents authored from your own templates.
+    <a href="/tools/extract-cli/">extract-cli</a> is how <em>foreign</em> paper gets in: hand it a
+    counterparty's contract in <code class="chip">.md</code> / <code class="chip">.txt</code> /
+    <code class="chip">.html</code> / <code class="chip">.docx</code> / <code class="chip">.pdf</code> and it
+    returns structured JSON — parties, dates, governing law, and a clause map normalized onto the same
+    canonical vocabulary the rest of the suite speaks. Feed that straight into <strong>review</strong>
+    (step 3) or <strong>compare</strong> (step 5). Authoring from your own template instead? Skip to step 1.
+  </p>
+  <CodeBlock label="step 0 · ingest">{`# Turn a counterparty's contract into structured JSON
+extract counterparty-nda.docx --output extract.json
+
+# Its canonical_title values line up with your vault, so a plain diff finds clause gaps
+extract counterparty-nda.docx | jq -r '.clauses[].canonical_title' | sort -u`}</CodeBlock>
 
   <h2 id="1--store" data-reveal>1 — Store &amp; version</h2>
   <p data-reveal>
@@ -191,6 +209,6 @@ sign audit verify --request-id <id>`}</CodeBlock>
     Each tool stands alone. If you already have a filled Word document, skip the vault + draft steps. If
     you trust the ready-to-sign file, skip the compare gate. If you sign with a notary or a different
     e-signature provider, skip the signing step — you'll still have a clean PDF from the convert step.
-    The point isn't that you must use all six; it's that they compose cleanly when you do.
+    The point isn't that you must use all seven; it's that they compose cleanly when you do.
   </p>
 </BaseLayout>
