@@ -5,4 +5,4 @@ export const PLAYGROUND_URL =
 
 // Tool slugs that have a tab in the unified playground (?cli=<id>).
 // nda-review and sign aren't here — they have their own dedicated live demos.
-export const PLAYGROUND_CLIS = ['extract', 'draft', 'compare', 'docx2pdf', 'template-vault'] as const;
+export const PLAYGROUND_CLIS = ['extract', 'draft', 'compare', 'docx2pdf', 'template-vault', 'contract-vault'] as const;

@@ -9,7 +9,7 @@ import CodeBlock from '../components/CodeBlock.astro';
   <h1>From a versioned template to a signed agreement, on your machine.</h1>
 
   <p class="text-lg text-ink-700 dark:text-night-100">
-    Eight steps across seven CLIs. Each is a single CLI invocation. The output of one step is the input
+    Nine steps across eight CLIs. Each is a single CLI invocation. The output of one step is the input
     of the next. Stop at any point — the artifacts you have are useful on their own. Two entry points:
     ingest foreign paper with <code class="chip">extract</code> (step 0), or start from your own versioned
     template (step 1).
@@ -18,7 +18,7 @@ import CodeBlock from '../components/CodeBlock.astro';
   <Callout label="TL;DR">
     <code class="chip">extract</code> → <code class="chip">template-vault get</code> → <code class="chip">draft</code> →
     <code class="chip">review</code> → <code class="chip">negotiate</code> → <code class="chip">compare</code> →
-    <code class="chip">docx2pdf</code> → <code class="chip">sign</code>. Seven tools, no SaaS, no shared database. Files in, files out.
+    <code class="chip">docx2pdf</code> → <code class="chip">sign</code> → <code class="chip">contract-vault</code>. Eight tools, no SaaS, no shared database. Files in, files out.
   </Callout>
 
   <WorkflowDiagram />
@@ -187,6 +187,24 @@ sign document output/agreed.docx \\
 sign pdf inspect --pdf output/agreed.signed.pdf
 sign audit verify --request-id <id>`}</CodeBlock>
 
+  <h2 id="8--manage" data-reveal>8 — Manage (post-signature)</h2>
+  <p data-reveal>
+    Signing isn't the end — it's the start of the obligations. Register the executed contract in
+    <a href="/tools/contract-vault-cli/">contract-vault-cli</a> (it ingests the same
+    <a href="/tools/extract-cli/">extract</a> output that drove intake), and it surfaces what you'd
+    otherwise miss: auto-renewal <strong>notice deadlines</strong>, expirations, and payment dates — as a
+    queryable portfolio and an <code class="chip">.ics</code> calendar. <code class="chip">risk --strict</code>
+    is a CI gate for a missed auto-renewal notice.
+  </p>
+  <CodeBlock label="step 8 · manage">{`# Register the signed contract (ingests extract-cli output)
+extract output/agreed.signed.pdf | contract-vault ingest -
+
+# Project the next quarter of renewals / notice deadlines to a calendar
+contract-vault due --within 90d --format ics > deadlines.ics
+
+# Renewal-exposure gate (non-zero on a missed auto-renewal notice)
+contract-vault risk --within 30d --strict`}</CodeBlock>
+
   <h2>What you end up with</h2>
 
   <ul>
@@ -196,6 +214,7 @@ sign audit verify --request-id <id>`}</CodeBlock>
     <li><code class="chip">output/agreed.signed.pdf</code> — the signed PDF, with embedded signatures</li>
     <li>A <strong>negotiation state file</strong> with every round, every amendment, every signature, hash-chained</li>
     <li>A <strong>signing receipt bundle</strong> with all audit events and timestamps</li>
+    <li>A <strong>registered deal</strong> in your contract-vault — git-tracked, with a renewals/notice <code class="chip">.ics</code> calendar</li>
   </ul>
 
   <p>
@@ -209,6 +228,6 @@ sign audit verify --request-id <id>`}</CodeBlock>
     Each tool stands alone. If you already have a filled Word document, skip the vault + draft steps. If
     you trust the ready-to-sign file, skip the compare gate. If you sign with a notary or a different
     e-signature provider, skip the signing step — you'll still have a clean PDF from the convert step.
-    The point isn't that you must use all seven; it's that they compose cleanly when you do.
+    The point isn't that you must use all eight; it's that they compose cleanly when you do.
   </p>
 </BaseLayout>

@@ -18,13 +18,13 @@ interface Page { title: string; eyebrow: string; description: string; }
 const pages: Record<string, Page> = {
   default: {
     eyebrow: 'contract-ops CLI suite',
-    title: 'Seven CLIs for the contract workflow',
-    description: 'Extract any contract · store & version templates · fill them · review against your policy · gate drift · convert to PDF · sign with audit trails. Local-first, MIT.',
+    title: 'Eight CLIs for the contract workflow',
+    description: 'Extract any contract · store & version templates · fill them · review against your policy · gate drift · convert to PDF · sign with audit trails · track renewals & deadlines. Local-first, MIT.',
   },
   overview: {
     eyebrow: 'contract-ops CLI suite',
-    title: 'Seven CLIs for the contract workflow',
-    description: 'extract-cli · template-vault-cli · draft-cli · nda-review-cli · compare-cli · docx2pdf-cli · sign-cli. Local-first, deterministic, no SaaS.',
+    title: 'Eight CLIs for the contract workflow',
+    description: 'extract-cli · template-vault-cli · draft-cli · nda-review-cli · compare-cli · docx2pdf-cli · sign-cli · contract-vault-cli. Local-first, deterministic, no SaaS.',
   },
   'build-a-cli': {
     eyebrow: 'Contributing',
@@ -34,17 +34,17 @@ const pages: Record<string, Page> = {
   workflow: {
     eyebrow: 'The workflow',
     title: 'From a versioned template to a signed agreement',
-    description: 'Extract → store → draft → review → negotiate → compare → convert → sign. Eight steps across seven CLIs, all on your machine.',
+    description: 'Extract → store → draft → review → negotiate → compare → convert → sign → manage. Nine steps across eight CLIs, all on your machine.',
   },
   tour: {
     eyebrow: '5-minute tour',
     title: 'The whole suite in five minutes',
-    description: 'Every CLI ships a zero-config demo. Run all seven, then chain them over stdin into one pipeline.',
+    description: 'Every CLI ships a zero-config demo. Run all eight, then chain them over stdin into one pipeline.',
   },
   play: {
     eyebrow: 'Playground',
     title: 'Run the CLIs in your browser',
-    description: 'extract, draft, compare, docx2pdf and a template-vault explorer — on your own input, in a sandbox. No install.',
+    description: 'extract, draft, compare, docx2pdf, plus template-vault & contract-vault explorers — on your own input, in a sandbox. No install.',
   },
   recipes: {
     eyebrow: 'Recipes',
@@ -53,8 +53,8 @@ const pages: Record<string, Page> = {
   },
   install: {
     eyebrow: 'Install',
-    title: 'Seven installs, one workflow',
-    description: 'pipx install extract-cli template-vault-cli nda-review-cli · npm i -g @drbaher/draft-cli compare-cli docx2pdf-cli @drbaher/sign-cli',
+    title: 'Eight installs, one workflow',
+    description: 'pipx install extract-cli template-vault-cli nda-review-cli contract-vault · npm i -g @drbaher/draft-cli compare-cli docx2pdf-cli @drbaher/sign-cli',
   },
   principles: {
     eyebrow: 'Principles',
@@ -74,7 +74,7 @@ const pages: Record<string, Page> = {
   changelog: {
     eyebrow: 'Changelog',
     title: 'What’s new across the suite',
-    description: 'Releases, fixes, and roadmap notes for extract-cli, template-vault-cli, draft-cli, nda-review-cli, compare-cli, docx2pdf-cli, and sign-cli.',
+    description: 'Releases, fixes, and roadmap notes for extract-cli, template-vault-cli, draft-cli, nda-review-cli, compare-cli, docx2pdf-cli, sign-cli, and contract-vault-cli.',
   },
   mcp: {
     eyebrow: 'MCP server',
@@ -120,6 +120,11 @@ const pages: Record<string, Page> = {
     eyebrow: 'Tool · Node.js',
     title: 'compare-cli',
     description: 'Clause-aware drift detection between two contract versions. A pre-signature gate with exit codes CI can branch on.',
+  },
+  'tools/contract-vault-cli': {
+    eyebrow: 'Tool · Python',
+    title: 'contract-vault-cli',
+    description: 'Post-signature layer: register signed contracts, then surface renewals, notice deadlines, and obligations (ics/json/csv). Git-backed.',
   },
 };
 
@@ -245,6 +250,7 @@ export const GET: APIRoute = async ({ params }) => {
                       'compare-cli',
                       'docx2pdf-cli',
                       'sign-cli',
+                      'contract-vault-cli',
                     ],
                   },
                 },

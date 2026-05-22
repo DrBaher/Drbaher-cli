@@ -1,10 +1,10 @@
 # drbaher CLI suite
 
-> Seven composable, local-first, agent-first CLIs for end-to-end contract operations. The agent does the operational work (ingesting foreign paper into structured data, storing and versioning templates, drafting, reviewing, comparing for drift, sending, tracking, verifying); the human approves the gestures that need a deliberate human action (signing, accepting a final position, escalating non-negotiables).
+> Eight composable, local-first, agent-first CLIs for end-to-end contract operations. The agent does the operational work (ingesting foreign paper into structured data, storing and versioning templates, drafting, reviewing, comparing for drift, sending, verifying, and tracking renewals/obligations on signed contracts); the human approves the gestures that need a deliberate human action (signing, accepting a final position, escalating non-negotiables).
 
 Site: https://cli.drbaher.com/
 
-## The seven CLIs
+## The eight CLIs
 
 1. **extract-cli** — Open-loop front door of the suite: ingest any contract (`.md`/`.txt`/`.html`/`.docx`/`.pdf`, yours or a counterparty's foreign paper) into structured JSON — parties, dates, term, governing law, a clause map normalized onto the suite's canonical clause vocabulary, defined terms, a headline value. Every field carries a `confidence` and a `source` (verify, don't trust). The deterministic tier is always on (no network); the opt-in `--llm` tier adds fuzzy fields and a clause-map fallback. Stdlib-only Python (zero runtime deps; `[docx]`/`[pdf]` extras improve fidelity).
    - GitHub: https://github.com/DrBaher/extract-cli
@@ -66,6 +66,13 @@ Site: https://cli.drbaher.com/
    - HTTP API: `sign serve --port 4000` (20 routes under `/v1/*`, schema at `/v1/openapi.json`)
    - Agent contract: https://github.com/DrBaher/sign-cli/blob/main/AGENTS.md
 
+8. **contract-vault-cli** — Post-signature ("manage-out") layer. Registers SIGNED contracts (typically from extract-cli output) in a git-backed vault, then surfaces renewals, auto-renewal notice deadlines, expirations, payment dates, and obligations — as a queryable portfolio and an RFC 5545 `.ics` calendar. The sibling of template-vault: template-vault stores blank templates, contract-vault stores signed instances. Human-review/`accept` workflow promotes fields to `source: manual`. `risk --strict` is a CI gate for missed renewal notices. Stdlib-only Python, zero runtime deps; extraction delegated to extract-cli.
+   - GitHub: https://github.com/DrBaher/contract-vault-cli
+   - PyPI: https://pypi.org/project/contract-vault/ (package `contract-vault`, bin `contract-vault`)
+   - Install: `pipx install contract-vault` (`[docx]` extra pulls in extract-cli for end-to-end ingest)
+   - Agent discovery: `contract-vault --catalog json` (18 commands incl. get/show, find/search, due/obligations, risk/at-risk aliases)
+   - Agent contract: https://github.com/DrBaher/contract-vault-cli/blob/main/AGENTS.md
+
 ## The architectural claim
 
 The asymmetry is the architecture: an agent can drive every step except the actual signing gesture, which stays gated behind a human. The mechanism is the per-signer approval token — TTL-bounded, scoped to a single signer's email, single-use. The requester (which can be the agent) holds and DMs the token to the human signer; the signer pastes it into `sign sign --token ...`. The agent never sees signer tokens. Pre-sign safety checks (`--require-hash`, `--require-title`, `--require-signer-email`) throw structured errors before any state mutation.
@@ -74,14 +81,14 @@ This means an LLM agent can do all the operational work (sending documents, trac
 
 ## Cross-suite agent contract
 
-All seven CLIs share the same output shape; exit-code meanings vary by CLI (see below):
+All eight CLIs share the same output shape; exit-code meanings vary by CLI (see below):
 
 - **Output**: success JSON to stdout, exit `0`. On failure, `{ ok: false, error: ... }` with a non-zero exit — but the error *shape* is NOT uniform (e.g. sign-cli emits a nested `error` object; docx2pdf-cli emits a flat `error` string). Branch on the exit code and confirm shape via `--catalog json`; don't assume a shared error object.
-- **Exit codes (NOT uniform — don't assume a shared meaning)**: most of the suite uses `0` success / `2` invalid input / `3` policy/chain/verification failed / `4` not found (nda-review-cli, sign-cli, docx2pdf-cli). Four need special-casing: **template-vault-cli** = `0` success / `1` a check reported problems / `2` invalid usage or error; **compare-cli** reuses `0`–`4` as drift classes — `0` clean, `2` substantive drift, `3` cosmetic/typographic, `4` clauses moved, `1` I/O error; **draft-cli** has its own `0`–`4` — `0` ok, `1` I/O error, `2` validation, `3` template-vault failure, `4` LLM failure; **extract-cli** = `0` success / `1` low-signal document (a finding — valid JSON still emitted; e.g. scanned/empty) / `2` bad usage. Read the `exitCodes` map from `--catalog json` and confirm against each CLI's AGENTS.md.
-- **Discovery**: **all seven answer `<bin> --catalog json`** — one uniform shape `{ name, bin, version, description, commands|flags, exitCodes }` — call it at startup instead of hardcoding tool/flag names. Tool-specific extras: extract-cli `schema` (output JSON Schema) + `fields --json`; template-vault-cli `info <ref> --json` + `find <query> --json` (schemas under `docs/spec/`); draft-cli `--list-placeholders --json` (per-template manifest); docx2pdf-cli `--capabilities` + `--doctor` (schema-validated host readiness); sign-cli `sign mcp tools` (live MCP tool catalog); compare-cli `--json` for the structured drift verdict.
+- **Exit codes (NOT uniform — don't assume a shared meaning)**: most of the suite uses `0` success / `2` invalid input / `3` policy/chain/verification failed / `4` not found (nda-review-cli, sign-cli, docx2pdf-cli). Five need special-casing: **template-vault-cli** = `0` success / `1` a check reported problems / `2` invalid usage or error; **compare-cli** reuses `0`–`4` as drift classes — `0` clean, `2` substantive drift, `3` cosmetic/typographic, `4` clauses moved, `1` I/O error; **draft-cli** has its own `0`–`4` — `0` ok, `1` I/O error, `2` validation, `3` template-vault failure, `4` LLM failure; **extract-cli** = `0` success / `1` low-signal document (a finding — valid JSON still emitted; e.g. scanned/empty) / `2` bad usage; **contract-vault-cli** = `0` success / `1` failure or findings (integrity check failed, or a `--strict` review/risk gate tripped) / `2` bad usage. Read the `exitCodes` map from `--catalog json` and confirm against each CLI's AGENTS.md.
+- **Discovery**: **all eight answer `<bin> --catalog json`** — one uniform shape `{ name, bin, version, description, commands|flags, exitCodes }` — call it at startup instead of hardcoding tool/flag names. Tool-specific extras: extract-cli `schema` (output JSON Schema) + `fields --json`; template-vault-cli `info <ref> --json` + `find <query> --json` (schemas under `docs/spec/`); draft-cli `--list-placeholders --json` (per-template manifest); docx2pdf-cli `--capabilities` + `--doctor` (schema-validated host readiness); sign-cli `sign mcp tools` (live MCP tool catalog); compare-cli `--json` for the structured drift verdict; contract-vault-cli `due/obligations --format ics|json` + `export --format csv|md|json`.
 - **Never hardcode tool counts, flag lists, or sub-command names** — call `--catalog json` at startup.
 
-## Repository shape (consistent across all seven)
+## Repository shape (consistent across all eight)
 
 ```
 README.md           # lede + "Run this" + decision tree
@@ -131,7 +138,7 @@ sign mcp serve --read-only true \
 
 - Suite home: https://cli.drbaher.com/
 - 5-minute tour: https://cli.drbaher.com/tour/
-- Playground (run all seven in-browser): https://cli.drbaher.com/play/
+- Playground (run all eight in-browser): https://cli.drbaher.com/play/
 - Workflow walkthrough: https://cli.drbaher.com/workflow/
 - MCP integration guide: https://cli.drbaher.com/mcp/
 - Built for agents (Claude, Cursor, Codex, OpenClaw, langchain): https://cli.drbaher.com/built-for-agents/
@@ -142,4 +149,4 @@ sign mcp serve --read-only true \
 
 ## License
 
-All seven CLIs are MIT-licensed. The showcase site itself is also open source.
+All eight CLIs are MIT-licensed. The showcase site itself is also open source.
