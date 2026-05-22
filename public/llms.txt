@@ -1,10 +1,10 @@
 # drbaher CLI suite
 
-> Eight composable, local-first, agent-first CLIs for end-to-end contract operations. The agent does the operational work (ingesting foreign paper into structured data, storing and versioning templates, drafting, reviewing, comparing for drift, sending, verifying, and tracking renewals/obligations on signed contracts); the human approves the gestures that need a deliberate human action (signing, accepting a final position, escalating non-negotiables).
+> Nine composable, local-first, agent-first CLIs for end-to-end contract operations. The agent does the operational work (ingesting foreign paper into structured data, storing and versioning templates, drafting, reviewing, linting for internal defects, comparing for drift, sending, verifying, and tracking renewals/obligations on signed contracts); the human approves the gestures that need a deliberate human action (signing, accepting a final position, escalating non-negotiables).
 
 Site: https://cli.drbaher.com/
 
-## The eight CLIs
+## The nine CLIs
 
 1. **extract-cli** — Open-loop front door of the suite: ingest any contract (`.md`/`.txt`/`.html`/`.docx`/`.pdf`, yours or a counterparty's foreign paper) into structured JSON — parties, dates, term, governing law, a clause map normalized onto the suite's canonical clause vocabulary, defined terms, a headline value. Every field carries a `confidence` and a `source` (verify, don't trust). The deterministic tier is always on (no network); the opt-in `--llm` tier adds fuzzy fields and a clause-map fallback. Stdlib-only Python (zero runtime deps; `[docx]`/`[pdf]` extras improve fidelity).
    - GitHub: https://github.com/DrBaher/extract-cli
@@ -37,7 +37,14 @@ Site: https://cli.drbaher.com/
    - Agent discovery: `nda-review-cli --catalog json` (24 commands, including 12 nested `negotiate` subcommands)
    - Agent contract: https://github.com/DrBaher/nda-review-cli/blob/main/AGENTS.md
 
-5. **compare-cli** — Agent-first, clause-aware drift detection between two contract versions. Single-file Node CLI, deterministic by design, no LLM tier in v1. Four-tier clause-detection cascade (H2 / bold-prefix / ALL-CAPS / synthetic). Five-class spectrum (clean / cosmetic / typographic / substantive / moved). `--from-negotiation` reads nda-review-cli's `negotiation.json` with a three-tier resolution (status: converged → per-round agreed → clause_status all "agreed"). `--require-signoffs` double-locks the gate. Output modes: human (with inline word-diff for substantive changes), `--json` (locked across v1.x), `--sarif` (SARIF v2.1.0 for code-scanning). `--check` for exit-code-only CI gates. Track-changes metadata from `.docx` surfaces alongside the diff. Two runtime deps (`jszip` + `pdfjs-dist`).
+5. **contract-lint-cli** — A deterministic linter for a contract's INTERNAL consistency: leftover placeholders, broken cross-references (a Section/Exhibit/Schedule reference with no target), undefined/unused/duplicate defined terms, heading-number gaps, inconsistent party spellings, and impossible dates. Each defect is a finding `{rule, severity, message, line, excerpt}`, and it exits non-zero so CI or an agent can gate on it. Eight rules (placeholder + broken-xref are errors; undefined-term ships off by default). Output: human table, `--json` (locked, timestamp-free → diff-stable), or `--sarif` (2.1.0). `--fail-on error|warning|none`, `--check` (exit-code-only), `--enable`/`--disable` a rule, `--config`. Lints `.md`/`.txt`/`.html`/`.docx`/`.pdf` and stdin (`-`, with `--format md`). Local-first, stdlib-only Python, zero deps, no model, no network. Works standalone; also composes with the contract-ops suite as the pre-signature quality gate — where compare-cli gates *drift between versions*, contract-lint gates *defects within one document*.
+   - GitHub: https://github.com/DrBaher/contract-lint-cli
+   - PyPI: https://pypi.org/project/contract-lint/ (package `contract-lint`, bin `contract-lint`)
+   - Install: `pipx install contract-lint`
+   - Agent discovery: `contract-lint --catalog json` (commands: lint, rules, demo, completion) + `contract-lint rules --json` (the rule catalog: id, severity, default state)
+   - Agent contract: https://github.com/DrBaher/contract-lint-cli/blob/main/AGENTS.md
+
+6. **compare-cli** — Agent-first, clause-aware drift detection between two contract versions. Single-file Node CLI, deterministic by design, no LLM tier in v1. Four-tier clause-detection cascade (H2 / bold-prefix / ALL-CAPS / synthetic). Five-class spectrum (clean / cosmetic / typographic / substantive / moved). `--from-negotiation` reads nda-review-cli's `negotiation.json` with a three-tier resolution (status: converged → per-round agreed → clause_status all "agreed"). `--require-signoffs` double-locks the gate. Output modes: human (with inline word-diff for substantive changes), `--json` (locked across v1.x), `--sarif` (SARIF v2.1.0 for code-scanning). `--check` for exit-code-only CI gates. Track-changes metadata from `.docx` surfaces alongside the diff. Two runtime deps (`jszip` + `pdfjs-dist`).
    - GitHub: https://github.com/DrBaher/compare-cli
    - npm: https://www.npmjs.com/package/compare-cli (unscoped)
    - Install: `npm i -g compare-cli`
@@ -49,14 +56,14 @@ Site: https://cli.drbaher.com/
    - Schema contract: https://github.com/DrBaher/compare-cli/blob/main/COMPARE_SCHEMA.md (locked; stable across v1.x)
    - MCP design: https://github.com/DrBaher/compare-cli/blob/main/docs/mcp.md
 
-6. **docx2pdf-cli** — Agent-first DOCX → PDF converter. Six hybrid backends (LibreOffice, Gotenberg, ConvertAPI, Apple Pages, Microsoft Word, textutil-cups). Strict-fidelity guard, machine-readable `--capabilities` + `--doctor` JSON (both schema-validated). NDJSON batch mode.
+7. **docx2pdf-cli** — Agent-first DOCX → PDF converter. Six hybrid backends (LibreOffice, Gotenberg, ConvertAPI, Apple Pages, Microsoft Word, textutil-cups). Strict-fidelity guard, machine-readable `--capabilities` + `--doctor` JSON (both schema-validated). NDJSON batch mode.
    - GitHub: https://github.com/DrBaher/docx2pdf-cli
    - npm: https://www.npmjs.com/package/docx2pdf-cli
    - Install: `npm i -g docx2pdf-cli`
    - Agent discovery: `docx2pdf --capabilities` (machine-readable feature contract), `docx2pdf --doctor` (host-readiness JSON), `docx2pdf --catalog json` (flag inventory)
    - Agent contract: https://github.com/DrBaher/docx2pdf-cli/blob/main/AGENTS.md
 
-7. **sign-cli** — Agent-first e-signature CLI. Built-in fully-offline PAdES signer (PKCS#7 in `/ByteRange`, self-issued cert) produces real cryptographically verifiable signed PDFs with no signup. Or routes through Dropbox Sign / DocuSign / SignWell. 19-tool MCP server over stdio. 20-route HTTP API at `/v1/*`. Hash-chained audit log with append-only DB triggers. RFC 3161 timestamp anchoring. Per-signer approval tokens (TTL-bounded, single-use, scoped to one email).
+8. **sign-cli** — Agent-first e-signature CLI. Built-in fully-offline PAdES signer (PKCS#7 in `/ByteRange`, self-issued cert) produces real cryptographically verifiable signed PDFs with no signup. Or routes through Dropbox Sign / DocuSign / SignWell. 19-tool MCP server over stdio. 20-route HTTP API at `/v1/*`. Hash-chained audit log with append-only DB triggers. RFC 3161 timestamp anchoring. Per-signer approval tokens (TTL-bounded, single-use, scoped to one email).
    - GitHub: https://github.com/DrBaher/sign-cli
    - npm: https://www.npmjs.com/package/@drbaher/sign-cli (scoped — the unscoped `sign-cli` belongs to an unrelated project)
    - Install: `npm i -g @drbaher/sign-cli`
@@ -66,7 +73,7 @@ Site: https://cli.drbaher.com/
    - HTTP API: `sign serve --port 4000` (20 routes under `/v1/*`, schema at `/v1/openapi.json`)
    - Agent contract: https://github.com/DrBaher/sign-cli/blob/main/AGENTS.md
 
-8. **contract-vault-cli** — A git-backed register for SIGNED contracts: register an executed deal, then surface renewals, auto-renewal notice deadlines, expirations, payment dates, and **recurring obligations** — as a queryable portfolio, an RFC 5545 `.ics` calendar, and a **reminder digest** for cron/agents. Obligation lifecycle: `obligation <deal> <id>` marks done/waived, assigns `--owner`, sets `--reminders`, or makes it recur (weekly/monthly/quarterly/semiannual); `due`/`obligations` are status-aware (only open by default). `remind` is the open-reminder-window digest; `config reminders` sets corpus-wide lead-times. Human-review/`accept` promotes fields to `source: manual`; `risk --strict` is a CI gate for missed renewal notices. Stdlib-only Python, zero runtime deps. Works standalone; also composes with the contract-ops suite (ingests extract-cli output) — the post-signature sibling of template-vault (template-vault stores blank templates, contract-vault stores signed instances).
+9. **contract-vault-cli** — A git-backed register for SIGNED contracts: register an executed deal, then surface renewals, auto-renewal notice deadlines, expirations, payment dates, and **recurring obligations** — as a queryable portfolio, an RFC 5545 `.ics` calendar, and a **reminder digest** for cron/agents. Obligation lifecycle: `obligation <deal> <id>` marks done/waived, assigns `--owner`, sets `--reminders`, or makes it recur (weekly/monthly/quarterly/semiannual); `due`/`obligations` are status-aware (only open by default). `remind` is the open-reminder-window digest; `config reminders` sets corpus-wide lead-times. Human-review/`accept` promotes fields to `source: manual`; `risk --strict` is a CI gate for missed renewal notices. Stdlib-only Python, zero runtime deps. Works standalone; also composes with the contract-ops suite (ingests extract-cli output) — the post-signature sibling of template-vault (template-vault stores blank templates, contract-vault stores signed instances).
    - GitHub: https://github.com/DrBaher/contract-vault-cli
    - PyPI: https://pypi.org/project/contract-vault/ (package `contract-vault`, bin `contract-vault`)
    - Install: `pipx install contract-vault` (`[docx]` extra pulls in extract-cli for end-to-end ingest)
@@ -81,14 +88,14 @@ This means an LLM agent can do all the operational work (sending documents, trac
 
 ## Cross-suite agent contract
 
-All eight CLIs share the same output shape; exit-code meanings vary by CLI (see below):
+All nine CLIs share the same output shape; exit-code meanings vary by CLI (see below):
 
 - **Output**: success JSON to stdout, exit `0`. On failure, `{ ok: false, error: ... }` with a non-zero exit — but the error *shape* is NOT uniform (e.g. sign-cli emits a nested `error` object; docx2pdf-cli emits a flat `error` string). Branch on the exit code and confirm shape via `--catalog json`; don't assume a shared error object.
-- **Exit codes (NOT uniform — don't assume a shared meaning)**: most of the suite uses `0` success / `2` invalid input / `3` policy/chain/verification failed / `4` not found (nda-review-cli, sign-cli, docx2pdf-cli). Five need special-casing: **template-vault-cli** = `0` success / `1` a check reported problems / `2` invalid usage or error; **compare-cli** reuses `0`–`4` as drift classes — `0` clean, `2` substantive drift, `3` cosmetic/typographic, `4` clauses moved, `1` I/O error; **draft-cli** has its own `0`–`4` — `0` ok, `1` I/O error, `2` validation, `3` template-vault failure, `4` LLM failure; **extract-cli** = `0` success / `1` low-signal document (a finding — valid JSON still emitted; e.g. scanned/empty) / `2` bad usage; **contract-vault-cli** = `0` success / `1` failure or findings (integrity check failed, or a `--strict` review/risk gate tripped) / `2` bad usage. Read the `exitCodes` map from `--catalog json` and confirm against each CLI's AGENTS.md.
-- **Discovery**: **all eight answer `<bin> --catalog json`** — one uniform shape `{ name, bin, version, description, commands|flags, exitCodes }` — call it at startup instead of hardcoding tool/flag names. Tool-specific extras: extract-cli `schema` (output JSON Schema) + `fields --json`; template-vault-cli `info <ref> --json` + `find <query> --json` (schemas under `docs/spec/`); draft-cli `--list-placeholders --json` (per-template manifest); docx2pdf-cli `--capabilities` + `--doctor` (schema-validated host readiness); sign-cli `sign mcp tools` (live MCP tool catalog); compare-cli `--json` for the structured drift verdict; contract-vault-cli `due/obligations --format ics|json` (status-aware) + `export --format csv|md|json` + `remind` (open-reminder digest) + `config reminders` (corpus-wide lead-times).
+- **Exit codes (NOT uniform — don't assume a shared meaning)**: most of the suite uses `0` success / `2` invalid input / `3` policy/chain/verification failed / `4` not found (nda-review-cli, sign-cli, docx2pdf-cli). Six need special-casing: **template-vault-cli** = `0` success / `1` a check reported problems / `2` invalid usage or error; **compare-cli** reuses `0`–`4` as drift classes — `0` clean, `2` substantive drift, `3` cosmetic/typographic, `4` clauses moved, `1` I/O error; **draft-cli** has its own `0`–`4` — `0` ok, `1` I/O error, `2` validation, `3` template-vault failure, `4` LLM failure; **extract-cli** = `0` success / `1` low-signal document (a finding — valid JSON still emitted; e.g. scanned/empty) / `2` bad usage; **contract-vault-cli** = `0` success / `1` failure or findings (integrity check failed, or a `--strict` review/risk gate tripped) / `2` bad usage; **contract-lint-cli** = `0` clean (no findings at/above `--fail-on`, default `error`) / `1` findings at/above the threshold (the gate tripped) / `2` bad usage or unreadable input. Read the `exitCodes` map from `--catalog json` and confirm against each CLI's AGENTS.md.
+- **Discovery**: **all nine answer `<bin> --catalog json`** — one uniform shape `{ name, bin, version, description, commands|flags, exitCodes }` — call it at startup instead of hardcoding tool/flag names. Tool-specific extras: extract-cli `schema` (output JSON Schema) + `fields --json`; template-vault-cli `info <ref> --json` + `find <query> --json` (schemas under `docs/spec/`); draft-cli `--list-placeholders --json` (per-template manifest); docx2pdf-cli `--capabilities` + `--doctor` (schema-validated host readiness); sign-cli `sign mcp tools` (live MCP tool catalog); compare-cli `--json` for the structured drift verdict; contract-vault-cli `due/obligations --format ics|json` (status-aware) + `export --format csv|md|json` + `remind` (open-reminder digest) + `config reminders` (corpus-wide lead-times); contract-lint-cli `rules --json` (the rule catalog: id, severity, default) + `--json`/`--sarif` output + `--check`/`--fail-on` for exit-code-only CI gating.
 - **Never hardcode tool counts, flag lists, or sub-command names** — call `--catalog json` at startup.
 
-## Repository shape (consistent across all eight)
+## Repository shape (consistent across all nine)
 
 ```
 README.md           # lede + "Run this" + decision tree
@@ -138,7 +145,7 @@ sign mcp serve --read-only true \
 
 - Suite home: https://cli.drbaher.com/
 - 5-minute tour: https://cli.drbaher.com/tour/
-- Playground (run all eight in-browser): https://cli.drbaher.com/play/
+- Playground (run all nine in-browser): https://cli.drbaher.com/play/
 - Workflow walkthrough: https://cli.drbaher.com/workflow/
 - MCP integration guide: https://cli.drbaher.com/mcp/
 - Built for agents (Claude, Cursor, Codex, OpenClaw, langchain): https://cli.drbaher.com/built-for-agents/
@@ -149,4 +156,4 @@ sign mcp serve --read-only true \
 
 ## License
 
-All eight CLIs are MIT-licensed. The showcase site itself is also open source.
+All nine CLIs are MIT-licensed. The showcase site itself is also open source.

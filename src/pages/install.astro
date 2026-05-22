@@ -4,9 +4,9 @@ import Callout from '../components/Callout.astro';
 import InstallTabs from '../components/InstallTabs.astro';
 import CodeBlock from '../components/CodeBlock.astro';
 ---
-<BaseLayout title="Install" active="install" description="Install all eight CLIs in under two minutes — pipx for extract-cli, template-vault-cli, nda-review-cli, and contract-vault, npm for draft-cli, compare-cli, sign-cli, and docx2pdf-cli." toc>
+<BaseLayout title="Install" active="install" description="Install all nine CLIs in under two minutes — pipx for extract-cli, template-vault-cli, nda-review-cli, contract-vault, and contract-lint, npm for draft-cli, compare-cli, sign-cli, and docx2pdf-cli." toc>
   <p class="eyebrow">Install</p>
-  <h1>Eight installs, one workflow.</h1>
+  <h1>Nine installs, one workflow.</h1>
 
   <p class="text-lg text-ink-700 dark:text-night-100">
     Each CLI is a standalone package on its native registry. Install whichever ones you need;
@@ -14,17 +14,18 @@ import CodeBlock from '../components/CodeBlock.astro';
   </p>
 
   <Callout label="TL;DR">
-    <code class="chip">pipx install extract-cli</code> · <code class="chip">pipx install template-vault-cli</code> · <code class="chip">npm i -g @drbaher/draft-cli</code> · <code class="chip">pipx install nda-review-cli</code> · <code class="chip">npm i -g compare-cli</code> · <code class="chip">npm i -g docx2pdf-cli</code> · <code class="chip">npm i -g @drbaher/sign-cli</code>.
+    <code class="chip">pipx install extract-cli</code> · <code class="chip">pipx install template-vault-cli</code> · <code class="chip">npm i -g @drbaher/draft-cli</code> · <code class="chip">pipx install nda-review-cli</code> · <code class="chip">npm i -g compare-cli</code> · <code class="chip">npm i -g docx2pdf-cli</code> · <code class="chip">npm i -g @drbaher/sign-cli</code> · <code class="chip">pipx install contract-vault</code> · <code class="chip">pipx install contract-lint</code>.
     Verify with <code class="chip">--version</code> on each.
   </Callout>
 
   <h2>Install the whole suite</h2>
-  <p>Want all eight at once? Two package managers, five commands:</p>
-  <CodeBlock label="install all eight">{`# Four Python CLIs (pipx installs one package per command)
+  <p>Want all nine at once? Two package managers, six commands:</p>
+  <CodeBlock label="install all nine">{`# Five Python CLIs (pipx installs one package per command)
 pipx install extract-cli
 pipx install template-vault-cli
 pipx install nda-review-cli
 pipx install contract-vault
+pipx install contract-lint
 
 # Four Node CLIs (one npm command)
 npm i -g @drbaher/draft-cli compare-cli docx2pdf-cli @drbaher/sign-cli`}</CodeBlock>
@@ -33,7 +34,7 @@ npm i -g @drbaher/draft-cli compare-cli docx2pdf-cli @drbaher/sign-cli`}</CodeBl
   <h2>Prerequisites</h2>
   <ul>
     <li><strong>Node.js 18+</strong> for draft-cli and docx2pdf-cli; <strong>Node.js 20+</strong> for compare-cli (pinned by <code class="chip">pdfjs-dist</code>); <strong>Node.js 22+</strong> for sign-cli (uses <code class="chip">node:sqlite</code>). Install via <code class="chip">brew install node</code>, <code class="chip">nvm</code>, or your platform's installer.</li>
-    <li><strong>Python 3.9+</strong> with <code class="chip">pipx</code> for extract-cli, template-vault-cli, nda-review-cli, and contract-vault. Install pipx via <code class="chip">brew install pipx</code> or your distro package manager, then <code class="chip">pipx ensurepath</code>.</li>
+    <li><strong>Python 3.9+</strong> with <code class="chip">pipx</code> for extract-cli, template-vault-cli, nda-review-cli, contract-vault, and contract-lint. Install pipx via <code class="chip">brew install pipx</code> or your distro package manager, then <code class="chip">pipx ensurepath</code>.</li>
     <li><strong>A PDF backend</strong> (only for docx2pdf-cli) — LibreOffice, Microsoft Word, Apple Pages, or a Gotenberg / ConvertAPI server. The tool auto-detects what's installed.</li>
   </ul>
 
@@ -220,6 +221,28 @@ contract-vault demo
 mkdir my-contracts && cd my-contracts
 contract-vault init
 extract ~/contracts/signed.pdf | contract-vault ingest -`}</CodeBlock>
+
+  <h2>contract-lint-cli</h2>
+  <p>
+    The Python CLI for the pre-signature quality gate — lint one contract for internal-consistency
+    defects (leftover placeholders, broken cross-references, defined-term and numbering issues) with
+    CI-gateable exit codes. Stdlib-only at runtime, zero dependencies. Installs as
+    <code class="chip">contract-lint</code> on your PATH (PyPI package <code class="chip">contract-lint</code>).
+  </p>
+
+  <InstallTabs
+    id="clint-tabs"
+    tabs={[
+      { id: 'pipx', label: 'pipx', command: 'pipx install contract-lint\ncontract-lint --version', note: 'Recommended — isolates dependencies and adds the CLI to your $PATH.' },
+      { id: 'pip',  label: 'pip',  command: 'pip install contract-lint', note: 'Stdlib-only. Make sure ~/.local/bin is on your $PATH.' },
+    ]}
+  />
+
+  <CodeBlock label="first run">{`# Zero-config: lint a deliberately-flawed sample contract
+contract-lint demo
+
+# Lint your own document; gate CI on errors only
+contract-lint your-contract.md --check --fail-on error`}</CodeBlock>
 
   <h2>Configuration locations</h2>
   <p>Each tool keeps its config in standard places. Nothing is shared across tools.</p>

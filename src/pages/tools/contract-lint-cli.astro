@@ -1,0 +1,130 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Callout from '../../components/Callout.astro';
+import CastPlayer from '../../components/CastPlayer.astro';
+import Playground from '../../components/Playground.astro';
+import CodeBlock from '../../components/CodeBlock.astro';
+import FreshHeader from '../../components/FreshHeader.astro';
+import JsonLd from '../../components/JsonLd.astro';
+import { getCliMeta } from '../../data/registry';
+
+const meta = (await getCliMeta())['contract-lint-cli'];
+
+const jsonLd = {
+  '@type': 'SoftwareApplication',
+  name: 'contract-lint-cli',
+  applicationCategory: 'DeveloperApplication',
+  operatingSystem: 'macOS, Linux, Windows',
+  softwareVersion: meta.version,
+  programmingLanguage: 'Python',
+  license: 'https://opensource.org/licenses/MIT',
+  url: 'https://cli.drbaher.com/tools/contract-lint-cli/',
+  codeRepository: 'https://github.com/DrBaher/contract-lint-cli',
+  description: 'Deterministic, stdlib-only linter for a contract’s internal consistency — leftover placeholders, broken cross-references, undefined/unused defined terms, numbering gaps, party-name and date inconsistencies — with CI-gateable exit codes.',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+};
+---
+<BaseLayout
+  title="contract-lint-cli"
+  active="tools/contract-lint-cli"
+  description="Lint a contract for internal-consistency defects — leftover placeholders, broken cross-references, undefined/unused defined terms, numbering gaps, party-name and date inconsistencies — with CI-gateable exit codes. Deterministic, stdlib-only Python."
+  withCasts
+  toc
+>
+  <JsonLd data={jsonLd} />
+  <p class="eyebrow">Tool · Python</p>
+  <h1 class="flex items-center gap-4">
+    <img src="/assets/icons/contract-lint-cli.svg" alt="" class="h-12 w-12" />
+    <span class="font-serif">contract-lint-cli</span>
+  </h1>
+  <FreshHeader name="contract-lint-cli" version={meta.version} source={meta.source} fetchedAt={meta.fetchedAt} stars={meta.stars} weeklyDownloads={meta.weeklyDownloads} github="https://github.com/DrBaher/contract-lint-cli" />
+  <p class="text-lg text-ink-700 dark:text-night-100">
+    A linter for a contract's <strong>internal consistency</strong>. Point it at one document and it
+    flags the defects that slip past a read-through: leftover <strong>placeholders</strong>, broken
+    <strong>cross-references</strong> ("as set out in Section 7.2" pointing at nothing), undefined /
+    unused / duplicate <strong>defined terms</strong>, heading-<strong>number gaps</strong>, inconsistent
+    <strong>party spellings</strong>, and impossible <strong>dates</strong>. Each defect is a finding
+    (<code class="chip">rule</code>, <code class="chip">severity</code>, <code class="chip">line</code>,
+    <code class="chip">excerpt</code>), and it exits non-zero so CI or an agent can <strong>gate</strong>
+    on it. Fully deterministic — no model, no network, byte-stable output. Stdlib-only, single file.
+  </p>
+  <p class="text-ink-700 dark:text-night-100">
+    It works standalone, and also composes with the contract-ops suite as the <strong>pre-signature
+    quality gate</strong>. Its neighbor <a href="/tools/compare-cli/">compare-cli</a> gates <em>drift
+    between versions</em>; contract-lint gates <em>defects within one document</em> — run both after
+    <a href="/tools/draft-cli/">draft</a> and before <a href="/tools/sign-cli/">sign</a>.
+  </p>
+
+  <Callout label="TL;DR">
+    <code class="chip">pipx install contract-lint</code>, then <code class="chip">contract-lint demo</code>
+    for a zero-config run on a deliberately-flawed sample. Lint your own with
+    <code class="chip">contract-lint your-contract.md</code>; gate CI with
+    <code class="chip">contract-lint contract.md --check --fail-on error</code>. Deterministic,
+    stdlib-only, no network.
+  </Callout>
+
+  <CastPlayer src="/casts/contract-lint-cli-demo.cast" title="contract-lint demo — linting a flawed contract" />
+
+  <h2>Try it live</h2>
+  <p>Paste a contract (or load a flawed sample) and see the findings — leftover placeholders, broken refs, defined-term and numbering issues — in a sandbox, no install.</p>
+  <Playground cli="contract-lint" title="contract-lint playground" />
+
+  <h2>What it does</h2>
+
+  <ul>
+    <li><strong>Eight deterministic rules.</strong> Errors: <code class="chip">placeholder</code> (leftover <code class="chip">[Bracketed]</code> / <code class="chip">{'{{'}mustache{'}}'}</code> / <code class="chip">TBD</code>) and <code class="chip">broken-xref</code> (a Section/Exhibit/Schedule reference with no target). Warnings (on by default): <code class="chip">unused-definition</code>, <code class="chip">double-definition</code>, <code class="chip">numbering</code> (gaps/duplicates), <code class="chip">party-consistency</code> (variant spellings), <code class="chip">date-sanity</code>. <code class="chip">undefined-term</code> ships off by default (opt in with <code class="chip">--enable undefined-term</code>).</li>
+    <li><strong>One document, five formats.</strong> Lints <code class="chip">.md</code> / <code class="chip">.txt</code> / <code class="chip">.html</code> natively and <code class="chip">.docx</code> / <code class="chip">.pdf</code>; reads <code class="chip">-</code> from stdin (pass <code class="chip">--format md</code> to tell it the input type).</li>
+    <li><strong>A real CI gate.</strong> <code class="chip">--fail-on error|warning|none</code> sets the threshold; <code class="chip">--check</code> is exit-code-only (no output) for pipelines. Exit <code class="chip">0</code> clean · <code class="chip">1</code> findings at/above the threshold · <code class="chip">2</code> bad usage.</li>
+    <li><strong>Machine-readable output.</strong> A human table by default; <code class="chip">--json</code> (locked schema, timestamp-free so it's diff-stable) and <code class="chip">--sarif</code> (SARIF 2.1.0 for code-scanning) for tools and agents.</li>
+    <li><strong>Tunable.</strong> <code class="chip">--enable</code> / <code class="chip">--disable</code> a rule, or a <code class="chip">--config</code> file (the suite-wide <code class="chip">~/.config/contract-ops/</code> is honored). <code class="chip">--why</code> explains a finding on stderr.</li>
+  </ul>
+
+  <h2>Quickstart</h2>
+
+  <CodeBlock label="install + run">{`# Install (zero runtime deps; single-file stdlib Python)
+pipx install contract-lint
+contract-lint --version
+
+# Zero-config: lint a deliberately-flawed bundled contract
+contract-lint demo
+
+# Lint your own document; gate CI on errors only
+contract-lint your-contract.md
+contract-lint your-contract.md --check --fail-on error   # exit 1 if any error
+
+# Machine-readable for tools / code-scanning
+contract-lint your-contract.md --json | jq '.summary'
+contract-lint your-contract.md --sarif > lint.sarif`}</CodeBlock>
+
+  <h2>For agents and automation</h2>
+
+  <p>
+    contract-lint answers the suite's discovery contract: <code class="chip">contract-lint --catalog json</code>
+    returns <code class="chip">{'{'}name, bin, version, description, commands[], exitCodes{'}'}</code>, and
+    <code class="chip">contract-lint rules --json</code> lists every rule (id, severity, default state) — call
+    those at startup instead of hardcoding. The <code class="chip">--json</code> output is a locked,
+    timestamp-free schema (<code class="chip">{'{'}summary, findings[]{'}'}</code>), so two runs on the same
+    input diff cleanly. Branch on the exit code: <code class="chip">0</code> clean, <code class="chip">1</code>
+    findings at/above <code class="chip">--fail-on</code>, <code class="chip">2</code> bad usage.
+  </p>
+
+  <CodeBlock label="recommended agent defaults">{`contract-lint --catalog json                       # discover commands/flags
+contract-lint rules --json                          # the rule catalog (id, severity, default)
+contract-lint draft.md --json                       # structured findings to act on
+contract-lint draft.md --check --fail-on error      # CI gate (exit 1 on any error)`}</CodeBlock>
+
+  <h2>Where it fits in the workflow</h2>
+
+  <p>
+    The <strong>pre-signature quality gate</strong>. After <a href="/tools/draft-cli/">draft-cli</a> fills a
+    template (or you've ingested foreign paper with <a href="/tools/extract-cli/">extract-cli</a>), run
+    contract-lint to catch internal defects and <a href="/tools/compare-cli/">compare-cli</a> to catch drift
+    from the agreed version — two complementary gates before <a href="/tools/sign-cli/">sign-cli</a> seals it:
+    <code class="chip">draft → contract-lint / compare → docx2pdf → sign</code>. It also stands alone as a CI
+    check for any team that drafts contracts and wants a deterministic "did we leave a placeholder / break a
+    cross-reference?" gate. <a href="/workflow/">See the full workflow</a>.
+  </p>
+
+  <h2>Repo</h2>
+  <p><a href="https://github.com/DrBaher/contract-lint-cli" target="_blank" rel="noopener">github.com/DrBaher/contract-lint-cli</a> · MIT licensed · Stdlib-only Python (single file) · PyPI <code class="chip">contract-lint</code>.</p>
+</BaseLayout>

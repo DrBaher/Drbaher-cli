@@ -6,7 +6,7 @@ import CodeBlock from '../components/CodeBlock.astro';
 <BaseLayout
   title="5-minute tour"
   active="tour"
-  description="See all eight contract-ops CLIs in five minutes: every tool ships a zero-config demo, and they chain over stdin into one end-to-end pipeline."
+  description="See all nine contract-ops CLIs in five minutes: every tool ships a zero-config demo, and they chain over stdin into one end-to-end pipeline."
   toc
 >
   <p class="eyebrow">5-minute tour</p>
@@ -18,7 +18,7 @@ import CodeBlock from '../components/CodeBlock.astro';
   </p>
 
   <Callout label="TL;DR">
-    Eight commands, nothing to configure. Each <code class="chip">demo</code> runs against bundled
+    Nine commands, nothing to configure. Each <code class="chip">demo</code> runs against bundled
     fixtures and cleans up after itself. <a href="/install/">Install</a> the suite first (or run any
     one with <code class="chip">npx</code> / <code class="chip">pipx run</code> — no install needed).
   </Callout>
@@ -27,14 +27,15 @@ import CodeBlock from '../components/CodeBlock.astro';
   <p data-reveal>
     Paste these one at a time. Each is self-contained and shows that tool's job in a few seconds.
   </p>
-  <CodeBlock label="eight demos, zero config">{`extract demo            # 1. ingest — extract a bundled NDA into structured JSON
+  <CodeBlock label="nine demos, zero config">{`extract demo            # 1. ingest — extract a bundled NDA into structured JSON
 template-vault demo     # 2. store — compose a template + swap a clause, with provenance
 draft --demo            # 3. draft — fill [Party A], [Effective Date], … in a template
 nda-review-cli demo     # 4. review — score a sample NDA against a house policy
-compare --demo          # 5. compare — clause-aware drift gate (exits 2 on the fixture)
-docx2pdf demo           # 6. convert — render a sample DOCX to PDF
-npx @drbaher/sign-cli demo   # 7. sign — offline PAdES sign + verify + receipt
-contract-vault demo     # 8. manage — register signed deals + project a renewals calendar`}</CodeBlock>
+contract-lint demo      # 5. lint — flag internal defects in a deliberately-flawed sample
+compare --demo          # 6. compare — clause-aware drift gate (exits 2 on the fixture)
+docx2pdf demo           # 7. convert — render a sample DOCX to PDF
+npx @drbaher/sign-cli demo   # 8. sign — offline PAdES sign + verify + receipt
+contract-vault demo     # 9. manage — register signed deals + project a renewals calendar`}</CodeBlock>
 
   <h2 data-reveal>What just happened</h2>
   <ul data-reveal>
@@ -42,6 +43,7 @@ contract-vault demo     # 8. manage — register signed deals + project a renewa
     <li><a href="/tools/template-vault-cli/">template-vault</a> — forked a base NDA, swapped one clause from another, and recorded the provenance in <code class="chip">meta.json</code>.</li>
     <li><a href="/tools/draft-cli/">draft</a> — substituted typed placeholders into a template and printed the filled draft.</li>
     <li><a href="/tools/nda-review-cli/">nda-review-cli</a> — scored the sample NDA and emitted a structured verdict (decision + risk + findings).</li>
+    <li><a href="/tools/contract-lint-cli/">contract-lint</a> — linted a deliberately-flawed sample and reported its internal defects (leftover placeholders, broken cross-references, defined-term and numbering issues) as findings.</li>
     <li><a href="/tools/compare-cli/">compare</a> — diffed two versions clause-by-clause and flagged the substantive drift (exit <code class="chip">2</code>).</li>
     <li><a href="/tools/docx2pdf-cli/">docx2pdf</a> — converted a DOCX to PDF with whatever backend is installed.</li>
     <li><a href="/tools/sign-cli/">sign</a> — created, sent, signed, verified, and bundled a receipt for a PDF — fully offline.</li>

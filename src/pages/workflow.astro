@@ -4,12 +4,12 @@ import Callout from '../components/Callout.astro';
 import WorkflowDiagram from '../components/WorkflowDiagram.astro';
 import CodeBlock from '../components/CodeBlock.astro';
 ---
-<BaseLayout title="The workflow" active="workflow" description="How extract-cli, template-vault-cli, draft-cli, nda-review-cli, compare-cli, docx2pdf-cli, and sign-cli chain together into a complete contract pipeline — with copy-paste commands at each step." toc>
+<BaseLayout title="The workflow" active="workflow" description="How extract-cli, template-vault-cli, draft-cli, nda-review-cli, contract-lint-cli, compare-cli, docx2pdf-cli, sign-cli, and contract-vault-cli chain together into a complete contract pipeline — with copy-paste commands at each step." toc>
   <p class="eyebrow">The workflow</p>
   <h1>From a versioned template to a signed agreement, on your machine.</h1>
 
   <p class="text-lg text-ink-700 dark:text-night-100">
-    Nine steps across eight CLIs. Each is a single CLI invocation. The output of one step is the input
+    Nine steps across nine CLIs. Each is a single CLI invocation. The output of one step is the input
     of the next. Stop at any point — the artifacts you have are useful on their own. Two entry points:
     ingest foreign paper with <code class="chip">extract</code> (step 0), or start from your own versioned
     template (step 1).
@@ -17,8 +17,8 @@ import CodeBlock from '../components/CodeBlock.astro';
 
   <Callout label="TL;DR">
     <code class="chip">extract</code> → <code class="chip">template-vault get</code> → <code class="chip">draft</code> →
-    <code class="chip">review</code> → <code class="chip">negotiate</code> → <code class="chip">compare</code> →
-    <code class="chip">docx2pdf</code> → <code class="chip">sign</code> → <code class="chip">contract-vault</code>. Eight tools, no SaaS, no shared database. Files in, files out.
+    <code class="chip">review</code> → <code class="chip">negotiate</code> → <code class="chip">contract-lint</code> → <code class="chip">compare</code> →
+    <code class="chip">docx2pdf</code> → <code class="chip">sign</code> → <code class="chip">contract-vault</code>. Nine tools, no SaaS, no shared database. Files in, files out.
   </Callout>
 
   <WorkflowDiagram />
@@ -131,15 +131,26 @@ nda-review-cli negotiate finalize --state neg.json \\
     Negotiation is opt-in; the workflow doesn't depend on it.
   </p>
 
-  <h2 id="5--compare" data-reveal>5 — Compare for drift</h2>
+  <h2 id="5--compare" data-reveal>5 — Lint, then gate for drift</h2>
   <p data-reveal>
-    Before anything goes into a signing envelope, gate it. <a href="/tools/compare-cli/">compare-cli</a>
+    Two complementary gates run before anything goes into a signing envelope.
+    First, <a href="/tools/contract-lint-cli/">contract-lint</a> checks the document's
+    <strong>internal</strong> consistency — leftover placeholders, broken cross-references,
+    undefined/unused defined terms, numbering gaps, and party-name/date inconsistencies — and exits
+    non-zero so CI can block on it. Where compare gates <em>drift between versions</em>, contract-lint
+    gates <em>defects within one document</em>.
+  </p>
+  <CodeBlock label="step 5a · contract-lint">{`# Catch internal defects before the file goes anywhere
+contract-lint ready-to-sign.md --check --fail-on error
+# exit 0 = clean · 1 = findings at/above the threshold · 2 = bad usage`}</CodeBlock>
+  <p data-reveal>
+    Then <a href="/tools/compare-cli/">compare-cli</a>
     does a clause-aware diff between the text you agreed to and the artifact you're about to sign —
     catching the quiet shift between "final version" and "the file the paralegal actually sent back."
     The verdict is an exit code your script or CI can branch on, so a human only gets pulled in when the
     drift is substantive.
   </p>
-  <CodeBlock label="step 5 · compare">{`# Did the ready-to-sign file drift from the agreed text?
+  <CodeBlock label="step 5b · compare">{`# Did the ready-to-sign file drift from the agreed text?
 compare output/agreed.md ready-to-sign.pdf --json
 # exit 0 = safe to sign · 2 = substantive drift (review!) · 3 = cosmetic only · 4 = clauses moved`}</CodeBlock>
   <p data-reveal>
@@ -228,6 +239,6 @@ contract-vault risk --within 30d --strict`}</CodeBlock>
     Each tool stands alone. If you already have a filled Word document, skip the vault + draft steps. If
     you trust the ready-to-sign file, skip the compare gate. If you sign with a notary or a different
     e-signature provider, skip the signing step — you'll still have a clean PDF from the convert step.
-    The point isn't that you must use all eight; it's that they compose cleanly when you do.
+    The point isn't that you must use all nine; it's that they compose cleanly when you do.
   </p>
 </BaseLayout>
