@@ -23,6 +23,7 @@ export interface CliMeta {
 }
 
 const FALLBACKS: Record<string, string> = {
+  'extract-cli': '0.1.7',
   'template-vault-cli': '0.4.8',
   'nda-review-cli': '0.5.1',
   'docx2pdf-cli': '0.2.2',
@@ -138,6 +139,7 @@ async function readmeExcerpt(repo: string): Promise<{ heading?: string; excerpt?
 
 export async function getCliMeta(): Promise<Record<string, CliMeta>> {
   const targets: Array<{ key: string; npm?: string; pypi?: string; repo?: string }> = [
+    { key: 'extract-cli',    pypi: 'extract-cli',  repo: 'DrBaher/extract-cli' },
     { key: 'template-vault-cli', pypi: 'template-vault-cli', repo: 'DrBaher/template-vault-CLI' },
     { key: 'draft-cli',      npm: '@drbaher/draft-cli', repo: 'DrBaher/draft-cli' },
     { key: 'nda-review-cli', pypi: 'nda-review-cli', repo: 'DrBaher/nda-review-cli' },

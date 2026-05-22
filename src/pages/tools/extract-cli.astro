@@ -1,0 +1,130 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Callout from '../../components/Callout.astro';
+import Playground from '../../components/Playground.astro';
+import CodeBlock from '../../components/CodeBlock.astro';
+import FreshHeader from '../../components/FreshHeader.astro';
+import JsonLd from '../../components/JsonLd.astro';
+import { getCliMeta } from '../../data/registry';
+
+const meta = (await getCliMeta())['extract-cli'];
+
+const jsonLd = {
+  '@type': 'SoftwareApplication',
+  name: 'extract-cli',
+  applicationCategory: 'DeveloperApplication',
+  operatingSystem: 'macOS, Linux, Windows',
+  softwareVersion: meta.version,
+  programmingLanguage: 'Python',
+  license: 'https://opensource.org/licenses/MIT',
+  url: 'https://cli.drbaher.com/tools/extract-cli/',
+  codeRepository: 'https://github.com/DrBaher/extract-cli',
+  description: 'Open-loop front door of the contract-ops CLI suite: ingest any contract (.md/.txt/.html/.docx/.pdf) and emit structured JSON — parties, dates, term, governing law, and a clause map normalized onto the suite’s canonical vocabulary. Stdlib-only Python.',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+};
+---
+<BaseLayout
+  title="extract-cli"
+  active="tools/extract-cli"
+  description="Open-loop front door of the contract-ops suite: ingest any contract (.md/.txt/.html/.docx/.pdf) and emit structured JSON — parties, clauses, dates, governing law — with a confidence and source on every field. Stdlib-only Python."
+  toc
+>
+  <JsonLd data={jsonLd} />
+  <p class="eyebrow">Tool · Python</p>
+  <h1 class="flex items-center gap-4">
+    <img src="/assets/icons/extract-cli.svg" alt="" class="h-12 w-12" />
+    <span class="font-serif">extract-cli</span>
+  </h1>
+  <FreshHeader name="extract-cli" version={meta.version} source={meta.source} fetchedAt={meta.fetchedAt} stars={meta.stars} weeklyDownloads={meta.weeklyDownloads} github="https://github.com/DrBaher/extract-cli" />
+  <p class="text-lg text-ink-700 dark:text-night-100">
+    The suite's <strong>passport control</strong>. The rest of the contract-ops pipeline is a closed
+    loop that only handles documents it authored from its own templates; <code class="chip">extract-cli</code>
+    ingests <strong>any</strong> document — yours or a counterparty's foreign paper, in
+    <code class="chip">.md</code> / <code class="chip">.txt</code> / <code class="chip">.html</code> /
+    <code class="chip">.docx</code> / <code class="chip">.pdf</code> — and returns structured JSON the
+    pipeline can consume: parties, dates, term, governing law, a <strong>clause map</strong> normalized
+    onto the suite's canonical clause vocabulary, a defined-term inventory, and a headline value. Every
+    field carries a <code class="chip">confidence</code> and a <code class="chip">source</code> so
+    downstream tools <strong>verify, don't trust</strong>. It sits upstream of review — the open-loop
+    front door of the pipeline.
+  </p>
+
+  <Callout label="TL;DR">
+    <code class="chip">pipx install extract-cli</code>, then <code class="chip">extract demo</code> for a
+    zero-config tour on a bundled NDA. Point it at your own file with
+    <code class="chip">extract counterparty.docx</code>. Stdlib-only, no network on the default path;
+    <code class="chip">--llm</code> enrichment is opt-in.
+  </Callout>
+
+  <h2>Try it live</h2>
+  <p>Paste a contract (or use the preset) and watch the deterministic tier pull parties, clauses, dates, and governing law — in a sandbox, no install.</p>
+  <Playground cli="extract" title="extract-cli playground" />
+
+  <h2>What it does</h2>
+
+  <ul>
+    <li><strong>One tool, five formats.</strong> <code class="chip">.md</code>/<code class="chip">.txt</code>/<code class="chip">.html</code> are native; <code class="chip">.docx</code> and <code class="chip">.pdf</code> work out of the box via stdlib readers, with optional <code class="chip">[docx]</code>/<code class="chip">[pdf]</code> extras for higher fidelity. HTML is auto-detected even inside a <code class="chip">.txt</code> (e.g. SEC EDGAR filings).</li>
+    <li><strong>The clause map is the differentiator.</strong> A counterparty's "SECTION 7. NON-DISCLOSURE" and your template's "## Confidentiality" are the same clause. extract-cli reuses template-vault-cli's clause-detection cascade (<code class="chip">## H2</code> → bold-numbered → ALL-CAPS) and a built-in canonical alias vocabulary to normalize foreign titles onto the names the rest of the suite speaks. Unmappable clauses are kept with <code class="chip">mapped: false</code> — nothing is silently dropped.</li>
+    <li><strong>Two explicit tiers.</strong> The <strong>deterministic</strong> tier (always on, no network) extracts parties, dates, defined terms, the clause map, governing law, and best-effort term/notice/value. The <strong>llm</strong> tier is opt-in via <code class="chip">--llm</code> only — renewal mechanics, obligation phrasing, and a clause-map fallback when a document carries no detectable headings.</li>
+    <li><strong>Verify, not trust.</strong> Each scalar is a <code class="chip">{'{'}value, confidence, source{'}'}</code> envelope; "not found" is the canonical <code class="chip">{'{'}value: null, confidence: 0.0, source: "none"{'}'}</code>. <code class="chip">_meta</code> records which tiers ran and whether the LLM was used.</li>
+    <li><strong>A good pipe citizen.</strong> JSON on stdout by default; <code class="chip">--why</code>, warnings, and errors on stderr. Exit <code class="chip">1</code> on a low-signal document (scanned/empty) is a <em>finding</em>, not a crash — valid JSON is still emitted.</li>
+  </ul>
+
+  <h2>Quickstart</h2>
+
+  <CodeBlock label="install + run">{`# Install (zero runtime deps; extras improve .docx/.pdf fidelity)
+pipx install extract-cli
+extract --version
+
+# Zero-config: extract a bundled NDA and show the narrative
+extract demo
+
+# Your own document → structured JSON on stdout
+extract counterparty.docx | jq '{parties: [.parties[].name],
+  governing_law: .governing_law.value, clauses: [.clauses[].canonical_title]}'`}</CodeBlock>
+
+  <h2>For agents and automation</h2>
+
+  <p>
+    extract-cli answers the suite's discovery contract: <code class="chip">extract --catalog json</code>
+    returns <code class="chip">{'{'}name, bin, version, description, commands[], exitCodes{'}'}</code> so an
+    agent learns every command and flag at startup instead of hardcoding them. The output shape is locked
+    by a JSON Schema (<code class="chip">extract schema</code>, committed at
+    <a href="https://github.com/DrBaher/extract-cli/tree/main/docs/spec"><code class="chip">docs/spec/</code></a>)
+    with a semver commitment: a backward-incompatible change requires a major version bump. The full agent
+    contract — output envelope, exit codes, discovery, and failure → recovery — lives in
+    <a href="https://github.com/DrBaher/extract-cli/blob/main/AGENTS.md"><code class="chip">AGENTS.md</code></a>.
+  </p>
+
+  <CodeBlock label="recommended agent defaults">{`extract --catalog json            # discover commands/flags (call at startup)
+extract schema                    # the output JSON Schema (the data contract)
+extract counterparty.pdf | jq -e '.clauses | all(.confidence > 0.7)'   # gate on confidence`}</CodeBlock>
+
+  <p>
+    The integration contract is the <strong>output schema</strong> plus the <strong>shared canonical
+    clause vocabulary</strong> — extract's <code class="chip">canonical_title</code> values are the same
+    names <a href="/tools/template-vault-cli/">template-vault-cli</a> detects and
+    <a href="/tools/nda-review-cli/">nda-review-cli</a> keys policy on, so a foreign document's clauses line
+    up with the suite's with no bespoke adapter. See
+    <a href="https://github.com/DrBaher/extract-cli/blob/main/docs/INTEROP.md"><code class="chip">docs/INTEROP.md</code></a>.
+    The opt-in <code class="chip">--llm</code> tier reads the suite-wide
+    <code class="chip">~/.config/contract-ops/llm.json</code>, so configuring it once lights up LLM features
+    across every tool that adopts the same lookup order.
+  </p>
+
+  <h2>Where it fits in the workflow</h2>
+
+  <p>
+    The open-loop front door at the very start of the seven-CLI workflow. The closed loop —
+    <a href="/tools/template-vault-cli/">template-vault</a> → <a href="/tools/draft-cli/">draft</a> →
+    <a href="/tools/nda-review-cli/">nda-review</a> → <a href="/tools/compare-cli/">compare</a> →
+    <a href="/tools/docx2pdf-cli/">docx2pdf</a> → <a href="/tools/sign-cli/">sign</a> — only handles
+    documents authored from its own templates. extract-cli is how <em>foreign</em> paper gets in: turn a
+    counterparty's contract into the suite's structured vocabulary, then hand it to nda-review for a policy
+    verdict or to compare to align it against your canonical template. <a href="/workflow/">See the full
+    workflow</a> for the chained commands.
+  </p>
+
+  <h2>Repo</h2>
+  <p><a href="https://github.com/DrBaher/extract-cli" target="_blank" rel="noopener">github.com/DrBaher/extract-cli</a> · MIT licensed · Stdlib-only Python (<code class="chip">[docx]</code>/<code class="chip">[pdf]</code> extras add higher-fidelity readers) · PyPI-installable.</p>
+</BaseLayout>

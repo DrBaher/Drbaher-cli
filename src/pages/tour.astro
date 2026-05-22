@@ -6,7 +6,7 @@ import CodeBlock from '../components/CodeBlock.astro';
 <BaseLayout
   title="5-minute tour"
   active="tour"
-  description="See all six contract-ops CLIs in five minutes: every tool ships a zero-config demo, and they chain over stdin into one end-to-end pipeline."
+  description="See all seven contract-ops CLIs in five minutes: every tool ships a zero-config demo, and they chain over stdin into one end-to-end pipeline."
   toc
 >
   <p class="eyebrow">5-minute tour</p>
@@ -18,7 +18,7 @@ import CodeBlock from '../components/CodeBlock.astro';
   </p>
 
   <Callout label="TL;DR">
-    Six commands, nothing to configure. Each <code class="chip">demo</code> runs against bundled
+    Seven commands, nothing to configure. Each <code class="chip">demo</code> runs against bundled
     fixtures and cleans up after itself. <a href="/install/">Install</a> the suite first (or run any
     one with <code class="chip">npx</code> / <code class="chip">pipx run</code> — no install needed).
   </Callout>
@@ -27,15 +27,17 @@ import CodeBlock from '../components/CodeBlock.astro';
   <p data-reveal>
     Paste these one at a time. Each is self-contained and shows that tool's job in a few seconds.
   </p>
-  <CodeBlock label="six demos, zero config">{`template-vault demo     # 1. store — compose a template + swap a clause, with provenance
-draft --demo            # 2. draft — fill [Party A], [Effective Date], … in a template
-nda-review-cli demo     # 3. review — score a sample NDA against a house policy
-compare --demo          # 4. compare — clause-aware drift gate (exits 2 on the fixture)
-docx2pdf demo           # 5. convert — render a sample DOCX to PDF
-npx @drbaher/sign-cli demo   # 6. sign — offline PAdES sign + verify + receipt`}</CodeBlock>
+  <CodeBlock label="seven demos, zero config">{`extract demo            # 1. ingest — extract a bundled NDA into structured JSON
+template-vault demo     # 2. store — compose a template + swap a clause, with provenance
+draft --demo            # 3. draft — fill [Party A], [Effective Date], … in a template
+nda-review-cli demo     # 4. review — score a sample NDA against a house policy
+compare --demo          # 5. compare — clause-aware drift gate (exits 2 on the fixture)
+docx2pdf demo           # 6. convert — render a sample DOCX to PDF
+npx @drbaher/sign-cli demo   # 7. sign — offline PAdES sign + verify + receipt`}</CodeBlock>
 
   <h2 data-reveal>What just happened</h2>
   <ul data-reveal>
+    <li><a href="/tools/extract-cli/">extract</a> — ingested a bundled NDA and emitted structured JSON: parties, clauses, dates, and governing law, each with a confidence + source.</li>
     <li><a href="/tools/template-vault-cli/">template-vault</a> — forked a base NDA, swapped one clause from another, and recorded the provenance in <code class="chip">meta.json</code>.</li>
     <li><a href="/tools/draft-cli/">draft</a> — substituted typed placeholders into a template and printed the filled draft.</li>
     <li><a href="/tools/nda-review-cli/">nda-review-cli</a> — scored the sample NDA and emitted a structured verdict (decision + risk + findings).</li>

@@ -3,7 +3,7 @@
   "version": "0.4.0",
   "type": "module",
   "private": true,
-  "description": "Showcase site for template-vault-cli, draft-cli, nda-review-cli, compare-cli, docx2pdf-cli, and sign-cli — six composable, local-first CLIs for the contract operations workflow.",
+  "description": "Showcase site for extract-cli, template-vault-cli, draft-cli, nda-review-cli, compare-cli, docx2pdf-cli, and sign-cli — seven composable, local-first CLIs for the contract operations workflow.",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build && pagefind --site dist",
