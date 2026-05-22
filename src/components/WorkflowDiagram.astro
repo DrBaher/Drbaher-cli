@@ -1,28 +1,29 @@
 ---
 // Animated workflow diagram for the eight-CLI suite.
 //   • Tablet / desktop: two "floors" (4×2, serpentine) — pure SVG SMIL relay.
-//   • Phone (< sm): a vertical stack of full-width step cards — stays legible
-//     on narrow screens where eight boxes across would be unreadable.
+//   • Phone (< sm): a vertical stack of full-width step cards.
+//   • Each step is clickable / tappable / keyboard-activatable: it reveals a
+//     short description of that CLI in the panel below (with a link to its docs).
 // Both views are generated from one `steps` array. Respects prefers-reduced-motion.
 const steps = [
-  { cli: 'extract-cli',        verb: 'ingest' },
-  { cli: 'template-vault-cli', verb: 'store' },
-  { cli: 'draft-cli',          verb: 'draft' },
-  { cli: 'nda-review-cli',     verb: 'review' },
-  { cli: 'compare-cli',        verb: 'compare' },
-  { cli: 'docx2pdf-cli',       verb: 'convert' },
-  { cli: 'sign-cli',           verb: 'sign' },
-  { cli: 'contract-vault-cli', verb: 'manage' },
+  { cli: 'extract-cli',        verb: 'ingest',  href: '/tools/extract-cli/',        blurb: "Ingest any contract (.md/.txt/.html/.docx/.pdf) into structured JSON — parties, clauses, dates, governing law — with a confidence and source on every field." },
+  { cli: 'template-vault-cli', verb: 'store',   href: '/tools/template-vault-cli/', blurb: "A git-backed, clause-aware vault for your blank templates — fork, swap clauses with recorded provenance, and pull upstream upgrades." },
+  { cli: 'draft-cli',          verb: 'draft',   href: '/tools/draft-cli/',          blurb: "Fill placeholders in a markdown or .docx template — typed/computed/positional params, a parties registry, multi-document bundles." },
+  { cli: 'nda-review-cli',     verb: 'review',  href: '/tools/nda-review-cli/',      blurb: "Draft, review, and negotiate NDAs against your house playbook. Deterministic by default; opt-in LLM adjudication." },
+  { cli: 'compare-cli',        verb: 'compare', href: '/tools/compare-cli/',         blurb: "Clause-aware drift detection between two contract versions — a pre-signature gate with exit codes CI can branch on." },
+  { cli: 'docx2pdf-cli',       verb: 'convert', href: '/tools/docx2pdf-cli/',        blurb: "Honest DOCX → PDF conversion with hybrid backends, parallel batches, and font validation." },
+  { cli: 'sign-cli',           verb: 'sign',    href: '/tools/sign-cli/',            blurb: "Fully-offline PAdES e-signature with hash-chained audit events and RFC 3161 timestamps; per-signer tokens gate the human." },
+  { cli: 'contract-vault-cli', verb: 'manage',  href: '/tools/contract-vault-cli/',  blurb: "Register signed contracts, then surface renewals, notice deadlines, recurring obligations, and reminders as a portfolio + an .ics calendar." },
 ];
 
 const BW = 116, BH = 56, GAP = 16, PITCH = BW + GAP;   // 132
 const X0 = 12, COLS = 4;
 const W = X0 * 2 + COLS * BW + (COLS - 1) * GAP;        // 536 — keep max-w literal in sync
-const ROW_Y = [44, 150];                                // box tops for the two floors
+const ROW_Y = [44, 150];
 const FRAME_H = ROW_Y[1] + BH + 18;                     // 224
 const colX = (c: number) => X0 + c * PITCH;
 
-interface Box { cli: string; verb: string; x: number; y: number; cx: number; cy: number; }
+interface Box { cli: string; verb: string; href: string; blurb: string; x: number; y: number; cx: number; cy: number; }
 const boxes: Box[] = steps.map((s, i) => {
   const floor = i < 4 ? 0 : 1;
   const col = floor === 0 ? i : 7 - i;   // bottom floor runs right→left (a clean U-turn)
@@ -44,12 +45,12 @@ for (let i = 0; i < steps.length - 1; i++) {
   }
   arrows.push({ id: `flow${i}`, d, begin: i * 2 });
 }
-const DUR = steps.length * 2;  // staggered relay over the full cycle
+const DUR = steps.length * 2;
 ---
 <div class="not-prose my-8 rounded-lg border border-ink-700/10 bg-white p-5 dark:border-night-300/15 dark:bg-night-600">
   <!-- Tablet / desktop: two floors. max-w is literal for Tailwind's scanner; keep in sync with W. -->
   <svg viewBox={`0 0 ${W} ${FRAME_H + 6}`} class="mx-auto hidden h-auto w-full max-w-[536px] sm:block" role="img"
-       aria-label="Contract workflow in two rows: ingest, store, draft, review; then compare, convert, sign, manage — all on your machine">
+       aria-label="Contract workflow in two rows: ingest, store, draft, review; then compare, convert, sign, manage — all on your machine. Activate a step for a description.">
     <defs>
       <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
         <path d="M 0 0 L 10 5 L 0 10 z" class="fill-ink-500 dark:fill-night-200"/>
@@ -75,7 +76,7 @@ const DUR = steps.length * 2;  // staggered relay over the full cycle
     ))}
 
     {boxes.map((b) => (
-      <g class="step-box">
+      <g class="step-box" role="button" tabindex="0" data-cli={b.cli} data-href={b.href} data-blurb={b.blurb} aria-label={`${b.cli}: ${b.blurb}`}>
         <rect x={b.x} y={b.y} width={BW} height={BH} rx="6" fill="url(#boxGrad)" class="dark:[fill:url(#boxGradDark)] stroke-accent-200 dark:stroke-accent-700/40"/>
         <text x={b.cx} y={b.y + 22} font-family="JetBrains Mono, monospace" font-size="9.5" text-anchor="middle" font-weight="600" class="fill-accent-700 dark:fill-accent-300">{b.cli}</text>
         <text x={b.cx} y={b.y + 42} font-family="Inter, sans-serif" font-size="13" text-anchor="middle" font-weight="600" class="fill-ink-900 dark:fill-night-50">{b.verb}</text>
@@ -94,24 +95,72 @@ const DUR = steps.length * 2;  // staggered relay over the full cycle
   <div class="flex flex-col sm:hidden">
     {steps.map((s, i) => (
       <>
-        <div class="flex items-center justify-between rounded-md border border-accent-200 bg-cream-50 px-3.5 py-2.5 dark:border-accent-700/40 dark:bg-night-700">
+        <button type="button" class="wf-card flex w-full items-center justify-between rounded-md border border-accent-200 bg-cream-50 px-3.5 py-2.5 text-left dark:border-accent-700/40 dark:bg-night-700"
+                data-cli={s.cli} data-href={s.href} data-blurb={s.blurb} aria-label={`${s.cli}: ${s.blurb}`}>
           <span class="flex items-center gap-2.5">
             <span class="font-mono text-[11px] font-semibold text-ink-400 dark:text-night-300">{i + 1}</span>
             <span class="text-[15px] font-semibold text-ink-900 dark:text-night-50">{s.verb}</span>
           </span>
           <span class="font-mono text-[11px] text-accent-700 dark:text-accent-300">{s.cli}</span>
-        </div>
+        </button>
         {i < steps.length - 1 && (
           <div class="py-1 text-center text-[13px] leading-none text-accent-500 dark:text-accent-400" aria-hidden="true">↓</div>
         )}
       </>
     ))}
   </div>
+
+  <!-- Shared detail panel: updated when a step is activated -->
+  <div id="wf-detail" class="mt-4 rounded-md border border-ink-700/10 bg-cream-50 px-4 py-3 text-[14px] leading-relaxed text-ink-700 dark:border-night-300/15 dark:bg-night-700 dark:text-night-100" aria-live="polite">
+    <span data-wf-hint class="text-ink-500 dark:text-night-200">Tap any step above to see what that CLI does.</span>
+    <span data-wf-body hidden>
+      <a data-wf-link class="font-mono font-semibold text-accent-700 hover:underline dark:text-accent-300" href="#"></a><span data-wf-blurb></span>
+    </span>
+  </div>
 </div>
 
 <style>
+  /* Interactivity affordances. */
+  .step-box { cursor: pointer; }
+  .step-box > rect { transition: stroke 0.15s ease, stroke-width 0.15s ease; }
+  .step-box:hover > rect,
+  .step-box:focus-visible > rect { stroke: #1f7d5d; stroke-width: 2; }
+  .step-box[data-selected] > rect { stroke: #1f7d5d; stroke-width: 2.5; }
+  .step-box:focus { outline: none; }
+  .wf-card { cursor: pointer; transition: border-color 0.15s ease; }
+  .wf-card[data-selected] { border-color: #1f7d5d; }
+
   /* Pause the traveling dots for users who prefer reduced motion. */
   @media (prefers-reduced-motion: reduce) {
     .flow-dot { display: none; }
   }
 </style>
+
+<script>
+  const detail = document.getElementById('wf-detail');
+  if (detail) {
+    const hint = detail.querySelector<HTMLElement>('[data-wf-hint]');
+    const body = detail.querySelector<HTMLElement>('[data-wf-body]');
+    const link = detail.querySelector<HTMLAnchorElement>('[data-wf-link]');
+    const blurbEl = detail.querySelector<HTMLElement>('[data-wf-blurb]');
+    const steps = Array.from(document.querySelectorAll<HTMLElement | SVGElement>('[data-cli][data-blurb]'));
+
+    function select(el: HTMLElement | SVGElement) {
+      steps.forEach((s) => s.removeAttribute('data-selected'));
+      el.setAttribute('data-selected', '');
+      const cli = el.getAttribute('data-cli') ?? '';
+      if (link) { link.textContent = cli; link.setAttribute('href', el.getAttribute('data-href') ?? '#'); }
+      if (blurbEl) blurbEl.textContent = ' — ' + (el.getAttribute('data-blurb') ?? '');
+      if (hint) hint.hidden = true;
+      if (body) body.hidden = false;
+    }
+
+    steps.forEach((el) => {
+      el.addEventListener('click', () => select(el));
+      el.addEventListener('keydown', (e) => {
+        const k = (e as KeyboardEvent).key;
+        if (k === 'Enter' || k === ' ') { e.preventDefault(); select(el); }
+      });
+    });
+  }
+</script>
