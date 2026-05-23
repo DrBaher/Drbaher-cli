@@ -125,6 +125,28 @@ draft path/to/template.md --list-placeholders`}</CodeBlock>
   <CodeBlock label="first-run setup">{`# 14 quick questions write your house policy
 nda-review-cli quickstart`}</CodeBlock>
 
+  <h2>contract-lint-cli</h2>
+  <p>
+    The Python CLI for the pre-signature quality gate — lint one contract for internal-consistency
+    defects (leftover placeholders, broken cross-references, defined-term and numbering issues) with
+    CI-gateable exit codes. Stdlib-only at runtime, zero dependencies. Installs as
+    <code class="chip">contract-lint</code> on your PATH (PyPI package <code class="chip">contract-lint</code>).
+  </p>
+
+  <InstallTabs
+    id="clint-tabs"
+    tabs={[
+      { id: 'pipx', label: 'pipx', command: 'pipx install contract-lint\ncontract-lint --version', note: 'Recommended — isolates dependencies and adds the CLI to your $PATH.' },
+      { id: 'pip',  label: 'pip',  command: 'pip install contract-lint', note: 'Stdlib-only. Make sure ~/.local/bin is on your $PATH.' },
+    ]}
+  />
+
+  <CodeBlock label="first run">{`# Zero-config: lint a deliberately-flawed sample contract
+contract-lint demo
+
+# Lint your own document; gate CI on errors only
+contract-lint your-contract.md --check --fail-on error`}</CodeBlock>
+
   <h2>compare-cli</h2>
   <p>
     The Node.js CLI for clause-aware drift detection between two contract versions. Single-file, two
@@ -221,28 +243,6 @@ contract-vault demo
 mkdir my-contracts && cd my-contracts
 contract-vault init
 extract ~/contracts/signed.pdf | contract-vault ingest -`}</CodeBlock>
-
-  <h2>contract-lint-cli</h2>
-  <p>
-    The Python CLI for the pre-signature quality gate — lint one contract for internal-consistency
-    defects (leftover placeholders, broken cross-references, defined-term and numbering issues) with
-    CI-gateable exit codes. Stdlib-only at runtime, zero dependencies. Installs as
-    <code class="chip">contract-lint</code> on your PATH (PyPI package <code class="chip">contract-lint</code>).
-  </p>
-
-  <InstallTabs
-    id="clint-tabs"
-    tabs={[
-      { id: 'pipx', label: 'pipx', command: 'pipx install contract-lint\ncontract-lint --version', note: 'Recommended — isolates dependencies and adds the CLI to your $PATH.' },
-      { id: 'pip',  label: 'pip',  command: 'pip install contract-lint', note: 'Stdlib-only. Make sure ~/.local/bin is on your $PATH.' },
-    ]}
-  />
-
-  <CodeBlock label="first run">{`# Zero-config: lint a deliberately-flawed sample contract
-contract-lint demo
-
-# Lint your own document; gate CI on errors only
-contract-lint your-contract.md --check --fail-on error`}</CodeBlock>
 
   <h2>Configuration locations</h2>
   <p>Each tool keeps its config in standard places. Nothing is shared across tools.</p>

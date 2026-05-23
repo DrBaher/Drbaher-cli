@@ -6,7 +6,7 @@ import CodeBlock from '../components/CodeBlock.astro';
 <BaseLayout
   title="Recipes"
   active="recipes"
-  description="Task-oriented recipes for the contract-ops CLI suite — reviewing an incoming third-party NDA, gating drift in CI, driving the pipeline from an agent, and batch convert + sign."
+  description="Task-oriented recipes for the contract-ops CLI suite — reviewing an incoming third-party NDA, gating drift and defects in CI, driving the pipeline from an agent, and batch convert + sign."
   toc
 >
   <p class="eyebrow">Recipes</p>
@@ -30,12 +30,16 @@ nda-review-cli review --file their-nda.docx --playbook config/org-policy.json --
 compare --from-negotiation negotiation.json their-nda-final.docx
 #   exit 0 = matches the agreed text · 2 = it drifted — don't sign`}</CodeBlock>
 
-  <h2 data-reveal>Gate drift in CI</h2>
-  <p data-reveal>Fail the build if a ready-to-sign artifact drifted from the text everyone agreed to — the exit code is the gate, no parsing required.</p>
-  <CodeBlock label="ci gate">{`# Exit-code-only gate (0 safe · 2 substantive · 3 cosmetic · 4 moved)
+  <h2 data-reveal>Gate drift and defects in CI</h2>
+  <p data-reveal>Run the two pre-signature gates before a build can ship a contract: <a href="/tools/contract-lint-cli/">contract-lint</a> for internal-consistency defects <em>within</em> the document, <a href="/tools/compare-cli/">compare</a> for drift <em>between</em> versions. The exit code is the gate, no parsing required.</p>
+  <CodeBlock label="ci gate">{`# Lint the ready-to-sign doc for internal defects (0 clean · 1 findings · 2 bad usage)
+contract-lint ready-to-sign.docx --check --fail-on error
+
+# Gate drift against the agreed text (0 safe · 2 substantive · 3 cosmetic · 4 moved)
 compare agreed.md ready-to-sign.docx --check
 
 # …or emit SARIF for GitHub code-scanning / a PR annotation
+contract-lint ready-to-sign.docx --sarif > lint.sarif
 compare agreed.md ready-to-sign.docx --sarif > drift.sarif`}</CodeBlock>
 
   <h2 data-reveal>Drive the pipeline from an agent</h2>

@@ -37,16 +37,20 @@ const jsonLd = {
   </h1>
   <FreshHeader name="extract-cli" version={meta.version} source={meta.source} fetchedAt={meta.fetchedAt} stars={meta.stars} weeklyDownloads={meta.weeklyDownloads} github="https://github.com/DrBaher/extract-cli" />
   <p class="text-lg text-ink-700 dark:text-night-100">
-    The suite's <strong>passport control</strong>. The rest of the contract-ops pipeline is a closed
-    loop that only handles documents it authored from its own templates; <code class="chip">extract-cli</code>
-    ingests <strong>any</strong> document — yours or a counterparty's foreign paper, in
-    <code class="chip">.md</code> / <code class="chip">.txt</code> / <code class="chip">.html</code> /
-    <code class="chip">.docx</code> / <code class="chip">.pdf</code> — and returns structured JSON the
-    pipeline can consume: parties, dates, term, governing law, a <strong>clause map</strong> normalized
-    onto the suite's canonical clause vocabulary, a defined-term inventory, and a headline value. Every
-    field carries a <code class="chip">confidence</code> and a <code class="chip">source</code> so
-    downstream tools <strong>verify, don't trust</strong>. It sits upstream of review — the open-loop
-    front door of the pipeline.
+    <strong>Ingest any contract and get structured JSON.</strong> Hand <code class="chip">extract-cli</code>
+    any document — yours or a counterparty's foreign paper, in <code class="chip">.md</code> /
+    <code class="chip">.txt</code> / <code class="chip">.html</code> / <code class="chip">.docx</code> /
+    <code class="chip">.pdf</code> — and it returns the parties, dates, term, governing law, a normalized
+    <strong>clause map</strong>, a defined-term inventory, and a headline value. Every field carries a
+    <code class="chip">confidence</code> and a <code class="chip">source</code>, so you
+    <strong>verify, don't trust</strong>. Stdlib-only, single-file, local-first.
+  </p>
+  <p class="text-ink-700 dark:text-night-100">
+    It works standalone — and also composes with the contract-ops suite as its <strong>open-loop front
+    door</strong>: where the rest of the pipeline handles documents it authored from its own templates,
+    extract turns <em>any</em> foreign paper into the suite's canonical, structured vocabulary that
+    <a href="/tools/nda-review-cli/">review</a>, <a href="/tools/contract-lint-cli/">lint</a>,
+    <a href="/tools/compare-cli/">compare</a>, and the <a href="/tools/contract-vault-cli/">vault</a> consume.
   </p>
 
   <Callout label="TL;DR">
