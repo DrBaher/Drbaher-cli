@@ -30,6 +30,7 @@ const UPDATE = process.argv.includes('--update');
 // captures the `rules --json` rule ids (contract-lint's known drift point).
 const CLIS = [
   { key: 'extract-cli',        kind: 'pypi', pkg: 'extract-cli',        bin: 'extract' },
+  { key: 'template-vault-cli', kind: 'pypi', pkg: 'template-vault-cli', bin: 'template-vault' },
   { key: 'nda-review-cli',     kind: 'pypi', pkg: 'nda-review-cli',     bin: 'nda-review-cli' },
   { key: 'contract-lint-cli',  kind: 'pypi', pkg: 'contract-lint',      bin: 'contract-lint', rules: true },
   { key: 'docx2pdf-cli',       kind: 'npm',  pkg: 'docx2pdf-cli',       bin: 'docx2pdf' },
@@ -37,11 +38,12 @@ const CLIS = [
   { key: 'contract-vault-cli', kind: 'pypi', pkg: 'contract-vault',     bin: 'contract-vault' },
 ];
 
-// These DOCUMENT `--catalog json` on the site, but their current published
-// release doesn't expose it (verified 2026-05-23: compare → "unknown flag",
-// draft → wants a template, template-vault → no such top-level flag). Listed as
-// a standing reminder; move into CLIS once a release actually ships --catalog.
-const AWAITING_CATALOG = ['compare-cli', 'draft-cli', 'template-vault-cli'];
+// `--catalog json` is implemented on these two and released to main + tagged
+// (compare v0.4.0, draft v0.10.0), but the npm publish is currently blocked on
+// an NPM_TOKEN permission issue (E404). Their *published* releases still lack
+// --catalog, so they stay here; move into CLIS once the npm publish goes through.
+// (template-vault-cli published --catalog in 0.5.0 — now checked above.)
+const AWAITING_CATALOG = ['compare-cli', 'draft-cli'];
 
 const sh = (cmd, args, opts = {}) =>
   execFileSync(cmd, args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], timeout: 240000, ...opts });
