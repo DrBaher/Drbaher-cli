@@ -26,24 +26,22 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const SNAPSHOT = join(HERE, 'catalog-snapshot.json');
 const UPDATE = process.argv.includes('--update');
 
-// One row per CLI that publishes `<bin> --catalog json`. `rules: true` also
-// captures the `rules --json` rule ids (contract-lint's known drift point).
+// One row per CLI that publishes `<bin> --catalog json`, in pipeline order.
+// `rules: true` also captures the `rules --json` rule ids (contract-lint's
+// known drift point). All nine suite CLIs now ship --catalog in a published
+// release (compare-cli 0.4.0 + draft-cli 0.10.0 closed the last gap), so the
+// whole pipeline is covered.
 const CLIS = [
   { key: 'extract-cli',        kind: 'pypi', pkg: 'extract-cli',        bin: 'extract' },
   { key: 'template-vault-cli', kind: 'pypi', pkg: 'template-vault-cli', bin: 'template-vault' },
+  { key: 'draft-cli',          kind: 'npm',  pkg: '@drbaher/draft-cli', bin: 'draft' },
   { key: 'nda-review-cli',     kind: 'pypi', pkg: 'nda-review-cli',     bin: 'nda-review-cli' },
   { key: 'contract-lint-cli',  kind: 'pypi', pkg: 'contract-lint',      bin: 'contract-lint', rules: true },
+  { key: 'compare-cli',        kind: 'npm',  pkg: 'compare-cli',        bin: 'compare' },
   { key: 'docx2pdf-cli',       kind: 'npm',  pkg: 'docx2pdf-cli',       bin: 'docx2pdf' },
   { key: 'sign-cli',           kind: 'npm',  pkg: '@drbaher/sign-cli',  bin: 'sign' },
   { key: 'contract-vault-cli', kind: 'pypi', pkg: 'contract-vault',     bin: 'contract-vault' },
 ];
-
-// `--catalog json` is implemented on these two and released to main + tagged
-// (compare v0.4.0, draft v0.10.0), but the npm publish is currently blocked on
-// an NPM_TOKEN permission issue (E404). Their *published* releases still lack
-// --catalog, so they stay here; move into CLIS once the npm publish goes through.
-// (template-vault-cli published --catalog in 0.5.0 — now checked above.)
-const AWAITING_CATALOG = ['compare-cli', 'draft-cli'];
 
 const sh = (cmd, args, opts = {}) =>
   execFileSync(cmd, args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], timeout: 240000, ...opts });
@@ -151,7 +149,6 @@ if (drifted.length) {
 }
 if (isNew.length) console.log(`\n## Not yet in snapshot (run --update): ${isNew.join(', ')}`);
 if (failures.length) console.log(`\n## Could not fetch (transient — ignored): ${failures.join(', ')}`);
-console.log(`\n## Awaiting --catalog json in a published release (site documents it for these — re-verify after each ships, then move into the check): ${AWAITING_CATALOG.join(', ')}`);
 if (!drifted.length && !isNew.length) console.log('No drift. Site catalog facts match the live CLIs. ✓');
 
 process.exit(drifted.length || isNew.length ? 1 : 0);

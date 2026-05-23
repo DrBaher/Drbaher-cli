@@ -16,7 +16,7 @@
     }
   },
   "template-vault-cli": {
-    "version": "0.5.0",
+    "version": "0.5.1",
     "commands": [
       "ask",
       "clause-library",
@@ -48,6 +48,17 @@
       "0": "success",
       "1": "a check reported problems (e.g. verify drift, doctor issues)",
       "2": "invalid usage or an operation error (VaultError: bad ref, missing template, refused LLM send)"
+    }
+  },
+  "draft-cli": {
+    "version": "0.10.0",
+    "commands": [],
+    "exitCodes": {
+      "0": "ok",
+      "1": "i/o error",
+      "2": "validation",
+      "3": "template-vault failure",
+      "4": "llm failure"
     }
   },
   "nda-review-cli": {
@@ -106,6 +117,17 @@
       "unused-definition"
     ],
     "ruleCount": 11
+  },
+  "compare-cli": {
+    "version": "0.4.0",
+    "commands": [],
+    "exitCodes": {
+      "0": "clean — clauses match (safe to sign)",
+      "1": "I/O error",
+      "2": "substantive drift — do not sign without review",
+      "3": "cosmetic / typographic drift only (informational)",
+      "4": "clauses moved but content identical"
+    }
   },
   "docx2pdf-cli": {
     "version": "0.2.2",
