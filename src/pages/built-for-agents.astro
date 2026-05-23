@@ -13,14 +13,19 @@ import CodeBlock from '../components/CodeBlock.astro';
   <h1>Built for Claude, Cursor, Codex, OpenClaw — and any agent that speaks MCP or runs a shell.</h1>
 
   <p class="text-lg text-ink-700 dark:text-night-100">
-    The suite ships two MCP servers. <strong>sign-cli</strong> exposes 19 tools for the entire signing
-    surface (create, send, sign, audit-verify, bundle-export) with the per-signer-token guardrail intact.
-    <strong>compare-cli-mcp</strong> exposes three tools (<code class="chip">compare_files</code>,
-    <code class="chip">compare_with_negotiation</code>, <code class="chip">compare_demo</code>) for the
-    pre-signature drift gate. Wire either or both into any MCP-aware client — or, for a shell-running
-    agent like <a href="https://openclaw.ai/" target="_blank" rel="noopener">OpenClaw</a>, skip MCP
-    entirely and run the CLIs directly (see below).
+    The suite ships three MCP servers. <strong>contract-ops-mcp</strong> is the one to start with — a single
+    stdio server that exposes <em>all nine</em> CLIs as tools (extract, draft, lint, compare, convert, review,
+    the vaults), so an agent connects once and drives the whole pipeline. <strong>sign-cli</strong> ships its
+    own 19-tool server for the entire signing surface with the per-signer-token guardrail intact, and
+    <strong>compare-cli-mcp</strong> exposes three focused drift-gate tools. Wire any of them into an MCP-aware
+    client — or, for a shell-running agent like <a href="https://openclaw.ai/" target="_blank" rel="noopener">OpenClaw</a>,
+    skip MCP entirely and run the CLIs directly (see below).
   </p>
+  <CodeBlock label="contract-ops-mcp — the whole suite, one server">{`{
+  "mcpServers": {
+    "contract-ops": { "command": "npx", "args": ["-y", "contract-ops-mcp"] }
+  }
+}`}</CodeBlock>
 
   <Callout label="One install, every client">
     <code class="chip">npm i -g @drbaher/sign-cli</code> — then drop the wire-up snippet below into your client's
