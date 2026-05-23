@@ -18,6 +18,23 @@ import CodeBlock from '../components/CodeBlock.astro';
     Verify with <code class="chip">--version</code> on each.
   </Callout>
 
+  <h2>Everything in one command</h2>
+  <p>The fastest path: one script installs all nine from their native registries (pipx + npm), checks prerequisites, and prints versions. Re-run any time to upgrade.</p>
+  <CodeBlock label="one-command install">{`curl -fsSL https://cli.drbaher.com/install.sh | sh`}</CodeBlock>
+  <p>Prefer to read before you run it? (Always reasonable for a piped installer.)</p>
+  <CodeBlock label="review, then run">{`curl -fsSL https://cli.drbaher.com/install.sh -o install.sh
+less install.sh        # ~40 lines of pipx + npm, no magic
+sh install.sh`}</CodeBlock>
+  <p>Needs <code class="chip">python3</code> + <code class="chip">pipx</code> and <code class="chip">node</code> 22+ / <code class="chip">npm</code> on your PATH (see <a href="#prerequisites">Prerequisites</a>). MIT, in the open at <a href="https://github.com/DrBaher/Drbaher-cli/blob/main/public/install.sh"><code class="chip">public/install.sh</code></a>.</p>
+
+  <h2>…or run them in a container</h2>
+  <p>For CI, an agent sandbox, or a throwaway environment, the published image bundles all nine CLIs <em>and</em> the PDF backend (LibreOffice) — nothing to install on the host.</p>
+  <CodeBlock label="docker">{`# Run any CLI; mount the current directory as /work
+docker run --rm -v "$PWD:/work" -w /work ghcr.io/drbaher/contract-ops extract contract.pdf --json
+
+# …or drop into a shell with all nine on PATH
+docker run --rm -it -v "$PWD:/work" -w /work ghcr.io/drbaher/contract-ops bash`}</CodeBlock>
+
   <h2>Install the whole suite</h2>
   <p>Want all nine at once? Two package managers, six commands:</p>
   <CodeBlock label="install all nine">{`# Five Python CLIs (pipx installs one package per command)
