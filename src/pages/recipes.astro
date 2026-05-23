@@ -41,6 +41,23 @@ nda-review-cli review --file their-nda.docx --playbook config/org-policy.json --
 compare --from-negotiation negotiation.json their-nda-final.docx
 #   exit 0 = matches the agreed text · 2 = it drifted — don't sign`}</CodeBlock>
 
+  <h2 data-reveal>Negotiate an NDA to convergence</h2>
+  <p data-reveal>The back-and-forth itself, tracked. <a href="/tools/nda-review-cli/">nda-review</a>'s two-party <code class="chip">negotiate</code> flow keeps <strong>hash-chained</strong> state — every round is tamper-evident — and feeds straight into the pre-signature gate.</p>
+  <CodeBlock label="negotiate round by round">{`# Open a negotiation from your house template (creates hash-chained state)
+nda-review-cli negotiate init --base nda/house-mutual --out negotiation.json
+
+# Each round: a party counters, the other reviews — the chain records who changed what
+nda-review-cli negotiate counter --state negotiation.json --as party-b --amendments-file edits.json
+nda-review-cli negotiate review  --state negotiation.json --as party-a
+nda-review-cli negotiate status  --state negotiation.json
+
+# Both sign off, then finalize to the agreed text (Markdown / .docx / PDF)
+nda-review-cli negotiate sign-off --state negotiation.json --as party-a --yes
+nda-review-cli negotiate finalize --state negotiation.json --out-md agreed.md
+
+# When the executed copy comes back, gate it against exactly what was agreed
+compare --from-negotiation negotiation.json ready-to-sign.docx   #  exit 2 = it drifted`}</CodeBlock>
+
   <h2 data-reveal>Build a house template from a public source</h2>
   <p data-reveal>Don't draft from scratch. <a href="/tools/template-vault-cli/">template-vault</a> keeps public sources (Common Paper, YC SAFE, Bonterms) and your own house paper in one git-backed vault — fork a base and swap clauses with recorded provenance.</p>
   <CodeBlock label="compose a template">{`# Discover the public sources, then import one into your vault
@@ -92,6 +109,19 @@ docx2pdf --out-dir out/ contracts/*.docx
 for f in out/*.pdf; do
   sign request create --document "$f" --signer "name:Signer,email:$SIGNER_EMAIL,order:1"
 done`}</CodeBlock>
+
+  <h2 data-reveal>Verify a signed contract and its audit trail</h2>
+  <p data-reveal>The reason to use an audit-grade signer is being able to prove it <em>later</em>. <a href="/tools/sign-cli/">sign</a> re-verifies a signed PDF, a portable receipt bundle, and the hash-chained audit log — fully offline.</p>
+  <CodeBlock label="verify after the fact">{`# Confirm a signed PDF matches what was recorded for its request
+sign request verify-signed-pdf --request-id <id> --path signed.pdf
+
+# Export a portable receipt bundle, then re-verify it offline (hand it to a counterparty)
+sign request receipt --request-id <id> --out receipt/
+sign request verify-receipt --bundle receipt/
+
+# Walk the hash-chained audit log, and integrity-scan every chain for breaks
+sign audit show --request-id <id>
+sign audit scan`}</CodeBlock>
 
   <h2 data-reveal>Never miss a renewal or notice deadline</h2>
   <p data-reveal>Signing is the start, not the end. <a href="/tools/contract-vault-cli/">contract-vault</a> registers each executed contract in a git-backed vault and surfaces the deadlines you'd otherwise miss — as a calendar feed and a cron-friendly digest.</p>
