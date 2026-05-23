@@ -109,9 +109,11 @@ docs/
 schemas/            # JSON schemas for machine-readable outputs
 ```
 
-## MCP wire-up for sign-cli (the suite's flagship MCP server; compare-cli also ships `compare-cli-mcp`)
+## MCP wire-up
 
-Claude Code / Claude Desktop `~/.config/claude-code/settings.json` or `claude_desktop_config.json`:
+The suite ships three MCP servers. **`contract-ops-mcp`** (npm `contract-ops-mcp`, repo `DrBaher/contract-ops-mcp`) is the one to start with: a single stdio server that exposes ALL nine CLIs as tools — curated, typed tools for the common ops (`extract_contract`, `lint_contract`, `compare_versions`, `fill_template`, `convert_to_pdf`, `review_nda`, `template_vault_*`, `contract_vault_*`, read-only `verify_signature`/`verify_receipt`/`audit_show`) plus `catalog(cli)` / `run(cli, args)` / `suite_status` escape hatches. Discovery-driven off each CLI's `--catalog json`. Signing is human-gated (read/verify only — request/sign stays behind sign-cli's own MCP). File access confined to `CONTRACT_OPS_MCP_BASE_DIR`. Wire-up: `{ "mcpServers": { "contract-ops": { "command": "npx", "args": ["-y", "contract-ops-mcp"] } } }`. Needs the CLIs installed (`curl -fsSL https://cli.drbaher.com/install.sh | sh`, or the `ghcr.io/drbaher/contract-ops` image). The other two are specialized: **sign-cli**'s 19-tool MCP (the signing surface, below) and **compare-cli-mcp** (3 drift-gate tools).
+
+Claude Code / Claude Desktop `~/.config/claude-code/settings.json` or `claude_desktop_config.json` (sign-cli's signing-specific server):
 ```json
 {
   "mcpServers": {

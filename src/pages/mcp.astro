@@ -6,19 +6,45 @@ import CodeBlock from '../components/CodeBlock.astro';
 <BaseLayout
   title="MCP server"
   active="mcp"
-  description="Drive sign-cli from any MCP-aware client (Claude Code, Cursor, Codex). 19 tools over stdio, same per-signer approval guardrails — no agent can sign on a human's behalf."
+  description="Drive the whole contract-ops suite over MCP. One server (contract-ops-mcp) exposes all nine CLIs as tools; sign-cli's own MCP keeps signing human-gated — no agent can sign on a human's behalf."
   toc
 >
   <p class="eyebrow">MCP server</p>
   <h1>The agent drives. You approve.</h1>
 
   <p class="text-lg text-ink-700 dark:text-night-100">
-    The whole suite is designed for an agent-first workflow. sign-cli is the most concrete
-    expression of that: every CLI command worth automating is exposed as an MCP tool over stdio,
-    so any MCP-aware client (Claude Code, Cursor, Codex) can drive sending, tracking, detection,
-    stamping, and verification — while the actual signing remains gated behind a per-signer human
-    gesture.
+    The whole suite is built for an agent-first workflow, and there are two ways to drive it over MCP.
+    The fastest is <strong>contract-ops-mcp</strong> — <em>one</em> stdio server that exposes all nine
+    CLIs as tools, so an agent connects once and can extract, draft, lint, compare, convert, review, and
+    query the vaults. And <a href="https://github.com/DrBaher/sign-cli">sign-cli</a> ships its own deeper
+    MCP for the <strong>signing</strong> surface — where the human gate lives.
   </p>
+
+  <h2>One connection, the whole suite — <code class="chip">contract-ops-mcp</code></h2>
+  <p>Wire it up once; it discovers your installed CLIs and exposes curated tools (plus <code class="chip">catalog</code> / <code class="chip">run</code> escape hatches), all riding the suite's uniform <code class="chip">--catalog json</code> contract.</p>
+  <CodeBlock label="claude / cursor mcp config">{`{
+  "mcpServers": {
+    "contract-ops": { "command": "npx", "args": ["-y", "contract-ops-mcp"] }
+  }
+}`}</CodeBlock>
+  <p>
+    Tools: <code class="chip">extract_contract</code>, <code class="chip">lint_contract</code>,
+    <code class="chip">compare_versions</code>, <code class="chip">fill_template</code>,
+    <code class="chip">convert_to_pdf</code>, <code class="chip">review_nda</code>,
+    <code class="chip">template_vault_*</code>, <code class="chip">contract_vault_*</code>, and read-only
+    <code class="chip">verify_signature</code> / <code class="chip">verify_receipt</code> /
+    <code class="chip">audit_show</code> — plus <code class="chip">catalog(cli)</code>,
+    <code class="chip">run(cli, args)</code>, and <code class="chip">suite_status</code>. File access is confined
+    to <code class="chip">CONTRACT_OPS_MCP_BASE_DIR</code>. Needs the CLIs installed (<a href="/install/">install page</a>,
+    or the all-in-one container). <a href="https://github.com/DrBaher/contract-ops-mcp">Repo</a>.
+  </p>
+  <p>
+    <strong>Signing is deliberately not in this server</strong> — it exposes only sign-cli's read/verify
+    ops. To request or apply a signature, use sign-cli's own MCP below, where the per-signer human gate stays intact.
+  </p>
+
+  <h2>sign-cli's MCP — the signing surface</h2>
+  <p>The deeper, signing-specific server: 19 tools for sending, tracking, detection, stamping, and verification — with the human gesture gated behind a per-signer token.</p>
 
   <Callout label="The guardrail">
     Agents can <em>send</em> documents, <em>detect</em> signature fields, <em>stamp</em> previews,
