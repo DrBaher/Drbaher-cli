@@ -6,7 +6,7 @@ import CodeBlock from '../components/CodeBlock.astro';
 <BaseLayout
   title="Recipes"
   active="recipes"
-  description="Task-oriented recipes for the contract-ops CLI suite — reviewing an incoming third-party NDA, gating drift and defects in CI, driving the pipeline from an agent, and batch convert + sign."
+  description="Task-oriented recipes for the contract-ops CLI suite — ingesting a counterparty's PDF, building a house template, reviewing an NDA, gating drift and defects in CI, driving the pipeline from an agent, batch convert + sign, and tracking renewals and obligations after signing."
   toc
 >
   <p class="eyebrow">Recipes</p>
@@ -17,6 +17,17 @@ import CodeBlock from '../components/CodeBlock.astro';
     start to finish. These are the off-path situations that actually come up — copy-paste
     sequences you can adapt. Discover any tool's exact flags with <code class="chip">&lt;cli&gt; --catalog json</code>.
   </p>
+
+  <h2 data-reveal>Turn a counterparty's PDF into structured data</h2>
+  <p data-reveal>The deal arrives as <em>their</em> paper. <a href="/tools/extract-cli/">extract-cli</a> is the open-loop front door — any format in, structured JSON out, with a <code class="chip">confidence</code> and <code class="chip">source</code> on every field.</p>
+  <CodeBlock label="ingest foreign paper">{`# Any contract — yours or a counterparty's — into structured JSON
+extract counterparty.pdf --json > deal.json
+
+# Verify, don't trust: who are the parties, the term, the governing law?
+jq '{parties: [.parties[].name], term: .term, law: .governing_law.value}' deal.json
+
+# extract is a pipe — feed the JSON straight into review or the vault
+extract counterparty.pdf --json | contract-vault ingest -`}</CodeBlock>
 
   <h2 data-reveal>Review an incoming third-party NDA</h2>
   <p data-reveal>Someone sends you <em>their</em> paper. Score it against your house policy, then gate the final text before you sign.</p>
@@ -29,6 +40,23 @@ nda-review-cli review --file their-nda.docx --playbook config/org-policy.json --
 # 3. Before signing, gate the version they sent back against what you agreed
 compare --from-negotiation negotiation.json their-nda-final.docx
 #   exit 0 = matches the agreed text · 2 = it drifted — don't sign`}</CodeBlock>
+
+  <h2 data-reveal>Build a house template from a public source</h2>
+  <p data-reveal>Don't draft from scratch. <a href="/tools/template-vault-cli/">template-vault</a> keeps public sources (Common Paper, YC SAFE, Bonterms) and your own house paper in one git-backed vault — fork a base and swap clauses with recorded provenance.</p>
+  <CodeBlock label="compose a template">{`# Discover the public sources, then import one into your vault
+template-vault sources
+template-vault import <source-id>          # pick an id from the list above
+
+# Fork it into your house vault, then swap in your own clause (provenance recorded)
+template-vault compose --base nda/mutual --as nda/house-mutual
+template-vault swap nda/house-mutual --clause confidentiality --from msa/standard`}</CodeBlock>
+
+  <h2 data-reveal>Lint a draft before it leaves your hands</h2>
+  <p data-reveal>Fill a template, then catch the internal defects — leftover placeholders, broken cross-references, numbering gaps — before the draft ever reaches a counterparty.</p>
+  <CodeBlock label="fill + lint">{`# Pull the versioned template, fill it, lint the result
+template-vault get nda/house-mutual | draft - --params deal.json > ready.md
+contract-lint ready.md --fail-on error
+#   exit 0 = clean · 1 = a placeholder or broken reference slipped through`}</CodeBlock>
 
   <h2 data-reveal>Gate drift and defects in CI</h2>
   <p data-reveal>Run the two pre-signature gates before a build can ship a contract: <a href="/tools/contract-lint-cli/">contract-lint</a> for internal-consistency defects <em>within</em> the document, <a href="/tools/compare-cli/">compare</a> for drift <em>between</em> versions. The exit code is the gate, no parsing required.</p>
@@ -64,6 +92,33 @@ docx2pdf --out-dir out/ contracts/*.docx
 for f in out/*.pdf; do
   sign request create --document "$f" --signer "name:Signer,email:$SIGNER_EMAIL,order:1"
 done`}</CodeBlock>
+
+  <h2 data-reveal>Never miss a renewal or notice deadline</h2>
+  <p data-reveal>Signing is the start, not the end. <a href="/tools/contract-vault-cli/">contract-vault</a> registers each executed contract in a git-backed vault and surfaces the deadlines you'd otherwise miss — as a calendar feed and a cron-friendly digest.</p>
+  <CodeBlock label="renewals calendar">{`# Register the signed contract, then project the next quarter's deadlines
+contract-vault ingest ~/signed/acme-msa.pdf
+contract-vault due --within 90d --format ics > renewals.ics   # subscribe in any calendar
+
+# A reminder digest for cron or an agent — only what's due to nudge right now
+contract-vault remind --json`}</CodeBlock>
+
+  <h2 data-reveal>Catch a silent auto-renewal before it fires</h2>
+  <p data-reveal>The expensive miss is an auto-renewing contract whose notice window passes unnoticed. <code class="chip">risk --strict</code> is a CI gate for exactly that; mark the obligation done once handled and it drops off the calendar.</p>
+  <CodeBlock label="renewal-exposure gate">{`# Fail the job on a CRITICAL: a missed/imminent notice on an auto-renewing deal
+contract-vault risk --within 30d --strict
+#   exit 1 = act now (notice deadline missed or imminent while it auto-renews)
+
+# Mark the obligation done once handled (assign an owner; it leaves the digest)
+contract-vault obligation acme-corporation/master-services-agreement 1 --owner "Legal" --status done`}</CodeBlock>
+
+  <h2 data-reveal>Onboard a folder of signed contracts</h2>
+  <p data-reveal>Have a backlog of executed PDFs? Extract and register them in one pass, then read the portfolio.</p>
+  <CodeBlock label="bulk onboard">{`# Extract + register every signed PDF into the git-backed vault
+for f in ~/signed/*.pdf; do extract "$f" --json | contract-vault ingest -; done
+
+# Portfolio at a glance, then export for finance / legal
+contract-vault stats
+contract-vault export --format csv > portfolio.csv`}</CodeBlock>
 
   <Callout label="More">
     Run any of these in the browser on the <a href="/play/">playground</a> ·
