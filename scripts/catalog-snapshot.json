@@ -15,6 +15,41 @@
       "2": "bad usage / user-actionable error (unreadable path, bad flag value, unsupported completion shell)."
     }
   },
+  "template-vault-cli": {
+    "version": "0.5.0",
+    "commands": [
+      "ask",
+      "clause-library",
+      "clauses",
+      "compare-clauses",
+      "completion",
+      "compose",
+      "demo",
+      "diff",
+      "doctor",
+      "export",
+      "find",
+      "get",
+      "history",
+      "import",
+      "info",
+      "init",
+      "list",
+      "publish",
+      "sources",
+      "stats",
+      "swap",
+      "sync",
+      "upgrade",
+      "upload",
+      "verify"
+    ],
+    "exitCodes": {
+      "0": "success",
+      "1": "a check reported problems (e.g. verify drift, doctor issues)",
+      "2": "invalid usage or an operation error (VaultError: bad ref, missing template, refused LLM send)"
+    }
+  },
   "nda-review-cli": {
     "version": "0.5.1",
     "commands": [
