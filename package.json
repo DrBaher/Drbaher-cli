@@ -10,6 +10,8 @@
     "preview": "astro preview",
     "check": "astro check",
     "casts": "python3 scripts/gen-casts.py",
+    "drift": "node scripts/catalog-drift.mjs",
+    "drift:update": "node scripts/catalog-drift.mjs --update",
     "astro": "astro"
   },
   "dependencies": {

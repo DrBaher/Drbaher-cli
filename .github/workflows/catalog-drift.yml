@@ -1,0 +1,70 @@
+name: Catalog drift check
+
+# Weekly: install each suite CLI that publishes `--catalog json`, diff its live
+# catalog against scripts/catalog-snapshot.json, and open/update a GitHub issue
+# if the site copy has fallen out of sync. Also runnable on demand.
+on:
+  schedule:
+    - cron: '0 9 * * 1' # Mondays 09:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  drift:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Check catalog drift
+        id: check
+        continue-on-error: true
+        run: node scripts/catalog-drift.mjs | tee drift-report.txt
+
+      - name: Open or update drift issue
+        if: steps.check.outcome == 'failure'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const report = fs.readFileSync('drift-report.txt', 'utf8');
+            const marker = '<!-- catalog-drift-bot -->';
+            const title = 'Catalog drift — site copy may be out of sync with a published CLI';
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const body = [
+              marker,
+              "The weekly check found a CLI's live `--catalog json` differs from the committed snapshot.",
+              'Refresh the affected site copy (tool page, `llms.txt`, install, recipes), then re-baseline:',
+              '',
+              '```',
+              'node scripts/catalog-drift.mjs --update',
+              '```',
+              '',
+              '<details><summary>Report</summary>',
+              '',
+              '```',
+              report.trim(),
+              '```',
+              '',
+              '</details>',
+              '',
+              `_[workflow run](${runUrl})_`,
+            ].join('\n');
+
+            const open = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo, state: 'open', per_page: 100,
+            });
+            const found = open.data.find((i) => i.body && i.body.includes(marker));
+            if (found) {
+              await github.rest.issues.update({ owner: context.repo.owner, repo: context.repo.repo, issue_number: found.number, body });
+            } else {
+              await github.rest.issues.create({ owner: context.repo.owner, repo: context.repo.repo, title, body, labels: ['catalog-drift'] });
+            }
