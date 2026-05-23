@@ -171,6 +171,20 @@ const meta = await getCliMeta();
       weeklyDownloadsSource={meta['nda-review-cli'].weeklyDownloadsSource}
     />
     <ToolCard
+      title="contract-lint-cli"
+      tagline="Pre-signature quality gate: lint one contract for internal-consistency defects — leftover placeholders, broken cross-references, defined-term and numbering issues — with CI-gateable exit codes."
+      language="Python"
+      install="pipx install contract-lint"
+      href="/tools/contract-lint-cli/"
+      github="https://github.com/DrBaher/contract-lint-cli"
+      icon="/assets/icons/contract-lint-cli.svg"
+      version={meta['contract-lint-cli'].version}
+      versionSource={meta['contract-lint-cli'].source}
+      stars={meta['contract-lint-cli'].stars}
+      weeklyDownloads={meta['contract-lint-cli'].weeklyDownloads}
+      weeklyDownloadsSource={meta['contract-lint-cli'].weeklyDownloadsSource}
+    />
+    <ToolCard
       title="compare-cli"
       tagline="Clause-aware drift detection between two contract versions. Pre-signature gate with exit codes CI can branch on. No LLM tier."
       language="Node.js"
@@ -225,20 +239,6 @@ const meta = await getCliMeta();
       stars={meta['contract-vault-cli'].stars}
       weeklyDownloads={meta['contract-vault-cli'].weeklyDownloads}
       weeklyDownloadsSource={meta['contract-vault-cli'].weeklyDownloadsSource}
-    />
-    <ToolCard
-      title="contract-lint-cli"
-      tagline="Pre-signature quality gate: lint one contract for internal-consistency defects — leftover placeholders, broken cross-references, defined-term and numbering issues — with CI-gateable exit codes."
-      language="Python"
-      install="pipx install contract-lint"
-      href="/tools/contract-lint-cli/"
-      github="https://github.com/DrBaher/contract-lint-cli"
-      icon="/assets/icons/contract-lint-cli.svg"
-      version={meta['contract-lint-cli'].version}
-      versionSource={meta['contract-lint-cli'].source}
-      stars={meta['contract-lint-cli'].stars}
-      weeklyDownloads={meta['contract-lint-cli'].weeklyDownloads}
-      weeklyDownloadsSource={meta['contract-lint-cli'].weeklyDownloadsSource}
     />
   </div>
 

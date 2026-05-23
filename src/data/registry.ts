@@ -23,13 +23,13 @@ export interface CliMeta {
 }
 
 const FALLBACKS: Record<string, string> = {
-  'extract-cli': '0.1.8',
+  'extract-cli': '0.1.14',
   'template-vault-cli': '0.4.8',
   'nda-review-cli': '0.5.1',
   'docx2pdf-cli': '0.2.2',
-  'sign-cli': '0.6.4',
-  'contract-vault-cli': '0.4.2',
-  'contract-lint-cli': '0.1.0',
+  'sign-cli': '0.6.5',
+  'contract-vault-cli': '0.5.0',
+  'contract-lint-cli': '0.2.1',
   'draft-cli': '0.9.0',
   'compare-cli': '0.3.0',
 };
