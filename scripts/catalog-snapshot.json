@@ -1,5 +1,5 @@
 {
-  "_generated": "2026-05-23",
+  "_generated": "2026-05-24",
   "extract-cli": {
     "version": "0.1.14",
     "commands": [
@@ -9,6 +9,7 @@
       "fields",
       "schema"
     ],
+    "flags": [],
     "exitCodes": {
       "0": "success",
       "1": "low-signal document — no high-signal fields (parties/clauses/dates) could be extracted; e.g. a scanned/image-only or empty file. A finding, not a crash.",
@@ -44,6 +45,7 @@
       "upload",
       "verify"
     ],
+    "flags": [],
     "exitCodes": {
       "0": "success",
       "1": "a check reported problems (e.g. verify drift, doctor issues)",
@@ -53,6 +55,32 @@
   "draft-cli": {
     "version": "0.10.0",
     "commands": [],
+    "flags": [
+      "--bundle",
+      "--catalog",
+      "--check-llm",
+      "--completion",
+      "--demo",
+      "--dictionary",
+      "--diff",
+      "--from-deal",
+      "--help",
+      "--interactive",
+      "--json",
+      "--list-placeholders",
+      "--llm",
+      "--no-heuristic",
+      "--no-llm",
+      "--output",
+      "--params",
+      "--silent",
+      "--strict-runs",
+      "--syntax",
+      "--validate",
+      "--version",
+      "--why",
+      "--yes-heuristic"
+    ],
     "exitCodes": {
       "0": "ok",
       "1": "i/o error",
@@ -88,6 +116,7 @@
       "tutorial",
       "wizard"
     ],
+    "flags": [],
     "exitCodes": {}
   },
   "contract-lint-cli": {
@@ -98,6 +127,7 @@
       "lint",
       "rules"
     ],
+    "flags": [],
     "exitCodes": {
       "0": "clean — no findings at or above --fail-on",
       "1": "gate tripped — findings at or above --fail-on",
@@ -121,6 +151,26 @@
   "compare-cli": {
     "version": "0.4.0",
     "commands": [],
+    "flags": [
+      "--catalog",
+      "--check",
+      "--completion",
+      "--demo",
+      "--from-negotiation",
+      "--help",
+      "--ignore-clauses",
+      "--json",
+      "--no-intra-diff",
+      "--only-clauses",
+      "--output",
+      "--require-signoffs",
+      "--sarif",
+      "--silent",
+      "--strict",
+      "--strict-cosmetic",
+      "--version",
+      "--why"
+    ],
     "exitCodes": {
       "0": "clean — clauses match (safe to sign)",
       "1": "I/O error",
@@ -132,6 +182,25 @@
   "docx2pdf-cli": {
     "version": "0.2.2",
     "commands": [],
+    "flags": [
+      "--backend",
+      "--capabilities",
+      "--catalog",
+      "--check-fonts",
+      "--concurrency",
+      "--doctor",
+      "--help",
+      "--json",
+      "--list-backends",
+      "--out-dir",
+      "--overwrite",
+      "--quiet",
+      "--retries",
+      "--strict-fidelity",
+      "--timeout-seconds",
+      "--version",
+      "--why"
+    ],
     "exitCodes": {
       "0": "success",
       "2": "usage_or_bad_arguments",
@@ -237,6 +306,7 @@
       "webhook verify",
       "workflow nda"
     ],
+    "flags": [],
     "exitCodes": {
       "0": "success",
       "2": "invalid input (missing/malformed flag, schema fail)",
@@ -269,6 +339,7 @@
       "stats",
       "verify"
     ],
+    "flags": [],
     "exitCodes": {
       "0": "success",
       "1": "failure or findings (integrity check failed; or a --strict review/risk gate tripped)",

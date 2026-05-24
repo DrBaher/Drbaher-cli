@@ -2,8 +2,8 @@
 /**
  * Catalog drift check — keep the site copy honest as the CLIs evolve.
  *
- * Each suite CLI publishes a machine-readable `--catalog json` (commands,
- * version, exit codes). The tools ship releases faster than the prose on this
+ * Each suite CLI publishes a machine-readable `--catalog json` (commands or
+ * flags, version, exit codes). The tools ship releases faster than the prose on this
  * site is rewritten, so command lists / rule counts / exit codes can silently
  * drift out of sync. This script fetches each CLI's LIVE catalog and diffs it
  * against a committed snapshot — the catalog state when the site copy was last
@@ -70,11 +70,21 @@ function fetchCatalog(c) {
   }
 }
 
+/** Flag names from a catalog's `flags` array (entries are {name,...} or bare strings). */
+const flagNames = (cat) =>
+  (Array.isArray(cat.flags) ? cat.flags : [])
+    .map((f) => (typeof f === 'string' ? f : f.name || f.flag || f.long))
+    .filter(Boolean)
+    .sort();
+
 /** Reduce a catalog to the facts the site copy depends on. */
 function fingerprint(cat) {
   const fp = {
     version: cat.version ?? null,
     commands: (cat.commands ?? []).map((c) => c.name).filter(Boolean).sort(),
+    // Flag-based CLIs (compare, draft) expose no `commands`; their surface is
+    // `flags`, so track flag names too or their drift would go unnoticed.
+    flags: flagNames(cat),
     exitCodes: cat.exitCodes ?? {},
   };
   if (cat.__rules) { fp.rules = cat.__rules; fp.ruleCount = cat.__rules.length; }
@@ -93,6 +103,9 @@ function diff(key, was, now) {
   const cmd = arrDiff(was.commands, now.commands);
   if (cmd.added.length) lines.push(`    + commands: ${cmd.added.join(', ')}`);
   if (cmd.removed.length) lines.push(`    − commands: ${cmd.removed.join(', ')}`);
+  const fl = arrDiff(was.flags, now.flags);
+  if (fl.added.length) lines.push(`    + flags: ${fl.added.join(', ')}`);
+  if (fl.removed.length) lines.push(`    − flags: ${fl.removed.join(', ')}`);
   const exWas = JSON.stringify(was.exitCodes ?? {});
   const exNow = JSON.stringify(now.exitCodes ?? {});
   if (exWas !== exNow) lines.push(`    exit codes changed: ${exWas} → ${exNow}`);
