@@ -1,6 +1,5 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@config "../../tailwind.config.mjs";
 
 /* Self-host nothing; use Google Fonts via the layout <head> link.
    Page-level defaults that match peekaboo-style docs sites: warm cream

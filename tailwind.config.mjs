@@ -84,7 +84,7 @@ export default {
               '&:hover': { textDecoration: 'underline' },
             },
             'h1, h2, h3, h4': {
-              fontFamily: theme('fontFamily.serif').join(', '),
+              fontFamily: '"Source Serif 4", "Source Serif Pro", Georgia, ui-serif, serif',
               color: theme('colors.ink.900'),
               fontWeight: '600',
               letterSpacing: '-0.01em',
