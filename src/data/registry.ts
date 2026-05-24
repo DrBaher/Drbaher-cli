@@ -34,13 +34,18 @@ const FALLBACKS: Record<string, string> = {
   'compare-cli': '0.3.0',
 };
 
-// Last-resort weekly-download counts for the PyPI packages only. npm's API is
+// Last-resort weekly-download counts for the PyPI packages. npm's API is
 // reliable; pypistats.org rate-limits build IPs (429), which would otherwise
-// drop these badges intermittently. These are recent real figures — refresh
-// occasionally — used only when the live pypistats fetch fails.
+// drop these badges intermittently. EVERY PyPI package needs an entry — any one
+// missing here loses its /wk badge whenever pypistats 429s at build time (which
+// is what dropped extract/contract-vault/contract-lint). Recent real figures
+// (2026-05-24) — refresh occasionally; used only when the live fetch fails.
 const PYPI_WEEKLY_FALLBACK: Record<string, number> = {
-  'template-vault-cli': 470,
-  'nda-review-cli': 164,
+  'extract-cli': 1513,
+  'template-vault-cli': 762,
+  'nda-review-cli': 61,
+  'contract-vault-cli': 1472,
+  'contract-lint-cli': 319,
 };
 
 async function safeFetch(url: string, init: RequestInit = {}, timeoutMs = 8000): Promise<Response | null> {
