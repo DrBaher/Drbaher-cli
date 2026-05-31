@@ -1,5 +1,5 @@
 {
-  "_generated": "2026-05-24",
+  "_generated": "2026-05-31",
   "extract-cli": {
     "version": "0.1.14",
     "commands": [
@@ -90,11 +90,12 @@
     }
   },
   "nda-review-cli": {
-    "version": "0.5.1",
+    "version": "0.5.2",
     "commands": [
       "build-playbook",
       "calibrate-scoring",
       "create-manifest",
+      "demo",
       "doctor",
       "draft",
       "generate-office-script",
@@ -117,7 +118,12 @@
       "wizard"
     ],
     "flags": [],
-    "exitCodes": {}
+    "exitCodes": {
+      "0": "success",
+      "2": "invalid input (missing flag, malformed value, schema fail)",
+      "3": "policy / verification failed (stale playbook, hash-chain mismatch, stalemate, LLM consent denied)",
+      "4": "not found (missing file, counterparty profile, or playbook)"
+    }
   },
   "contract-lint-cli": {
     "version": "0.2.1",

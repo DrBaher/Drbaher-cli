@@ -354,7 +354,7 @@ extract counterparty.docx | jq -e '.clauses | all(.confidence > 0.7)'   # gate o
 
   <CodeBlock label="agent loop: review a counterparty NDA">{`nda-review-cli --catalog json                          # discover commands + flags
 nda-review-cli review --file counterparty.docx \\
-  --playbook policy.json --why                         # score against your house policy
+  --playbook policy.json --json --why                  # structured verdict on stdout; --why adds evidence
 # negotiate keeps hash-chained state across 12 subcommands; e.g. a two-party sim:
 nda-review-cli negotiate simulate \\
   --party-a-base ours.txt --party-b-base theirs.txt \\

@@ -128,6 +128,9 @@ nda-review-cli draft --template common-paper-mutual \\
   --counterparty "Vendor Co" --learn-profile \\
   --out-md output/review.md
 
+# Agents: add --json for a structured verdict on stdout (parse instead of scrape)
+nda-review-cli review --file incoming.docx --playbook policy.json --json --why
+
 # After wiring up an LLM provider, confirm reachability with a 1-token round-trip
 nda-review-cli doctor --check-llm`}</CodeBlock>
 
