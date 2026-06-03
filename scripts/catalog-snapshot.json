@@ -1,7 +1,7 @@
 {
-  "_generated": "2026-05-31",
+  "_generated": "2026-06-03",
   "extract-cli": {
-    "version": "0.1.14",
+    "version": "0.1.15",
     "commands": [
       "completion",
       "demo",
@@ -17,7 +17,7 @@
     }
   },
   "template-vault-cli": {
-    "version": "0.5.1",
+    "version": "0.5.3",
     "commands": [
       "ask",
       "clause-library",
@@ -53,7 +53,7 @@
     }
   },
   "draft-cli": {
-    "version": "0.10.0",
+    "version": "0.10.2",
     "commands": [],
     "flags": [
       "--bundle",
@@ -90,7 +90,7 @@
     }
   },
   "nda-review-cli": {
-    "version": "0.5.2",
+    "version": "0.5.4",
     "commands": [
       "build-playbook",
       "calibrate-scoring",
@@ -120,13 +120,14 @@
     "flags": [],
     "exitCodes": {
       "0": "success",
+      "1": "operational error (user aborted, consent declined, stalemate, hook failed, or other runtime precondition not met)",
       "2": "invalid input (missing flag, malformed value, schema fail)",
       "3": "policy / verification failed (stale playbook, hash-chain mismatch, stalemate, LLM consent denied)",
       "4": "not found (missing file, counterparty profile, or playbook)"
     }
   },
   "contract-lint-cli": {
-    "version": "0.2.1",
+    "version": "0.2.3",
     "commands": [
       "completion",
       "demo",
@@ -155,7 +156,7 @@
     "ruleCount": 11
   },
   "compare-cli": {
-    "version": "0.4.0",
+    "version": "0.4.2",
     "commands": [],
     "flags": [
       "--catalog",
@@ -186,7 +187,7 @@
     }
   },
   "docx2pdf-cli": {
-    "version": "0.2.2",
+    "version": "0.2.4",
     "commands": [],
     "flags": [
       "--backend",
@@ -215,7 +216,7 @@
     }
   },
   "sign-cli": {
-    "version": "0.6.4",
+    "version": "0.7.1",
     "commands": [
       "(global flags)",
       "approve",
@@ -321,7 +322,7 @@
     }
   },
   "contract-vault-cli": {
-    "version": "0.5.0",
+    "version": "0.5.2",
     "commands": [
       "accept",
       "at-risk",

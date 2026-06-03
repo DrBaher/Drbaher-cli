@@ -23,15 +23,15 @@ export interface CliMeta {
 }
 
 const FALLBACKS: Record<string, string> = {
-  'extract-cli': '0.1.14',
-  'template-vault-cli': '0.5.1',
-  'nda-review-cli': '0.5.1',
-  'docx2pdf-cli': '0.2.2',
-  'sign-cli': '0.6.5',
-  'contract-vault-cli': '0.5.0',
-  'contract-lint-cli': '0.2.1',
-  'draft-cli': '0.9.0',
-  'compare-cli': '0.3.0',
+  'extract-cli': '0.1.16',
+  'template-vault-cli': '0.5.3',
+  'nda-review-cli': '0.5.4',
+  'docx2pdf-cli': '0.2.4',
+  'sign-cli': '0.7.1',
+  'contract-vault-cli': '0.5.2',
+  'contract-lint-cli': '0.2.3',
+  'draft-cli': '0.10.2',
+  'compare-cli': '0.4.2',
 };
 
 // Last-resort weekly-download counts for the PyPI packages. npm's API is

@@ -71,7 +71,7 @@ const jsonLd = {
     <li><strong>One-shot DOCX → sealed PDF.</strong> <code class="chip">sign document</code> takes a <code>.docx</code> (or <code>.pdf</code>), converts via the bundled <a href="/tools/docx2pdf-cli/">docx2pdf-cli</a>, auto-places, stamps, PAdES-seals, and verifies — all in one call against a scoped temp database.</li>
     <li><strong>Named profiles.</strong> Bundle provider + dbPath + credentials under a name; activate by flag, env, or project-level <code>sign-profile.json</code> (git/npm-style upward discovery). Secrets reference shell env via <code>{`{{env:VAR}}`}</code> — credentials never live in the profile file.</li>
     <li><strong>Path-traversal guards.</strong> Every input and output path runs through a validator; an agent or buggy caller can't read or write outside the working directory unless you opt in with <code>SIGN_ALLOW_ABSOLUTE_DOCS=1</code>.</li>
-    <li><strong>PDF verification.</strong> Verify a signed PDF later, offline, with the receipt bundle.</li>
+    <li><strong>Cryptographic PDF verification.</strong> Verify a signed PDF later, offline, with the receipt bundle — the embedded PKCS#7 signature value is checked against the signer certificate's public key (RSA/ECDSA), not just the <code>/ByteRange</code> digest, so a forged or tampered signature fails.</li>
     <li><strong>19-tool MCP server.</strong> Every operationally-useful CLI command is also an MCP tool over stdio — plus a 20-route HTTP API at <code>/v1/*</code> for non-MCP clients.</li>
   </ul>
 
