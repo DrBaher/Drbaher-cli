@@ -23,7 +23,7 @@ export interface CliMeta {
 }
 
 const FALLBACKS: Record<string, string> = {
-  'extract-cli': '0.1.16',
+  'extract-cli': '0.1.17',
   'template-vault-cli': '0.5.3',
   'nda-review-cli': '0.5.4',
   'docx2pdf-cli': '0.2.4',

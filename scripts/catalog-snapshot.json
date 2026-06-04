@@ -1,7 +1,7 @@
 {
-  "_generated": "2026-06-03",
+  "_generated": "2026-06-04",
   "extract-cli": {
-    "version": "0.1.15",
+    "version": "0.1.17",
     "commands": [
       "completion",
       "demo",
