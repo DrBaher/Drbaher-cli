@@ -46,6 +46,8 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://cli.drbaher
   <meta property="og:description" content={desc} />
   <meta property="og:type" content="website" />
   <meta property="og:image" content={ogImageAbs} />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
   <meta property="og:url" content={canonical} />
 
   <meta name="twitter:card" content="summary_large_image" />
@@ -172,14 +174,15 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://cli.drbaher
       });
     });
 
-    // Reveal-on-scroll
-    if ('IntersectionObserver' in window) {
+    // Reveal-on-scroll — respect reduced-motion (just show everything, no animation)
+    const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion || !('IntersectionObserver' in window)) {
+      document.querySelectorAll('[data-reveal]').forEach(el => el.classList.add('is-visible'));
+    } else {
       const io = new IntersectionObserver(entries => {
         entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('is-visible'); io.unobserve(e.target); } });
       }, { rootMargin: '0px 0px -8% 0px', threshold: 0.05 });
       document.querySelectorAll('[data-reveal]').forEach(el => io.observe(el));
-    } else {
-      document.querySelectorAll('[data-reveal]').forEach(el => el.classList.add('is-visible'));
     }
 
     // Heading anchor links — slugify in-page H2/H3, attach a "#" link on hover.

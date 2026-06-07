@@ -4,11 +4,32 @@ import Callout from '../components/Callout.astro';
 import ToolCard from '../components/ToolCard.astro';
 import WorkflowDiagram from '../components/WorkflowDiagram.astro';
 import TryDemo from '../components/TryDemo.astro';
+import JsonLd from '../components/JsonLd.astro';
 import { getCliMeta } from '../data/registry';
 
 const meta = await getCliMeta();
+
+const jsonLd = {
+  '@graph': [
+    {
+      '@type': 'WebSite',
+      '@id': 'https://cli.drbaher.com/#website',
+      name: 'contract-ops CLI suite',
+      url: 'https://cli.drbaher.com',
+      description: 'Nine open-source, local-first CLIs for contract operations — extract, draft, lint, compare, review, convert, sign, and track contracts.',
+    },
+    {
+      '@type': 'Organization',
+      '@id': 'https://cli.drbaher.com/#org',
+      name: 'contract-ops CLI suite',
+      url: 'https://cli.drbaher.com',
+      sameAs: ['https://github.com/DrBaher'],
+    },
+  ],
+};
 ---
 <BaseLayout title="Overview" active="overview" description="Nine composable, local-first CLIs built for an agent-first contract workflow: agents do the operational work, humans approve the gates that matter.">
+  <JsonLd data={jsonLd} />
   <div class="not-prose hero-band">
     <p class="eyebrow">Built for the agent era</p>
     <h1 class="!mt-2">Agents do the work. You approve what matters.</h1>
