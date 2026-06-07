@@ -20,6 +20,13 @@ import CodeBlock from '../components/CodeBlock.astro';
     MCP for the <strong>signing</strong> surface — where the human gate lives.
   </p>
 
+  <p class="mt-2 border-l-2 border-ink-700/20 pl-4 text-sm text-ink-600 dark:border-night-300/25 dark:text-night-200">
+    All three servers — <code class="chip">contract-ops-mcp</code>, <code class="chip">sign-cli</code>, and
+    <code class="chip">compare-cli-mcp</code> — are published on the official
+    <a href="https://registry.modelcontextprotocol.io">MCP Registry</a> (namespace
+    <code class="chip">io.github.DrBaher/*</code>), so any MCP-aware runtime can discover them.
+  </p>
+
   <h2>One connection, the whole suite — <code class="chip">contract-ops-mcp</code></h2>
   <p>Wire it up once; it discovers your installed CLIs and exposes curated tools (plus <code class="chip">catalog</code> / <code class="chip">run</code> escape hatches), all riding the suite's uniform <code class="chip">--catalog json</code> contract.</p>
   <CodeBlock label="claude / cursor mcp config">{`{
