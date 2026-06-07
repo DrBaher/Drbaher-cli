@@ -1,0 +1,91 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Callout from '../../components/Callout.astro';
+
+const rows = [
+  ['Deployment', 'Self-hosted / local — runs on your machine or your infra', 'Cloud SaaS (your documents are uploaded)'],
+  ['Data residency', 'Documents never leave your environment; fully offline option', 'Documents stored on the vendor’s cloud'],
+  ['Pricing', 'Free, open source (MIT). No per-envelope fees', 'Subscription + per-envelope / API metering'],
+  ['Interface', 'CLI + MCP server (for developers, ops, and AI agents)', 'Web GUI + REST API'],
+  ['Signature standard', 'PAdES (PKCS#7 in /ByteRange), self-issued or your own cert', 'Proprietary + standards-based, vendor trust anchor'],
+  ['Verification', 'Cryptographic — signature value checked vs signer cert key, offline', 'Vendor-side verification / certificate of completion'],
+  ['Audit trail', 'Hash-chained, tamper-evident, local; optional RFC 3161 timestamp', 'Vendor audit trail / certificate'],
+  ['Agent / automation', 'Native MCP server — agents can request, sign, verify (human-gated)', 'API integration; no first-class MCP'],
+  ['Identity verification / KYC', 'Not built in (bring your own)', 'Built-in ID verification options'],
+  ['Best for', 'Devs, privacy/regulated teams, agents, cost-sensitive high volume', 'Non-technical users, broad recognition, turnkey compliance'],
+];
+---
+
+<BaseLayout
+  title="Open-source DocuSign alternative (self-hosted, offline) — sign-cli"
+  description="sign-cli is a free, self-hosted, fully-offline alternative to DocuSign for developers and AI agents: PAdES e-signatures, cryptographic verification, a hash-chained audit trail, and a native MCP server — with no per-envelope fees and no documents leaving your infrastructure."
+>
+  <p class="eyebrow">Comparison</p>
+  <h1 class="font-serif">An open-source, self-hosted DocuSign alternative</h1>
+
+  <p class="text-lg text-ink-700 dark:text-night-100">
+    <a href="/tools/sign-cli/">sign-cli</a> is a free, open-source e-signature tool that runs on your
+    own machine or infrastructure. It produces real <strong>PAdES (PKCS#7)</strong> signed PDFs
+    <strong>fully offline</strong> — no signup, no API keys, no per-envelope fees, and no document
+    ever leaving your environment. If you reach DocuSign for its API and chafe at the cost, the
+    cloud round-trip, or the lack of a clean automation/agent surface, sign-cli is the local-first
+    alternative.
+  </p>
+
+  <Callout label="Honest scope">
+    sign-cli is a <strong>CLI + MCP server</strong> for developers, ops teams, and AI agents — not a
+    point-and-click web app, and it doesn’t bundle identity verification/KYC or a household-name
+    trust brand. If you need a GUI for non-technical signers or turnkey regulatory packaging,
+    DocuSign may fit better. If you want self-hosted, offline, scriptable, agent-native signing with
+    no recurring per-signature cost, read on.
+  </Callout>
+
+  <h2>sign-cli vs DocuSign at a glance</h2>
+  <div class="overflow-x-auto">
+    <table class="w-full text-left text-sm">
+      <thead>
+        <tr class="border-b border-ink-700/20 dark:border-night-300/25">
+          <th class="py-2 pr-4"></th>
+          <th class="py-2 pr-4 font-semibold">sign-cli</th>
+          <th class="py-2 pr-4 font-semibold">DocuSign</th>
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map(([label, ours, theirs]) => (
+          <tr class="border-b border-ink-700/10 dark:border-night-300/15 align-top">
+            <td class="py-2 pr-4 font-medium">{label}</td>
+            <td class="py-2 pr-4">{ours}</td>
+            <td class="py-2 pr-4 text-ink-600 dark:text-night-200">{theirs}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Why teams switch (the API/automation case)</h2>
+  <ul>
+    <li><strong>Cost.</strong> No per-envelope or per-API-call metering — sign as much as you want.</li>
+    <li><strong>Privacy / compliance.</strong> Documents are signed and verified locally; nothing is
+      uploaded to a third party. A real unlock for healthcare, finance, legal, and regulated teams.</li>
+    <li><strong>Agent-native.</strong> sign-cli ships a native <a href="/mcp/">MCP server</a>, so an
+      AI agent can request, place, sign, and verify a document through a human-gated, auditable
+      surface — never an unguarded auto-sign path.</li>
+    <li><strong>Verifiable & durable.</strong> Cryptographic PAdES verification plus a hash-chained
+      audit trail and optional RFC 3161 timestamps — evidence that survives even if any vendor
+      disappears.</li>
+    <li><strong>No lock-in.</strong> Open source (MIT). Need a hosted trust anchor too? sign-cli can
+      also route through Dropbox Sign, DocuSign, or SignWell from the same interface.</li>
+  </ul>
+
+  <h2>Try it in five seconds</h2>
+  <Callout label="Install">
+    <code class="chip">npx @drbaher/sign-cli demo</code> runs the full offline lifecycle
+    (create → send → sign → verify → receipt). Or <code class="chip">npm i -g @drbaher/sign-cli</code>.
+  </Callout>
+
+  <p>
+    See the full feature tour on the <a href="/tools/sign-cli/">sign-cli</a> page, or the
+    <a href="/mcp/">MCP server</a> docs for the agent workflow. Source on
+    <a href="https://github.com/DrBaher/sign-cli">GitHub</a>.
+  </p>
+</BaseLayout>
