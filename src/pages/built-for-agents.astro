@@ -21,6 +21,36 @@ import CodeBlock from '../components/CodeBlock.astro';
     client — or, for a shell-running agent like <a href="https://openclaw.ai/" target="_blank" rel="noopener">OpenClaw</a>,
     skip MCP entirely and run the CLIs directly (see below).
   </p>
+
+  <div class="not-prose my-5 overflow-x-auto rounded-lg border border-ink-700/10 dark:border-night-300/15">
+    <table class="w-full border-collapse text-[14px]">
+      <thead>
+        <tr class="border-b border-ink-700/15 bg-cream-100 text-left dark:border-night-300/20 dark:bg-night-600">
+          <th class="px-4 py-2.5 font-semibold text-ink-900 dark:text-night-50">If you're on…</th>
+          <th class="px-4 py-2.5 font-semibold text-ink-900 dark:text-night-50">Do this</th>
+        </tr>
+      </thead>
+      <tbody class="text-ink-800 dark:text-night-100">
+        <tr class="border-b border-ink-700/10 dark:border-night-300/15">
+          <td class="px-4 py-2.5 align-top">Claude Desktop / Cursor / Codex / any Smithery client</td>
+          <td class="px-4 py-2.5 align-top">One-click via <a href="#smithery--one-click-install-no-setup">Smithery</a>, or drop an MCP config snippet (below)</td>
+        </tr>
+        <tr class="border-b border-ink-700/10 dark:border-night-300/15">
+          <td class="px-4 py-2.5 align-top">A shell-running agent (e.g. OpenClaw)</td>
+          <td class="px-4 py-2.5 align-top">Skip MCP — run the CLIs directly; discover each via <code class="chip">--catalog json</code></td>
+        </tr>
+        <tr class="border-b border-ink-700/10 dark:border-night-300/15">
+          <td class="px-4 py-2.5 align-top">langchain / AutoGen / OpenAI SDK (no MCP)</td>
+          <td class="px-4 py-2.5 align-top">Use the <a href="/mcp/#http-api-for-non-mcp-clients"><code class="chip">/v1/*</code> HTTP API</a></td>
+        </tr>
+        <tr>
+          <td class="px-4 py-2.5 align-top">Any other MCP-aware client</td>
+          <td class="px-4 py-2.5 align-top">Wire <code class="chip">contract-ops-mcp</code> (whole suite) + <code class="chip">sign-cli</code> (signing) into <code class="chip">mcpServers</code></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
   <CodeBlock label="contract-ops-mcp — the whole suite, one server">{`{
   "mcpServers": {
     "contract-ops": { "command": "npx", "args": ["-y", "contract-ops-mcp"] }
@@ -62,7 +92,7 @@ import CodeBlock from '../components/CodeBlock.astro';
     answered) — only I/O failures, malformed input, and "no agreed round found" surface as MCP errors.
   </p>
 
-  <CodeBlock label="install">{`npm i -g compare-cli@^0.3.0 compare-cli-mcp@^0.1.1
+  <CodeBlock label="install">{`npm i -g compare-cli compare-cli-mcp
 compare-mcp           # spawns the server on stdio (for testing)`}</CodeBlock>
 
   <p>

@@ -13,12 +13,38 @@ import CodeBlock from '../components/CodeBlock.astro';
   <h1>The agent drives. You approve.</h1>
 
   <p class="text-lg text-ink-700 dark:text-night-100">
-    The whole suite is built for an agent-first workflow, and there are two ways to drive it over MCP.
-    The fastest is <strong>contract-ops-mcp</strong> — <em>one</em> stdio server that exposes all nine
-    CLIs as tools, so an agent connects once and can extract, draft, lint, compare, convert, review, and
-    query the vaults. And <a href="https://github.com/DrBaher/sign-cli">sign-cli</a> ships its own deeper
-    MCP for the <strong>signing</strong> surface — where the human gate lives.
+    The whole suite is built for an agent-first workflow. <strong>Three MCP servers</strong> expose it —
+    pick by what you want the agent to do, or use the HTTP API for frameworks that don't speak MCP.
   </p>
+
+  <div class="not-prose my-5 overflow-x-auto rounded-lg border border-ink-700/10 dark:border-night-300/15">
+    <table class="w-full border-collapse text-[14px]">
+      <thead>
+        <tr class="border-b border-ink-700/15 bg-cream-100 text-left dark:border-night-300/20 dark:bg-night-600">
+          <th class="px-4 py-2.5 font-semibold text-ink-900 dark:text-night-50">If the agent should…</th>
+          <th class="px-4 py-2.5 font-semibold text-ink-900 dark:text-night-50">Use</th>
+        </tr>
+      </thead>
+      <tbody class="text-ink-800 dark:text-night-100">
+        <tr class="border-b border-ink-700/10 dark:border-night-300/15">
+          <td class="px-4 py-2.5 align-top">Extract, draft, lint, compare, review, convert, query the vaults</td>
+          <td class="px-4 py-2.5 align-top"><code class="chip">contract-ops-mcp</code> — one server, all nine CLIs</td>
+        </tr>
+        <tr class="border-b border-ink-700/10 dark:border-night-300/15">
+          <td class="px-4 py-2.5 align-top">Send, sign, track, and verify signatures (human-gated)</td>
+          <td class="px-4 py-2.5 align-top"><a href="https://github.com/DrBaher/sign-cli">sign-cli</a>'s MCP — the signing surface</td>
+        </tr>
+        <tr class="border-b border-ink-700/10 dark:border-night-300/15">
+          <td class="px-4 py-2.5 align-top">Run a pre-signature drift gate only</td>
+          <td class="px-4 py-2.5 align-top"><code class="chip">compare-cli-mcp</code></td>
+        </tr>
+        <tr>
+          <td class="px-4 py-2.5 align-top">Integrate from a framework that doesn't speak MCP</td>
+          <td class="px-4 py-2.5 align-top">the <a href="#http-api-for-non-mcp-clients"><code class="chip">/v1/*</code> HTTP API</a></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
   <p class="mt-2 border-l-2 border-ink-700/20 pl-4 text-sm text-ink-600 dark:border-night-300/25 dark:text-night-200">
     All three servers — <code class="chip">contract-ops-mcp</code>, <code class="chip">sign-cli</code>, and

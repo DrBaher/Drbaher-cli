@@ -21,11 +21,17 @@ import TryDemo from '../components/TryDemo.astro';
   </p>
 
   <Callout label="Pattern">
-    Agent: <strong>draft</strong> → <strong>review</strong> → <strong>negotiate</strong> →
-    <strong>convert</strong> → <strong>compare</strong> → <strong>send</strong>.
-    &nbsp;Human: <strong>approve signature</strong>, <strong>resolve escalations</strong>,
-    <strong>sign-off on final agreed text</strong>, <strong>review substantive drift</strong>.
-    Stop wherever you want; pick up where you stopped.
+    <div class="not-prose grid gap-4 sm:grid-cols-2">
+      <div>
+        <div class="font-mono text-[11px] uppercase tracking-[0.14em] text-accent-700 dark:text-accent-300">Agent does</div>
+        <p class="mt-1 text-[14px] text-ink-800 dark:text-night-100">draft → review → negotiate → convert → compare → send</p>
+      </div>
+      <div>
+        <div class="font-mono text-[11px] uppercase tracking-[0.14em] text-amber-700 dark:text-amber-200">Human approves</div>
+        <p class="mt-1 text-[14px] text-ink-800 dark:text-night-100">the signature · escalations · the final agreed text · substantive drift</p>
+      </div>
+    </div>
+    <p class="mt-3 text-[13px] text-ink-600 dark:text-night-200">Stop wherever you want; pick up where you stopped.</p>
   </Callout>
 
   <h2>1. Vendor onboarding NDA at scale</h2>
