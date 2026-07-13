@@ -1,12 +1,11 @@
 ---
-title: "sign-cli — consent & attribution layer (intent, consent, and identity assurance in the audit chain)"
+title: "sign-cli v0.9 — consent & attribution layer (intent, consent, and identity assurance in the audit chain)"
 date: 2026-07-13
 cli: sign-cli
-summary: "sign-cli now captures the evidence e-signature disputes actually turn on — intent, consent, and attribution — directly in its tamper-evident audit chain. Opt in per request: --require-consent gates signing on a recorded intent-to-sign attestation plus an electronic-records (ESIGN) disclosure; --require-email-verification gates it on proof of mailbox control. A third command records how you verified a signer's identity out-of-band. No accounts, no KYC forms, no identity documents stored — by design. On main now; ships in the next release after 0.8.0."
+version: "0.9.0"
+summary: "sign-cli now captures the evidence e-signature disputes actually turn on — intent, consent, and attribution — directly in its tamper-evident audit chain. Opt in per request: --require-consent gates signing on a recorded intent-to-sign attestation plus an electronic-records (ESIGN) disclosure; --require-email-verification gates it on proof of mailbox control. A third command records how you verified a signer's identity out-of-band. No accounts, no KYC forms, no identity documents stored — by design."
 tags: ["sign-cli"]
 ---
-
-**Availability:** merged to `main` (commits `f18a4b6` + `6773469`); ships in the first release after 0.8.0. The published `@drbaher/sign-cli@0.8.0` does not have these flags yet.
 
 Under US ESIGN/UETA, what a court asks about an e-signature is procedural: did the signer intend to sign, did they consent to transact electronically, and can you attribute the signature to them? This release records all three in sign-cli's hash-chained audit log — and deliberately stops short of collecting identity documents, because self-asserted KYC data adds privacy liability without adding evidentiary weight.
 
@@ -40,7 +39,7 @@ Both gates live in the shared signing service, so the CLI, the MCP `sign` tool, 
 
 ### See it in five seconds
 
-Once released, `npx @drbaher/sign-cli demo` runs the full consent flow offline: both gates on, two sign attempts visibly blocked (`EMAIL_VERIFICATION_REQUIRED`, `CONSENT_REQUIRED`), email verified, consent captured, identity recorded, then approve → sign → verify chain → export receipt. Then it deletes everything.
+`npx @drbaher/sign-cli demo` runs the full consent flow offline: both gates on, two sign attempts visibly blocked (`EMAIL_VERIFICATION_REQUIRED`, `CONSENT_REQUIRED`), email verified, consent captured, identity recorded, then approve → sign → verify chain → export receipt. Then it deletes everything.
 
 ### What it doesn't claim
 

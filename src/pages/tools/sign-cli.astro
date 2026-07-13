@@ -48,8 +48,9 @@ const jsonLd = {
 
   <Callout label="TL;DR">
     <code class="chip">npm i -g @drbaher/sign-cli</code> — or <code class="chip">npx @drbaher/sign-cli demo</code> for
-    a five-second offline walkthrough of the full lifecycle (create → send → sign → verify →
-    receipt). Pick the local PAdES signer or a hosted provider (Dropbox Sign, DocuSign, SignWell)
+    a five-second offline walkthrough of the full consent-gated lifecycle (create with both gates on →
+    blocked sign attempts → email verified → consent captured → approve → sign → verify → receipt).
+    Pick the local PAdES signer or a hosted provider (Dropbox Sign, DocuSign, SignWell)
     and send a PDF with one command.
   </Callout>
 
@@ -66,7 +67,7 @@ const jsonLd = {
     <li><strong>Multi-provider hosted sending.</strong> Dropbox Sign, DocuSign, and SignWell are wired in for when you need an external trust anchor. Same surface across all four providers.</li>
     <li><strong>Per-signer approval tokens with TTL.</strong> Every signer gets an explicit token tied to their email; agents can't impersonate humans, and tokens expire.</li>
     <li><strong>Hash-chained audit events.</strong> Every event hashes into the previous one and into append-only DB triggers. Tampering breaks <code class="chip">audit verify</code>.</li>
-    <li><strong>Consent & attribution layer</strong> <em>(next release after 0.8.0 — on main today)</em>. Opt in per request: <code>--require-consent</code> gates signing on a recorded intent-to-sign attestation plus an electronic-records (ESIGN) disclosure; <code>--require-email-verification</code> gates it on proof of mailbox control; <code class="chip">signer record-identity</code> records how you verified a signer's identity out-of-band. No accounts, no KYC forms, no identity documents stored — by design.</li>
+    <li><strong>Consent & attribution layer.</strong> Opt in per request: <code>--require-consent</code> gates signing on a recorded intent-to-sign attestation plus an electronic-records (ESIGN) disclosure; <code>--require-email-verification</code> gates it on proof of mailbox control; <code class="chip">signer record-identity</code> records how you verified a signer's identity out-of-band. No accounts, no KYC forms, no identity documents stored — by design.</li>
     <li><strong>RFC 3161 timestamping.</strong> External TSA anchors prove a signature existed by a given date — durable evidence that survives even if the provider disappears.</li>
     <li><strong>Auto-place signatures.</strong> Detect AcroForm <code>/Sig</code> widgets and anchor text (<code>Signature:</code>, <code>Date:</code>, <code>Sign here</code>, French/EU conventions) and stamp at the right rectangle. Multi-candidate selectors (<code>first</code>, <code>last</code>, <code>all</code>, <code>page:N</code>, <code>index:N</code>) handle the foot-gun where multiple anchors exist.</li>
     <li><strong>One-shot DOCX → sealed PDF.</strong> <code class="chip">sign document</code> takes a <code>.docx</code> (or <code>.pdf</code>), converts via the bundled <a href="/tools/docx2pdf-cli/">docx2pdf-cli</a>, auto-places, stamps, PAdES-seals, and verifies — all in one call against a scoped temp database.</li>
@@ -106,12 +107,6 @@ sign request create \\
   --provider signwell`}</CodeBlock>
 
   <h2>Consent, verification, and identity assurance — without collecting anyone's ID</h2>
-
-  <Callout label="Availability">
-    Merged to <code class="chip">main</code>; ships in the first release after 0.8.0. The published
-    <code class="chip">@drbaher/sign-cli@0.8.0</code> doesn't have these flags yet — see the
-    <a href="/changelog/">changelog</a> for release status.
-  </Callout>
 
   <p>
     Under US ESIGN/UETA, what a court asks about an e-signature is procedural: did the signer

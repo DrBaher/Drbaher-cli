@@ -27,7 +27,7 @@ const FALLBACKS: Record<string, string> = {
   'template-vault-cli': '0.5.3',
   'nda-review-cli': '0.5.4',
   'docx2pdf-cli': '0.2.4',
-  'sign-cli': '0.7.1',
+  'sign-cli': '0.9.0',
   'contract-vault-cli': '0.5.2',
   'contract-lint-cli': '0.2.3',
   'draft-cli': '0.10.2',

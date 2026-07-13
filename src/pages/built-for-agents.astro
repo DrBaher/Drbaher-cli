@@ -346,8 +346,8 @@ curl http://localhost:4000/v1/openapi.json    # full OpenAPI 3.1 spec`}</CodeBlo
   </p>
 
   <p>
-    The next sign-cli release (after 0.8.0; on main today) deepens the guardrail with opt-in
-    <strong>consent & attribution gates</strong>: on a request created with
+    Since sign-cli 0.9.0, opt-in <strong>consent & attribution gates</strong> deepen the
+    guardrail: on a request created with
     <code class="chip">--require-consent</code> / <code class="chip">--require-email-verification</code>,
     even a valid signer token won't sign until the human has attested intent to sign, accepted the
     electronic-records (ESIGN) disclosure, and/or proven mailbox control with a 6-digit code. The gates
