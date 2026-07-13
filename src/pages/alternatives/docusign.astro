@@ -11,7 +11,8 @@ const rows = [
   ['Verification', 'Cryptographic — signature value checked vs signer cert key, offline', 'Vendor-side verification / certificate of completion'],
   ['Audit trail', 'Hash-chained, tamper-evident, local; optional RFC 3161 timestamp', 'Vendor audit trail / certificate'],
   ['Agent / automation', 'Native MCP server — agents can request, sign, verify (human-gated)', 'API integration; no first-class MCP'],
-  ['Identity verification / KYC', 'Not built in (bring your own)', 'Built-in ID verification options'],
+  ['Consent & attribution evidence', 'Intent-to-sign attestation, ESIGN electronic-records disclosure, and mailbox verification recorded in the tamper-evident audit chain (opt-in per request; next release)', 'Consent capture + certificate of completion, vendor-held'],
+  ['Identity verification / KYC', 'No built-in IDV — records how you verified identity out-of-band, without storing ID documents', 'Built-in ID verification options'],
   ['Best for', 'Devs, privacy/regulated teams, agents, cost-sensitive high volume', 'Non-technical users, broad recognition, turnkey compliance'],
 ];
 ---
@@ -73,6 +74,10 @@ const rows = [
     <li><strong>Verifiable & durable.</strong> Cryptographic PAdES verification plus a hash-chained
       audit trail and optional RFC 3161 timestamps — evidence that survives even if any vendor
       disappears.</li>
+    <li><strong>Consent & attribution, without KYC.</strong> Opt-in gates (shipping in the next
+      release) record what US ESIGN/UETA disputes actually turn on — intent to sign, consent to
+      transact electronically, and attribution — in the same audit chain, while deliberately never
+      collecting identity documents. Details on the <a href="/tools/sign-cli/">sign-cli page</a>.</li>
     <li><strong>No lock-in.</strong> Open source (MIT). Need a hosted trust anchor too? sign-cli can
       also route through Dropbox Sign, DocuSign, or SignWell from the same interface.</li>
   </ul>

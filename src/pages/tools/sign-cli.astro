@@ -20,14 +20,14 @@ const jsonLd = {
   license: 'https://opensource.org/licenses/MIT',
   url: 'https://cli.drbaher.com/tools/sign-cli/',
   codeRepository: 'https://github.com/DrBaher/sign-cli',
-  description: 'Fully-offline PAdES e-signature CLI with hash-chained audit events, RFC 3161 timestamps, per-signer approval tokens, named profiles, and a 19-tool MCP server for agents.',
+  description: 'Fully-offline PAdES e-signature CLI with hash-chained audit events, RFC 3161 timestamps, per-signer approval tokens, consent & attribution capture, named profiles, and a 19-tool MCP server for agents.',
   offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
 };
 ---
 <BaseLayout
   title="sign-cli"
   active="tools/sign-cli"
-  description="Fully-offline PAdES e-signature CLI with hash-chained audit events, RFC 3161 timestamps, per-signer approval tokens, named profiles, and a 19-tool MCP server for agents."
+  description="Fully-offline PAdES e-signature CLI with hash-chained audit events, RFC 3161 timestamps, per-signer approval tokens, consent & attribution capture, named profiles, and a 19-tool MCP server for agents."
   withCasts
   toc
 >
@@ -66,6 +66,7 @@ const jsonLd = {
     <li><strong>Multi-provider hosted sending.</strong> Dropbox Sign, DocuSign, and SignWell are wired in for when you need an external trust anchor. Same surface across all four providers.</li>
     <li><strong>Per-signer approval tokens with TTL.</strong> Every signer gets an explicit token tied to their email; agents can't impersonate humans, and tokens expire.</li>
     <li><strong>Hash-chained audit events.</strong> Every event hashes into the previous one and into append-only DB triggers. Tampering breaks <code class="chip">audit verify</code>.</li>
+    <li><strong>Consent & attribution layer</strong> <em>(next release after 0.8.0 — on main today)</em>. Opt in per request: <code>--require-consent</code> gates signing on a recorded intent-to-sign attestation plus an electronic-records (ESIGN) disclosure; <code>--require-email-verification</code> gates it on proof of mailbox control; <code class="chip">signer record-identity</code> records how you verified a signer's identity out-of-band. No accounts, no KYC forms, no identity documents stored — by design.</li>
     <li><strong>RFC 3161 timestamping.</strong> External TSA anchors prove a signature existed by a given date — durable evidence that survives even if the provider disappears.</li>
     <li><strong>Auto-place signatures.</strong> Detect AcroForm <code>/Sig</code> widgets and anchor text (<code>Signature:</code>, <code>Date:</code>, <code>Sign here</code>, French/EU conventions) and stamp at the right rectangle. Multi-candidate selectors (<code>first</code>, <code>last</code>, <code>all</code>, <code>page:N</code>, <code>index:N</code>) handle the foot-gun where multiple anchors exist.</li>
     <li><strong>One-shot DOCX → sealed PDF.</strong> <code class="chip">sign document</code> takes a <code>.docx</code> (or <code>.pdf</code>), converts via the bundled <a href="/tools/docx2pdf-cli/">docx2pdf-cli</a>, auto-places, stamps, PAdES-seals, and verifies — all in one call against a scoped temp database.</li>
@@ -103,6 +104,88 @@ sign request create \\
   --signer "name:Alice Founder,email:alice@acme.com" \\
   --signer "name:Bob Counsel,email:bob@beta.com" \\
   --provider signwell`}</CodeBlock>
+
+  <h2>Consent, verification, and identity assurance — without collecting anyone's ID</h2>
+
+  <Callout label="Availability">
+    Merged to <code class="chip">main</code>; ships in the first release after 0.8.0. The published
+    <code class="chip">@drbaher/sign-cli@0.8.0</code> doesn't have these flags yet — see the
+    <a href="/changelog/">changelog</a> for release status.
+  </Callout>
+
+  <p>
+    Under US ESIGN/UETA, what a court asks about an e-signature is procedural: did the signer
+    <em>intend</em> to sign, did they <em>consent</em> to transact electronically, and can you
+    <em>attribute</em> the signature to them? sign-cli records all three in its hash-chained audit
+    log — and deliberately stops short of collecting identity documents, because self-asserted KYC
+    data adds privacy liability without adding evidentiary weight.
+  </p>
+
+  <ul>
+    <li><strong>Intent + consent, as versioned attestations.</strong> With <code>--require-consent true</code>,
+      no signer can sign until they've affirmatively accepted two canonical statements — an
+      intent-to-sign attestation and an electronic-records disclosure covering the ESIGN §7001(c)
+      elements (right to paper, withdrawal, retention). <code class="chip">sign consent show</code>
+      prints the exact texts; the audit chain records each acceptance with the statement's version
+      id, SHA-256, full text, and timestamp. Statement versions are immutable: historical consents
+      always re-verify against exactly what was accepted.</li>
+    <li><strong>Email verification, opt-in.</strong> <code>--require-email-verification true</code>
+      gates signing on a 6-digit code that proves control of the signer's mailbox — evidence the
+      approval token alone can't give you. Codes are hashed at rest, TTL-bounded, locked after 5
+      wrong attempts, and never appear in the audit chain (only a masked hint does). Wire
+      <code class="chip">SIGN_VERIFICATION_WEBHOOK_URL</code> to your mailer, or deliver codes
+      out-of-band.</li>
+    <li><strong>Identity assurance, recorded — not collected.</strong> When you have verified who
+      you're dealing with (a video call, an in-person meeting, a provider IDV flow),
+      <code class="chip">sign signer record-identity</code> logs the method, the verifier, and a
+      pointer to the evidence in the audit chain. The assertion is recorded; the personal data stays
+      wherever it already lives.</li>
+    <li><strong>Enforced everywhere, gated where it counts.</strong> Both gates live in the shared
+      signing service, so the CLI, the MCP <code>sign</code> tool, and <code>POST /v1/sign</code>
+      all honor them — an agent holding a token still can't get past a gate
+      (<code>CONSENT_REQUIRED</code>, <code>EMAIL_VERIFICATION_REQUIRED</code>), and
+      <code>--auto-approve</code> is rejected in combination with either. Capture itself stays
+      CLI-side, consistent with the tool's core asymmetry: agents drive the workflow, humans perform
+      the signing gesture.</li>
+  </ul>
+
+  <CodeBlock label="consent-gated flow">{`# Gate signing on consent + mailbox proof
+sign request create \\
+  --title "Vendor MSA" \\
+  --document contract.pdf \\
+  --signer "name:Alice Founder,email:alice@acme.com" \\
+  --require-consent true \\
+  --require-email-verification true
+
+# Read the canonical statements (version id + SHA-256 + full text)
+sign consent show
+
+# Prove mailbox control: issue a 6-digit code, then redeem it
+sign signer send-verification --request-id req_abc --email alice@acme.com
+sign signer verify-email --request-id req_abc --email alice@acme.com --code 123456
+
+# The signer attests intent + accepts the ESIGN disclosure while approving
+sign approve --request-id req_abc --token alice-tok-... \\
+  --agree true --accept-disclosure true
+
+# Record how you verified who they are (the assertion, not the evidence)
+sign signer record-identity --request-id req_abc --email alice@acme.com \\
+  --identity-assurance method:video-call,verifier:ops@acme.com,reference:TICKET-123`}</CodeBlock>
+
+  <p>
+    Each step lands in the audit chain as a first-class event:
+    <code>request.consent_captured</code>, <code>request.esign_consent_captured</code>,
+    <code>request.signer_verification_issued</code>, <code>request.signer_email_verified</code>,
+    <code>request.identity_assurance_recorded</code>.
+  </p>
+
+  <Callout label="What it doesn't claim">
+    This strengthens the ESIGN/UETA evidence story. It does not change the eIDAS tier — the local
+    provider still produces a Simple Electronic Signature, and verified legal identity remains the
+    domain of hosted-provider IDV or a QTSP. The full posture is documented in
+    <a href="https://github.com/DrBaher/sign-cli/blob/main/docs/reference/legal.md"><code class="chip">docs/reference/legal.md</code></a> and
+    <a href="https://github.com/DrBaher/sign-cli/blob/main/docs/reference/consent-and-identity.md"><code class="chip">docs/reference/consent-and-identity.md</code></a>.
+  </Callout>
 
   <h2>One-shot: DOCX → sealed PDF</h2>
 

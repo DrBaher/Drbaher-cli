@@ -345,6 +345,18 @@ curl http://localhost:4000/v1/openapi.json    # full OpenAPI 3.1 spec`}</CodeBlo
     mutation, so an agent computing a hash earlier can refuse to sign if the document was swapped in flight.
   </p>
 
+  <p>
+    The next sign-cli release (after 0.8.0; on main today) deepens the guardrail with opt-in
+    <strong>consent & attribution gates</strong>: on a request created with
+    <code class="chip">--require-consent</code> / <code class="chip">--require-email-verification</code>,
+    even a valid signer token won't sign until the human has attested intent to sign, accepted the
+    electronic-records (ESIGN) disclosure, and/or proven mailbox control with a 6-digit code. The gates
+    live in the shared signing service, so the CLI, the MCP <code>sign</code> tool, and
+    <code>POST /v1/sign</code> all return <code>CONSENT_REQUIRED</code> /
+    <code>EMAIL_VERIFICATION_REQUIRED</code> until satisfied — and <code class="chip">--auto-approve</code>
+    is rejected in combination with either. Details on the <a href="/tools/sign-cli/">sign-cli page</a>.
+  </p>
+
   <h2>The other CLIs — agent-friendly over stdio</h2>
 
   <p>
