@@ -43,9 +43,13 @@ import CodeBlock from '../components/CodeBlock.astro';
           <td class="px-4 py-2.5 align-top">langchain / AutoGen / OpenAI SDK (no MCP)</td>
           <td class="px-4 py-2.5 align-top">Use the <a href="/mcp/#http-api-for-non-mcp-clients"><code class="chip">/v1/*</code> HTTP API</a></td>
         </tr>
-        <tr>
+        <tr class="border-b border-ink-700/10 dark:border-night-300/15">
           <td class="px-4 py-2.5 align-top">Any other MCP-aware client</td>
           <td class="px-4 py-2.5 align-top">Wire <code class="chip">contract-ops-mcp</code> (whole suite) + <code class="chip">sign-cli</code> (signing) into <code class="chip">mcpServers</code></td>
+        </tr>
+        <tr>
+          <td class="px-4 py-2.5 align-top">You don't want to <em>build</em> an agent</td>
+          <td class="px-4 py-2.5 align-top">Run the ready-made <a href="#contract-ops-agent--the-ready-made-enclosed-agent"><code class="chip">contract-ops-agent</code></a> — bring your own model</td>
         </tr>
       </tbody>
     </table>
@@ -61,6 +65,38 @@ import CodeBlock from '../components/CodeBlock.astro';
     <code class="chip">npm i -g @drbaher/sign-cli</code> — then drop the wire-up snippet below into your client's
     MCP config. Every command is also a stable MCP tool with input/output schemas; agents discover the live
     catalog via <code class="chip">sign mcp tools</code>.
+  </Callout>
+
+  <h2 id="contract-ops-agent--the-ready-made-enclosed-agent">contract-ops-agent — the ready-made, enclosed agent</h2>
+
+  <p>
+    Don't want to wire up MCP and build your own loop? <strong>contract-ops-agent</strong> is a terminal agent
+    that already wraps the whole suite — and it's <em>enclosed by construction</em>: the model's only tools are
+    the contract-ops tools. No shell, no filesystem, no web, no signing — not by policy, by design. If a request
+    can't be served by extract, lint, compare, draft, review, convert, negotiate, the vaults, or verify, the agent
+    literally has no way to do it.
+  </p>
+
+  <p><strong>Bring your own model.</strong> Claude (an API key or your existing Claude Code login), OpenAI, or any
+    OpenAI-compatible endpoint — Gemini, Grok, DeepSeek, OpenRouter, or a local Ollama — all behind one interface,
+    with the same enclosure on every backend.</p>
+
+  <CodeBlock label="Install & run — bring only a model key">{`npm install -g contract-ops-agent
+contract-ops-agent            # first run: a short setup wizard, then a REPL
+
+# or zero-setup — the agent, all the CLIs, and a PDF backend, bundled:
+docker run -it --rm -v "$PWD:/workspace" -e OPENAI_API_KEY \\
+  ghcr.io/drbaher/contract-ops-agent`}</CodeBlock>
+
+  <p>Then just say what you want in plain language — <em>"extract agreement.md and lint it,"</em>
+    <em>"compare v1 and v2,"</em> <em>"review this NDA against our playbook and draft redlines."</em>
+    It reads files in your workspace freely, but asks before it writes a file or runs anything beyond a read.</p>
+
+  <Callout label="Signing stays human — by construction">
+    The agent can prepare everything up to signature, but it cannot sign: signing is unreachable unless you
+    deliberately opt in (a config flag <em>and</em> a launch flag), and even then every signing action stops at a
+    typed-consent gate you approve. The enclosure is verified at startup — the session refuses to run if any tool
+    outside the suite is mounted. <a href="https://github.com/DrBaher/contract-ops-agent" target="_blank" rel="noopener">Source &amp; docs on GitHub →</a>
   </Callout>
 
   <h2>Smithery — one-click install (no setup)</h2>
