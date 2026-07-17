@@ -1,13 +1,9 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Callout from '../components/Callout.astro';
-import ToolCard from '../components/ToolCard.astro';
 import WorkflowDiagram from '../components/WorkflowDiagram.astro';
 import TryDemo from '../components/TryDemo.astro';
 import JsonLd from '../components/JsonLd.astro';
-import { getCliMeta } from '../data/registry';
-
-const meta = await getCliMeta();
 
 const jsonLd = {
   '@graph': [
@@ -38,8 +34,8 @@ const jsonLd = {
       review, lint, compare, convert, sign, and track contracts from the command line. Each works
       standalone; together they cover the whole workflow. Built so an AI agent can run the operational
       work over MCP, while a human approves the gates that matter — starting with signing. Bring your
-      own agent, or skip the wiring and run the ready-made <strong>contract-ops-agent</strong>: one
-      command, your model of choice, the whole suite in an enclosure.
+      own agent, or skip the wiring and run the ready-made <strong>contract-ops-agent</strong> (beta):
+      one command, your model of choice, the whole suite in an enclosure.
     </p>
     <div class="mt-5 flex flex-wrap items-center gap-2 text-[12.5px]">
       <span class="rounded-md border border-accent-200 bg-accent-50 px-2 py-1 font-mono text-accent-700 dark:border-accent-700/40 dark:bg-accent-900/20 dark:text-accent-300">MCP-native</span>
@@ -59,12 +55,8 @@ const jsonLd = {
       <a href="/built-for-agents/#contract-ops-agent--the-ready-made-enclosed-agent" class="inline-flex items-center gap-1.5 rounded-md bg-accent-600 px-4 py-2 text-[14px] font-semibold text-cream-50 shadow-sm transition-colors hover:bg-accent-700 dark:bg-accent-500 dark:text-night-900 dark:hover:bg-accent-400">
         Run the agent <span aria-hidden="true">→</span>
       </a>
-      <span class="rounded-md border border-accent-200 bg-accent-50 px-2 py-1 font-mono text-[12px] text-accent-700 dark:border-accent-700/40 dark:bg-accent-900/20 dark:text-accent-300">New · beta</span>
       <a href="/tour/" class="inline-flex items-center gap-1.5 rounded-md border border-ink-700/15 px-4 py-2 text-[14px] font-medium text-ink-700 transition-colors hover:border-accent-300 hover:text-accent-700 dark:border-night-300/20 dark:text-night-100 dark:hover:text-accent-300">
-        Take the 5-minute tour
-      </a>
-      <a href="/install/" class="inline-flex items-center gap-1.5 rounded-md border border-ink-700/15 px-4 py-2 text-[14px] font-medium text-ink-700 transition-colors hover:border-accent-300 hover:text-accent-700 dark:border-night-300/20 dark:text-night-100 dark:hover:text-accent-300">
-        Install
+        Explore the CLIs
       </a>
     </div>
   </div>
@@ -137,197 +129,41 @@ const jsonLd = {
   </div>
   <p class="text-[13px] text-ink-500 dark:text-night-200" data-reveal>Every tool answers <code class="chip">--catalog json</code> for uniform agent discovery. Exit-code meanings differ per tool — see <a href="/built-for-agents/">built for agents</a>.</p>
 
-  <h2 data-reveal>The tools</h2>
-
-  <div class="not-prose mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3" data-reveal>
-    <ToolCard
-      title="extract-cli"
-      tagline="Open-loop front door: ingest any contract (.md/.txt/.html/.docx/.pdf) into structured JSON — parties, clauses, dates, governing law — with a confidence and source on every field."
-      language="Python"
-      install="pipx install extract-cli"
-      href="/tools/extract-cli/"
-      github="https://github.com/DrBaher/extract-cli"
-      icon="/assets/icons/extract-cli.svg"
-      version={meta['extract-cli'].version}
-      versionSource={meta['extract-cli'].source}
-      stars={meta['extract-cli'].stars}
-      weeklyDownloads={meta['extract-cli'].weeklyDownloads}
-      weeklyDownloadsSource={meta['extract-cli'].weeklyDownloadsSource}
-    />
-    <ToolCard
-      title="template-vault-cli"
-      tagline="Git-backed, clause-aware vault for legal-document templates. Fork, swap clauses with recorded provenance, pull upstream upgrades."
-      language="Python"
-      install="pipx install template-vault-cli"
-      href="/tools/template-vault-cli/"
-      github="https://github.com/DrBaher/template-vault-cli"
-      icon="/assets/icons/template-vault-cli.svg"
-      version={meta['template-vault-cli'].version}
-      versionSource={meta['template-vault-cli'].source}
-      stars={meta['template-vault-cli'].stars}
-      weeklyDownloads={meta['template-vault-cli'].weeklyDownloads}
-      weeklyDownloadsSource={meta['template-vault-cli'].weeklyDownloadsSource}
-    />
-    <ToolCard
-      title="draft-cli"
-      tagline="Fill placeholders in markdown or .docx templates. Typed/computed/positional params, parties registry, multi-doc bundles."
-      language="Node.js"
-      install="npm i -g @drbaher/draft-cli"
-      href="/tools/draft-cli/"
-      github="https://github.com/DrBaher/draft-cli"
-      icon="/assets/icons/draft-cli.svg"
-      version={meta['draft-cli'].version}
-      versionSource={meta['draft-cli'].source}
-      stars={meta['draft-cli'].stars}
-      weeklyDownloads={meta['draft-cli'].weeklyDownloads}
-      weeklyDownloadsSource={meta['draft-cli'].weeklyDownloadsSource}
-    />
-    <ToolCard
-      title="nda-review-cli"
-      tagline="Draft, review, and negotiate NDAs against your own house playbook. Deterministic by default; opt-in LLM augmentation."
-      language="Python"
-      install="pipx install nda-review-cli"
-      href="/tools/nda-review-cli/"
-      github="https://github.com/DrBaher/nda-review-cli"
-      icon="/assets/icons/nda-review-cli.svg"
-      version={meta['nda-review-cli'].version}
-      versionSource={meta['nda-review-cli'].source}
-      stars={meta['nda-review-cli'].stars}
-      weeklyDownloads={meta['nda-review-cli'].weeklyDownloads}
-      weeklyDownloadsSource={meta['nda-review-cli'].weeklyDownloadsSource}
-    />
-    <ToolCard
-      title="contract-lint-cli"
-      tagline="Pre-signature quality gate: lint one contract for internal-consistency defects — leftover placeholders, broken cross-references, defined-term and numbering issues — with CI-gateable exit codes."
-      language="Python"
-      install="pipx install contract-lint"
-      href="/tools/contract-lint-cli/"
-      github="https://github.com/DrBaher/contract-lint-cli"
-      icon="/assets/icons/contract-lint-cli.svg"
-      version={meta['contract-lint-cli'].version}
-      versionSource={meta['contract-lint-cli'].source}
-      stars={meta['contract-lint-cli'].stars}
-      weeklyDownloads={meta['contract-lint-cli'].weeklyDownloads}
-      weeklyDownloadsSource={meta['contract-lint-cli'].weeklyDownloadsSource}
-    />
-    <ToolCard
-      title="compare-cli"
-      tagline="Clause-aware drift detection between two contract versions. Pre-signature gate with exit codes CI can branch on. No LLM tier."
-      language="Node.js"
-      install="npm i -g compare-cli"
-      href="/tools/compare-cli/"
-      github="https://github.com/DrBaher/compare-cli"
-      icon="/assets/icons/compare-cli.svg"
-      version={meta['compare-cli'].version}
-      versionSource={meta['compare-cli'].source}
-      stars={meta['compare-cli'].stars}
-      weeklyDownloads={meta['compare-cli'].weeklyDownloads}
-      weeklyDownloadsSource={meta['compare-cli'].weeklyDownloadsSource}
-    />
-    <ToolCard
-      title="docx2pdf-cli"
-      tagline="Honest DOCX → PDF conversion with batch processing, parallel runs, font validation, and pluggable backends."
-      language="Node.js"
-      install="npm i -g docx2pdf-cli"
-      href="/tools/docx2pdf-cli/"
-      github="https://github.com/DrBaher/docx2pdf-cli"
-      icon="/assets/icons/docx2pdf-cli.svg"
-      version={meta['docx2pdf-cli'].version}
-      versionSource={meta['docx2pdf-cli'].source}
-      stars={meta['docx2pdf-cli'].stars}
-      weeklyDownloads={meta['docx2pdf-cli'].weeklyDownloads}
-      weeklyDownloadsSource={meta['docx2pdf-cli'].weeklyDownloadsSource}
-    />
-    <ToolCard
-      title="sign-cli"
-      tagline="Fully-offline PAdES e-signature with hash-chained audit events, consent & attribution capture, RFC 3161 timestamps, and a 19-tool MCP server for agents."
-      language="TypeScript"
-      install="npx @drbaher/sign-cli@latest"
-      href="/tools/sign-cli/"
-      github="https://github.com/DrBaher/sign-cli"
-      icon="/assets/icons/sign-cli.svg"
-      version={meta['sign-cli'].version}
-      versionSource={meta['sign-cli'].source}
-      stars={meta['sign-cli'].stars}
-      weeklyDownloads={meta['sign-cli'].weeklyDownloads}
-      weeklyDownloadsSource={meta['sign-cli'].weeklyDownloadsSource}
-    />
-    <ToolCard
-      title="contract-vault-cli"
-      tagline="Post-signature layer: register signed contracts in a git-backed vault, then surface renewals, notice deadlines, and obligations as a queryable portfolio + an .ics calendar."
-      language="Python"
-      install="pipx install contract-vault"
-      href="/tools/contract-vault-cli/"
-      github="https://github.com/DrBaher/contract-vault-cli"
-      icon="/assets/icons/contract-vault-cli.svg"
-      version={meta['contract-vault-cli'].version}
-      versionSource={meta['contract-vault-cli'].source}
-      stars={meta['contract-vault-cli'].stars}
-      weeklyDownloads={meta['contract-vault-cli'].weeklyDownloads}
-      weeklyDownloadsSource={meta['contract-vault-cli'].weeklyDownloadsSource}
-    />
-  </div>
-
   <TryDemo
     href="https://contract-ops-playground-production.up.railway.app/?cli=nda-review"
     title="Try the NDA review live"
     blurb="Score an NDA against a house policy book and watch it flag every non-compliant clause, in a sandbox. No install. No sign-in."
   />
 
-  <h2>Built for an agent-first workflow</h2>
+  <h2>Two ways to use it</h2>
 
-  <p>
-    Most legal-tech assumes a human at a desk: dashboards, threaded comments, in-app redlining.
-    These CLIs assume the opposite — an LLM agent doing the operational work and a human approving
-    the things that legitimately need a human. Drafting, scoring, suggesting amendments, sending,
-    tracking: agent. Signing, escalating non-negotiable conflicts, accepting a final position:
-    human, with a deliberate gesture.
-  </p>
-
-  <div class="not-prose my-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
-    <div class="rounded-lg border border-accent-200 bg-mint-50 p-4 dark:border-accent-700/40 dark:bg-accent-900/15">
-      <div class="font-mono text-[11px] uppercase tracking-[0.14em] text-accent-700 dark:text-accent-300">Agent does</div>
-      <ul class="mt-2 space-y-1 text-[14px] text-ink-800 dark:text-night-100">
-        <li>Drafts NDAs from your house templates</li>
-        <li>Reviews counterparty docs against your policy</li>
-        <li>Proposes amendments using your stance + priorities</li>
-        <li>Sends documents for signature, tracks status</li>
-        <li>Verifies signed PDFs and audit chains</li>
-      </ul>
+  <div class="not-prose my-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+    <div class="rounded-lg border border-accent-200 bg-mint-50 p-5 dark:border-accent-700/40 dark:bg-accent-900/15">
+      <div class="font-mono text-[11px] uppercase tracking-[0.14em] text-accent-700 dark:text-accent-300">Run the ready-made agent</div>
+      <p class="mt-2 text-[14px] text-ink-800 dark:text-night-100">
+        One command, bring your own model. <code class="chip">contract-ops-agent</code> is an enclosed
+        agent whose only tools are the suite — it drafts, reviews, compares, and tracks, and asks
+        before it writes a file or signs anything.
+      </p>
+      <a href="/built-for-agents/#contract-ops-agent--the-ready-made-enclosed-agent" class="mt-3 inline-block text-[14px] font-medium text-accent-700 dark:text-accent-300">Run the agent →</a>
     </div>
-    <div class="rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-700/40 dark:bg-amber-900/15">
-      <div class="font-mono text-[11px] uppercase tracking-[0.14em] text-amber-700 dark:text-amber-200">Human approves</div>
-      <ul class="mt-2 space-y-1 text-[14px] text-ink-800 dark:text-night-100">
-        <li>Signing — every signature requires a per-signer token</li>
-        <li>Escalations on non-negotiable redlines</li>
-        <li>Accepting the final agreed position before finalize</li>
-        <li>Anything outside the deterministic policy guardrails</li>
-      </ul>
+    <div class="rounded-lg border border-ink-700/15 p-5 dark:border-night-300/20">
+      <div class="font-mono text-[11px] uppercase tracking-[0.14em] text-ink-600 dark:text-night-200">Wire it into your own agent or code</div>
+      <p class="mt-2 text-[14px] text-ink-800 dark:text-night-100">
+        Every CLI answers <code class="chip">--catalog json</code>, and <code class="chip">contract-ops-mcp</code>
+        exposes all nine over MCP to any client (Claude Code, Cursor, Codex). Same guardrails — signing
+        stays behind a human.
+      </p>
+      <a href="/built-for-agents/" class="mt-3 inline-block text-[14px] font-medium text-accent-700 dark:text-accent-300">Built for agents →</a>
     </div>
   </div>
 
-  <p>
-    The MCP server in <a href="/tools/sign-cli/">sign-cli</a> exposes every command to any
-    MCP-aware client (Claude Code, Cursor, Codex). Same per-signer guardrails — the agent never
-    sees the approval token, the human does. <a href="/mcp/">Read the MCP guide</a> for the wire-up,
-    or grab the hosted listing on <a href="https://smithery.ai/servers/drbaher/sign-cli" target="_blank" rel="noopener">Smithery</a> for one-click install into Claude Desktop, Cursor, and friends.
-  </p>
-
-  <h2>Why nine small tools instead of one big platform</h2>
-
-  <p>
-    Most contract operations products are SaaS suites. They want every step in one dashboard, every
-    document in their database, every signature behind their identity provider. That's a fine
-    business model for them, but it makes contract operations expensive, opaque, and — critically
-    for an agent-first workflow — hard for an agent to drive without scraping or RPA glue.
-  </p>
-
-  <p>
-    The nine CLIs here take the opposite stance. Each does one thing well. None of them require
-    an account, a subscription, or a network call you didn't ask for. An agent can drive them over
-    stdio or MCP; a human can drive them from a terminal. You can swap any one of them, fork them,
-    or audit the source end to end. Together they cover the same workflow a SaaS suite would, with
-    the documents and audit trail on your machine — and an interface an agent can use natively.
+  <p class="text-[14px] text-ink-700 dark:text-night-100">
+    Either way the split is the same: the agent does the operational work — drafting, scoring,
+    amending, sending, tracking — and a human approves what legitimately needs one, starting with
+    signing. <a href="/principles/">The principles</a> spell out what these tools refuse to do, and
+    <a href="/compare/">the comparison</a> covers why nine small tools beat one big platform for an
+    agent-first workflow.
   </p>
 
   <h2>Where to go from here</h2>
@@ -341,5 +177,5 @@ const jsonLd = {
     <li><a href="/principles/">Principles</a> — what these tools have in common and what they refuse to do.</li>
     <li><a href="/changelog/">Changelog</a> — what's new and what's coming next.</li>
   </ul>
-  <p class="text-[13px] text-ink-500 dark:text-night-200">Or jump straight to any tool from the cards above.</p>
+  <p class="text-[13px] text-ink-500 dark:text-night-200">Or jump straight to any tool from the table above.</p>
 </BaseLayout>
