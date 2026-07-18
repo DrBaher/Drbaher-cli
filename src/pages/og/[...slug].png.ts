@@ -41,6 +41,11 @@ const pages: Record<string, Page> = {
     title: 'The whole suite in five minutes',
     description: 'Every CLI ships a zero-config demo. Run all nine, then chain them over stdin into one pipeline.',
   },
+  agent: {
+    eyebrow: 'contract-ops-agent',
+    title: 'A contract agent in an enclosure',
+    description: 'A ready-made terminal agent whose only tools are the suite — no shell, no filesystem, no web, no signing, by construction. Bring any model; the enclosure is identical on every backend.',
+  },
   play: {
     eyebrow: 'Playground',
     title: 'Run the CLIs in your browser',

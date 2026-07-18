@@ -49,7 +49,7 @@ import CodeBlock from '../components/CodeBlock.astro';
         </tr>
         <tr>
           <td class="px-4 py-2.5 align-top">You don't want to <em>build</em> an agent</td>
-          <td class="px-4 py-2.5 align-top">Run the ready-made <a href="#contract-ops-agent--the-ready-made-enclosed-agent"><code class="chip">contract-ops-agent</code></a> — bring your own model</td>
+          <td class="px-4 py-2.5 align-top">Run the ready-made <a href="/agent/"><code class="chip">contract-ops-agent</code></a> — bring your own model</td>
         </tr>
       </tbody>
     </table>
@@ -74,7 +74,8 @@ import CodeBlock from '../components/CodeBlock.astro';
     that already wraps the whole suite — and it's <em>enclosed by construction</em>: the model's only tools are
     the contract-ops tools. No shell, no filesystem, no web, no signing — not by policy, by design. If a request
     can't be served by extract, lint, compare, draft, review, convert, negotiate, the vaults, or verify, the agent
-    literally has no way to do it.
+    literally has no way to do it. Full walkthrough — providers, fallback chains, the enclosure layers, signing
+    modes — on <a href="/agent/">the agent page</a>.
   </p>
 
   <p><strong>Bring your own model.</strong> Claude (an API key or your existing Claude Code login), OpenAI, or any
@@ -545,6 +546,7 @@ sign --version`}</CodeBlock>
   <h2>See also</h2>
 
   <ul>
+    <li><a href="/agent/">The agent</a> — contract-ops-agent, the suite's ready-made terminal agent (enclosure, any model, human-gated signing).</li>
     <li><a href="/mcp/">MCP guide</a> — full tool surface and read-only walkthrough.</li>
     <li><a href="https://openclaw.ai/" target="_blank" rel="noopener">OpenClaw</a> — the shell-running agent the suite has been tested with; runs the CLIs directly, no MCP.</li>
     <li><a href="https://github.com/DrBaher/template-vault-cli/blob/main/docs/INTEROP.md">template-vault-cli docs/INTEROP.md</a> — the suite's storage/output contract and shared LLM config.</li>

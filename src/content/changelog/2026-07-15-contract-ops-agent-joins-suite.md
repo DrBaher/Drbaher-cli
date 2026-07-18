@@ -16,4 +16,4 @@ The idea is the enclosure. The model's *only* tools are the contract-ops tools â
 - **NDA review & negotiation.** Score an NDA against your house playbook, generate clause-ready redlines, draft from a template, and run a round-based negotiation â€” with every binding commitment gated.
 - **Zero-setup option.** A Docker image bundles the agent, all the CLIs, and a PDF backend: `docker run -it --rm -v "$PWD:/workspace" -e OPENAI_API_KEY ghcr.io/drbaher/contract-ops-agent`.
 
-Install and run: `npm install -g contract-ops-agent`, then `contract-ops-agent` for a short setup wizard and a REPL. See the [Built for agents](/built-for-agents/#contract-ops-agent--the-ready-made-enclosed-agent) page for the full story, or the [repo](https://github.com/DrBaher/contract-ops-agent) for source and docs. MIT.
+Install and run: `npm install -g contract-ops-agent`, then `contract-ops-agent` for a short setup wizard and a REPL. See [the agent page](/agent/) for the full walkthrough, or the [repo](https://github.com/DrBaher/contract-ops-agent) for source and docs. MIT.

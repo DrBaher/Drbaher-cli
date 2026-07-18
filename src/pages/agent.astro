@@ -1,0 +1,208 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Callout from '../components/Callout.astro';
+import CodeBlock from '../components/CodeBlock.astro';
+---
+<BaseLayout
+  title="The agent"
+  active="agent"
+  description="contract-ops-agent: a ready-made terminal agent for contract work in an enclosure — its only tools are the contract-ops suite. No shell, no filesystem, no web, no signing. Bring any model."
+  toc
+>
+  <p class="eyebrow">contract-ops-agent</p>
+  <h1>A contract agent in an enclosure.</h1>
+
+  <p class="text-lg text-ink-700 dark:text-night-100">
+    Don't want to wire the suite into your own agent? <strong>contract-ops-agent</strong> is a
+    ready-made terminal agent whose <em>only</em> tools are the contract-ops suite, exposed through
+    <a href="/mcp/">contract-ops-mcp</a>. No shell, no filesystem access, no web, no signing — not
+    by policy but <strong>by construction</strong>. If a request can't be served by extract, lint,
+    compare, fill, convert, review, draft, negotiate, the vaults, or verify, the agent literally
+    has no way to do it.
+  </p>
+
+  <Callout label="TL;DR">
+    <code class="chip">npm install -g contract-ops-agent</code>, run it, answer a short wizard
+    (installed CLIs, workspace, model &amp; auth), and you're in a REPL where you type contract
+    requests in plain language. Works with Claude, OpenAI, Gemini, Grok, DeepSeek, OpenRouter,
+    Ollama, or any OpenAI-compatible endpoint — the enclosure is identical on every backend.
+    <a href="https://github.com/DrBaher/contract-ops-agent">Repo</a>.
+  </Callout>
+
+  <h2>Install &amp; run</h2>
+  <CodeBlock label="npm">{`npm install -g contract-ops-agent
+contract-ops-agent          # first run: a one-time setup wizard, then the REPL`}</CodeBlock>
+
+  <p>
+    Or zero-setup via Docker — the agent, all nine CLIs, and a PDF backend bundled; bring only a
+    model key. The named volume persists config and stored keys across runs:
+  </p>
+  <CodeBlock label="docker">{`docker run -it --rm \\
+  -v "$PWD:/workspace" \\
+  -v contract-ops-config:/config \\
+  -e OPENAI_API_KEY \\
+  ghcr.io/drbaher/contract-ops-agent`}</CodeBlock>
+
+  <p>
+    The local install needs the contract-ops CLIs on your PATH (the MCP server shells out to
+    them) — the wizard and <code class="chip">doctor</code> report which are missing and can
+    install them. macOS and Linux; Windows via WSL or the container. Config lives under
+    <code class="chip">~/.config/contract-ops-agent/</code>; any secret is stored in a separate
+    <code class="chip">0600</code> file, never in <code class="chip">config.json</code> or a
+    transcript.
+  </p>
+
+  <h2>What a session looks like</h2>
+  <p>
+    Type requests in plain language — "extract acme-nda.docx, score it against our playbook, and
+    show me what changed since round 2". Each executed tool is echoed as
+    <code class="chip">⚙ tool {'{args}'}</code>, and every turn ends with an accounting footer
+    (tool calls, cost or tokens). Consequential tools — <code class="chip">fill_template</code>,
+    <code class="chip">convert_to_pdf</code>, the <code class="chip">run</code> escape hatch —
+    stop and ask you first.
+  </p>
+  <CodeBlock label="the CLI surface">{`contract-ops-agent [--workspace <dir>] [--model <m>]   start the agent
+contract-ops-agent --resume [last|<transcript.jsonl>]  continue a prior conversation
+contract-ops-agent setup                               (re)run the setup wizard
+contract-ops-agent doctor                              check env, auth, signing + fallback config
+contract-ops-agent tool [<name> ['{json}']]            list tools, or run one directly (no model)
+contract-ops-agent usage                               per-session turns / tools / tokens / cost`}</CodeBlock>
+  <p>
+    In the REPL, <code class="chip">/help</code> lists commands and
+    <code class="chip">/model</code> switches the model mid-session
+    (<code class="chip">/model gemini</code> — context resets, the enclosure is re-verified).
+    Input can also be piped for scripted one-shot sessions:
+    <code class="chip">echo "lint agreement.md" | contract-ops-agent</code>. And
+    <code class="chip">tool</code> is the model-free path — it drives one CLI through the same
+    MCP mount, with the same path confinement and the same gates.
+  </p>
+  <p>
+    Every tool call, gate decision, and result is recorded to a JSONL transcript, which is what
+    <code class="chip">--resume</code> and <code class="chip">usage</code> read back.
+  </p>
+
+  <h2>Bring your own model</h2>
+  <p>The model is a config choice, not an architecture choice:</p>
+  <div class="not-prose my-5 overflow-x-auto rounded-lg border border-ink-700/10 dark:border-night-300/15">
+    <table class="w-full border-collapse text-[14px]">
+      <thead>
+        <tr class="border-b border-ink-700/15 bg-cream-100 text-left dark:border-night-300/20 dark:bg-night-600">
+          <th class="px-4 py-2.5 font-semibold text-ink-900 dark:text-night-50">Ref</th>
+          <th class="px-4 py-2.5 font-semibold text-ink-900 dark:text-night-50">Runs on</th>
+          <th class="px-4 py-2.5 font-semibold text-ink-900 dark:text-night-50">Auth</th>
+        </tr>
+      </thead>
+      <tbody class="text-ink-800 dark:text-night-100">
+        <tr class="border-b border-ink-700/10 dark:border-night-300/15">
+          <td class="px-4 py-2.5 align-top font-mono">claude</td>
+          <td class="px-4 py-2.5 align-top">Claude Agent SDK (default)</td>
+          <td class="px-4 py-2.5 align-top"><code class="chip">ANTHROPIC_API_KEY</code> or your existing Claude Code login</td>
+        </tr>
+        <tr class="border-b border-ink-700/10 dark:border-night-300/15">
+          <td class="px-4 py-2.5 align-top font-mono">openai/gpt-4o</td>
+          <td class="px-4 py-2.5 align-top">the agent's own tool-calling loop</td>
+          <td class="px-4 py-2.5 align-top"><code class="chip">OPENAI_API_KEY</code></td>
+        </tr>
+        <tr class="border-b border-ink-700/10 dark:border-night-300/15">
+          <td class="px-4 py-2.5 align-top font-mono">gemini/… grok/… deepseek/… openrouter/… ollama/…</td>
+          <td class="px-4 py-2.5 align-top">zero-config presets (ollama needs no key)</td>
+          <td class="px-4 py-2.5 align-top">the preset's key env var</td>
+        </tr>
+        <tr>
+          <td class="px-4 py-2.5 align-top font-mono">myendpoint/…</td>
+          <td class="px-4 py-2.5 align-top">any OpenAI-compatible endpoint via a <code class="chip">providers</code> config entry</td>
+          <td class="px-4 py-2.5 align-top">your choice of env var</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>
+    <strong>Fallback chains:</strong> list refs in config
+    (<code class="chip">{`"fallbacks": ["gemini/gemini-2.5-flash", "claude"]`}</code>) and the
+    agent fails over mid-conversation when a provider dies — terminal errors only; rate limits
+    just retry — replaying your unanswered message with the conversation re-seeded.
+    <code class="chip">doctor</code> validates every fallback ref and its key up front.
+  </p>
+
+  <Callout label="Local models have a real limit">
+    The agent exposes ~50 tools, and small local models (7B–14B) can't reliably pick from that
+    many — in testing, qwen2.5 7B <em>and</em> 14B both failed the full workflow. Frontier cloud
+    models (Claude, gpt-4o) handle all 50 cleanly (5/5). For Ollama, use a large model (32B+);
+    otherwise prefer a cloud model. Full data:
+    <a href="https://github.com/DrBaher/contract-ops-agent/blob/main/docs/model-eval.md">docs/model-eval.md</a>.
+  </Callout>
+
+  <h2>The enclosure</h2>
+  <p>
+    The guarantee is the same on every backend: the model only ever sees the contract-ops tools,
+    every consequential tool passes a human gate, and <strong>the session refuses to start if
+    anything else is mounted</strong>. On Claude (Agent SDK) that's three layers:
+  </p>
+  <ol>
+    <li><strong>Context stripping</strong> — <code class="chip">disallowedTools</code> removes every built-in and harness tool from the model's view.</li>
+    <li><strong>Gate deny</strong> — a <code class="chip">canUseTool</code> policy denies anything not matching <code class="chip">mcp__contract-ops__*</code>, and requires human approval for consequential tools.</li>
+    <li><strong>Startup assertion</strong> — the harness reads the SDK's init message and refuses to run unless every mounted tool is a contract-ops tool. This is the real guarantee; layers 1–2 are how it's satisfied.</li>
+  </ol>
+  <p>
+    On every other provider the harness owns the loop, so layer 1 is a property of construction —
+    the tool list handed to the model is built <em>only</em> from the contract-ops MCP server;
+    there are no built-ins to strip. The gate and the startup assertion are the same code on both
+    paths. And a provider failure never loses your session: transient errors retry with backoff,
+    anything else ends the <em>turn</em> — not the conversation — with a clear message.
+  </p>
+
+  <h2>Signing is opt-in, twice</h2>
+  <p>
+    By default signing is unreachable — the loop ends at "ready for signature" and hands off to
+    your own <a href="/tools/sign-cli/">sign-cli</a> flow. Two modes soften this deliberately;
+    both require <code class="chip">{`"signing": {"mode": …}`}</code> in config <em>and</em>
+    <code class="chip">--enable-signing</code> at launch:
+  </p>
+  <ul>
+    <li>
+      <strong><code class="chip">prepare</code></strong> mounts sign-cli's own MCP server
+      least-privilege (enforced by sign-cli itself via
+      <code class="chip">--read-only --tool …</code>): request tracking, audit/receipt
+      verification, field detection, preview stamps. The signing act does not exist in the session.
+    </li>
+    <li>
+      <strong><code class="chip">full</code></strong> adds the signing act (<code class="chip">sign</code>,
+      <code class="chip">document</code>, <code class="chip">signer_decline</code>). Every such
+      action stops at a <strong>typed gate</strong>: you must type the exact target (request id /
+      file name) back — y/N is not consent for a signature, and approvals are never remembered.
+      A signing act can only be approved from an interactive terminal; piped or scripted input can
+      never confirm a signature.
+    </li>
+  </ul>
+  <p>
+    In both modes the startup assertion accepts exactly that mode's sign tools and still fails on
+    anything unexpected. Design record:
+    <a href="https://github.com/DrBaher/contract-ops-agent/blob/main/docs/sign-mount-scope.md">docs/sign-mount-scope.md</a>.
+  </p>
+
+  <h2>NDA review &amp; negotiation</h2>
+  <p>
+    The agent also drives the full <a href="/tools/nda-review-cli/">nda-review-cli</a> surface:
+    score an NDA against your house playbook, generate clause-ready redlines, draft from a
+    template, and run a round-based negotiation. Signing a negotiation round is a binding
+    commitment, so — like signing itself — it stops at a typed-consent gate you approve.
+  </p>
+
+  <h2>Where it sits</h2>
+  <p>
+    Three ways to put an agent on the suite, in increasing order of assembly required:
+    this ready-made agent (nothing to wire), <a href="/mcp/">contract-ops-mcp</a> in your own
+    MCP-aware client (Claude Code, Cursor, Codex…), or the CLIs driven directly by a
+    shell-running agent (<a href="/built-for-agents/">built for agents</a>). The enclosure is
+    what the first buys you over the other two: a session that <em>cannot</em> touch anything
+    but contract work, on any model you point it at.
+  </p>
+
+  <Callout label="Next">
+    <a href="https://github.com/DrBaher/contract-ops-agent">The repo</a> ·
+    <a href="https://github.com/DrBaher/contract-ops-agent/blob/main/docs/providers.md">point it at any endpoint</a> ·
+    <a href="https://github.com/DrBaher/contract-ops-agent/blob/main/docs/model-eval.md">which models can drive it</a> ·
+    or wire the suite into your own agent via <a href="/mcp/">the MCP page</a>.
+  </Callout>
+</BaseLayout>

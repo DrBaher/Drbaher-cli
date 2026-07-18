@@ -145,9 +145,14 @@ sign mcp serve --read-only true \
   --tool request_show --tool audit_verify --tool pdf_detect_signature_field
 ```
 
+## The ready-made agent (contract-ops-agent)
+
+Don't want to wire up a client? **contract-ops-agent** (npm `contract-ops-agent`, repo `DrBaher/contract-ops-agent`, image `ghcr.io/drbaher/contract-ops-agent`) is a terminal agent whose ONLY tools are the suite via contract-ops-mcp — no shell, no filesystem, no web, no signing, by construction (a startup assertion refuses to run the session if anything else is mounted; consequential tools pass a human gate). Bring any model: Claude (API key or Claude Code login), OpenAI, presets for Gemini/Grok/DeepSeek/OpenRouter/Ollama, or any OpenAI-compatible endpoint; `fallbacks` chains fail over mid-conversation. Signing is opt-in twice (`signing.mode` in config + `--enable-signing`): `prepare` mounts sign-cli read-only, `full` adds the signing act behind a typed-consent gate (interactive terminal only). Subcommands: `setup`, `doctor`, `tool` (model-free single tool call), `usage`, `--resume`. Caveat: ~50 tools are exposed — small local models (7B–14B) fail to pick from that many; use frontier cloud models or 32B+ local. Guide: https://cli.drbaher.com/agent/
+
 ## Key URLs for agents
 
 - Suite home: https://cli.drbaher.com/
+- The ready-made agent (enclosure REPL, any model): https://cli.drbaher.com/agent/
 - 5-minute tour: https://cli.drbaher.com/tour/
 - Playground (run all nine in-browser): https://cli.drbaher.com/play/
 - Workflow walkthrough: https://cli.drbaher.com/workflow/
